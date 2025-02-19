@@ -13,4 +13,4 @@ srun bash -c "lm-eval --model_args=\"pretrained=$MODEL_NAME_OR_PATH,revision=mai
 --tasks=$2 \
 --batch_size=auto \
 --log_samples \
---output_path=./results/$2"
+--output_path=$3/$2"

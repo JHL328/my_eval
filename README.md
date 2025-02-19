@@ -8,7 +8,6 @@
 ## Quick Start
 ```
 python main.py
-
 ```
 
 Currently it supports 5 benchmarks: 

@@ -2,7 +2,7 @@ set -ex
 
 PROMPT_TYPE=$1
 MODEL_NAME_OR_PATH=$2
-OUTPUT_DIR=/mbz/users/yuqi.wang/RL-Eval/results
+OUTPUT_DIR=$3
 
 SPLIT="test"
 NUM_TEST_SAMPLE=-1
