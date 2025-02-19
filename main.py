@@ -10,7 +10,11 @@ for benchmark in BENCHMARKS:
         subprocess.run([
             "sbatch",
             "./sbatch_scripts/aime.sh",
-            MODEL_NAME_OR_PATH
+            MODEL_NAME_OR_PATH,
+            # prompt type
+            # ./qwen2.5-math/evaluation/utils.py
+            # choose from PROMPT_TEMPLATES
+            "qwen25-math-cot",
         ], check=True)
     else:
         subprocess.run([

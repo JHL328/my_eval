@@ -11,4 +11,4 @@ MODEL_NAME_OR_PATH=$1
 source /mbz/users/yuqi.wang/miniconda3/bin/activate qwen-eval
 cd ./qwen2.5-math/evaluation
 # it can support multi-gpu
-srun bash -c "bash sh/eval.sh qwen25-math-cot $MODEL_NAME_OR_PATH"
+srun bash -c "bash sh/eval.sh $2 $MODEL_NAME_OR_PATH"
