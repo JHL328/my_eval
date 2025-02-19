@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=eval_aime
+#SBATCH --job-name=eval_qwen2.5_math
 #SBATCH --partition=mbzuai
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:1

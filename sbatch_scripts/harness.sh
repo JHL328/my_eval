@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=eval_aime
+#SBATCH --job-name=eval_harness
 #SBATCH --partition=mbzuai
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:1
@@ -13,4 +13,4 @@ srun bash -c "lm-eval --model_args=\"pretrained=$MODEL_NAME_OR_PATH,revision=mai
 --tasks=$2 \
 --batch_size=auto \
 --log_samples \
---output_path=/mbz/users/yuqi.wang/RL-Eval/results/$2"
+--output_path=./results/$2"
