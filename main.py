@@ -4,9 +4,9 @@ import subprocess
 
 MODEL_NAME_OR_PATH="Qwen/Qwen2.5-Math-1.5B-Instruct"
 BENCHMARKS=["aime24", "math", "gpqa", "ifeval", "mmlu", "mmlu_pro"]
-BENCHMARKS=["aime24", "math", "gpqa", "ifeval", "mmlu"]
+BENCHMARKS=["aime24"]
 OUTPUT_DIR = "./results"
-SKIP_COMPLETED = True
+SKIP_COMPLETED = False
 
 
 def is_completed(path):
@@ -14,7 +14,6 @@ def is_completed(path):
 
 
 model_name_or_path_re = MODEL_NAME_OR_PATH.replace("/", "__")
-benchmark_output_dir = [os.path.join(OUTPUT_DIR, benchmark) for benchmark in BENCHMARKS]
 for benchmark in BENCHMARKS:
     # skip completed eval when enabled
     if SKIP_COMPLETED and is_completed(os.path.join(OUTPUT_DIR, benchmark, model_name_or_path_re)):
@@ -30,6 +29,7 @@ for benchmark in BENCHMARKS:
             # choose from PROMPT_TEMPLATES
             "qwen25-math-cot",
             MODEL_NAME_OR_PATH,
+            benchmark,
             os.path.abspath(OUTPUT_DIR)
         ], check=True)
     # supported by lm-evalulation-harness

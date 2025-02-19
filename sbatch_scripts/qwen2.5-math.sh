@@ -10,4 +10,4 @@
 source /mbz/users/yuqi.wang/miniconda3/bin/activate qwen-eval
 cd ./qwen2.5-math/evaluation
 # it can support multi-gpu
-srun bash -c "bash sh/eval.sh $1 $2 $3"
+srun bash -c "bash sh/eval.sh $1 $2 $3 $4"
