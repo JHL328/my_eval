@@ -3,7 +3,8 @@ set -ex
 PROMPT_TYPE=$1
 MODEL_NAME_OR_PATH=$2
 DATA_NAME=$3
-OUTPUT_DIR=$4
+MAX_TOKENS_PER_CALL=$4
+OUTPUT_DIR=$5
 
 SPLIT="test"
 NUM_TEST_SAMPLE=-1
@@ -23,6 +24,7 @@ python3 -u math_eval.py \
     --temperature 0 \
     --n_sampling 1 \
     --top_p 1 \
+    --max_tokens_per_call ${MAX_TOKENS_PER_CALL} \
     --start 0 \
     --end -1 \
     --use_vllm \

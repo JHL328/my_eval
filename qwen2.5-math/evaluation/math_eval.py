@@ -51,6 +51,12 @@ def parse_args():
         action="store_true",
         help="Few shot for multiple-choice questions, zero shot for others.",
     )
+    parser.add_argument(
+        "--vllm_maxlen",
+        default=4096,
+        type=int,
+        help="Maximum sequence (prompt + response) length of the vLLM engine"
+    )
     args = parser.parse_args()
     args.top_p = (
         1 if args.temperature == 0 else args.top_p
@@ -116,6 +122,7 @@ def setup(args):
             tensor_parallel_size=len(available_gpus) // args.pipeline_parallel_size,
             pipeline_parallel_size=args.pipeline_parallel_size,
             trust_remote_code=True,
+            max_model_len=args.vllm_maxlen
         )
         tokenizer = None
         if args.apply_chat_template:
