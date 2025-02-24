@@ -19,7 +19,7 @@ conda create -n harness-eval python=3.10
 conda activate harness-eval
 cd ./lm-evaluation-harness
 pip install -e .
-pip install langdetect
+pip install langdetect, immutabledict
 ```
 
 
