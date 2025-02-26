@@ -2,9 +2,9 @@ import os
 import subprocess
 
 
-MODEL_NAME_OR_PATH="Qwen/Qwen2.5-Math-1.5B-Instruct"
+MODEL_NAME_OR_PATH="Qwen/Qwen2.5-32B-Instruct"
 BENCHMARKS=["aime24", "math", "gpqa", "ifeval", "mmlu", "mmlu_pro"]
-BENCHMARKS=["aime24", "math"]
+# BENCHMARKS=["mmlu"]
 OUTPUT_DIR = "./results"
 SKIP_COMPLETED = False
 

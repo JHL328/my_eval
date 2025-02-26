@@ -27,6 +27,7 @@ python3 -u math_eval.py \
     --max_tokens_per_call ${MAX_TOKENS_PER_CALL} \
     --start 0 \
     --end -1 \
+    --apply_chat_template \
     --use_vllm \
     --save_outputs \
     --overwrite \

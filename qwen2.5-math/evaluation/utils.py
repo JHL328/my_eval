@@ -150,6 +150,11 @@ PROMPT_TEMPLATES = {
         "{output}",
         "\n\n",
     ),
+    "internal-rl": (
+        "{input} Let's think step by step and output the final answer within \\boxed{{}}.",
+        "{output}",
+        "\n\n",
+    ),
     "internlm-math-fs": ("Question:{input}\nAnswer:", "{output}", "\n"),
     "internlm-math-chat": (
         "<|im_start|>user\n{input}<|im_end|>\n" "<|im_start|>assistant\n",
