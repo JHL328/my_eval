@@ -21,10 +21,11 @@ cd ./lm-evaluation-harness
 pip install -e .
 pip install langdetect, immutabledict
 ```
-
+> [!IMPORTANT]  
+> Currently we are seeing OOM issues in MMLU evaluation with lm_eval using vllm as backend, this is [a known bug](https://github.com/EleutherAI/lm-evaluation-harness/issues/2490). To bypass this, users need to add `prompt_logprobs=1` to `SamplingParams` in function `_dummy_run` in vllm: `vllm/worker/model_runner.py`.
 
 ## Quick Start
-update `MODEL_NAME_OR_PATH` in `main.py` and run
+update `MODEL_NAME_OR_PATH` and `BENCHMARKS_TO_RUN` in `main.py` and run
 ```
 python main.py
 ```

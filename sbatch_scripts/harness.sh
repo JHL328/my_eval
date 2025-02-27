@@ -24,4 +24,5 @@ srun bash -c "lm_eval --model vllm \
     --log_samples \
     --apply_chat_template \
     --gen_kwargs temperature=0,top_p=1 \
-    --output_path=$3/$2"
+    --num_fewshot $3 \
+    --output_path=$4/$2"

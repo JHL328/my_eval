@@ -2,9 +2,35 @@ import os
 import subprocess
 
 
-MODEL_NAME_OR_PATH="Qwen/Qwen2.5-32B-instruct"
-BENCHMARKS=["aime24", "math", "gpqa", "ifeval", "mmlu", "mmlu_pro"]
-# BENCHMARKS=["mmlu"]
+MODEL_NAME_OR_PATH = "Qwen/Qwen2.5-32B"
+BENCHMARKS_TO_RUN = ["aime24", "math", "gpqa", "ifeval", "mmlu", "mmlu_pro"]
+BENCHMARKS_TO_RUN = ["aime24"]
+SUPPORTED_BENCHMARKS = {
+    "aime24": {
+        "n_fewshot": 0,
+        "n_sampling": 16
+    },
+    "math": {
+        "n_fewshot": 5,
+        "n_sampling": 1
+    },
+    "gpqa": {
+        "n_fewshot": 5,
+        "n_sampling": 1
+    },
+    "ifeval": {
+        "n_fewshot": 0,
+        "n_sampling": 1
+    },
+    "mmlu": {
+        "n_fewshot": 5,
+        "n_sampling": 1
+    },
+    "mmlu_pro": {
+        "n_fewshot": 5,
+        "n_sampling": 1
+    }
+}
 OUTPUT_DIR = "./results"
 SKIP_COMPLETED = False
 
@@ -14,7 +40,7 @@ def is_completed(path):
 
 
 model_name_or_path_re = MODEL_NAME_OR_PATH.replace("/", "__")
-for benchmark in BENCHMARKS:
+for benchmark in BENCHMARKS_TO_RUN:
     # skip completed eval when enabled
     if SKIP_COMPLETED and is_completed(os.path.join(OUTPUT_DIR, benchmark, model_name_or_path_re)):
         print(f"skipping {benchmark}...")
@@ -29,9 +55,11 @@ for benchmark in BENCHMARKS:
             # choose from PROMPT_TEMPLATES
             # for qwen2.5-32B, use "qwen25"
             # for qwen2.5-32B-instruct, use "qwen2.5-instruct"
-            "qwen25-instruct",
+            "qwen25",
             MODEL_NAME_OR_PATH,
             benchmark,
+            str(SUPPORTED_BENCHMARKS[benchmark]["n_fewshot"]),
+            str(SUPPORTED_BENCHMARKS[benchmark]["n_sampling"]),
             # max tokens per call
             "131072",
             os.path.abspath(OUTPUT_DIR)
@@ -43,5 +71,6 @@ for benchmark in BENCHMARKS:
             "./sbatch_scripts/harness.sh",
             MODEL_NAME_OR_PATH,
             benchmark,
+            str(SUPPORTED_BENCHMARKS[benchmark]["n_fewshot"]),
             OUTPUT_DIR
         ], check=True)

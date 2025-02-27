@@ -3,8 +3,10 @@ set -ex
 PROMPT_TYPE=$1
 MODEL_NAME_OR_PATH=$2
 DATA_NAME=$3
-MAX_TOKENS_PER_CALL=$4
-OUTPUT_DIR=$5
+N_FEWSHOT=$4
+N_SAMPLING=$5
+MAX_TOKENS_PER_CALL=$6
+OUTPUT_DIR=$7
 
 SPLIT="test"
 NUM_TEST_SAMPLE=-1
@@ -22,7 +24,7 @@ python3 -u math_eval.py \
     --num_test_sample ${NUM_TEST_SAMPLE} \
     --seed 0 \
     --temperature 0 \
-    --n_sampling 1 \
+    --n_sampling ${N_SAMPLING} \
     --top_p 1 \
     --max_tokens_per_call ${MAX_TOKENS_PER_CALL} \
     --start 0 \
@@ -31,6 +33,7 @@ python3 -u math_eval.py \
     --use_vllm \
     --save_outputs \
     --overwrite \
+    --num_shots ${N_FEWSHOT}
 
 # English multiple-choice datasets
 # DATA_NAME="aqua,sat_math,mmlu_stem"
