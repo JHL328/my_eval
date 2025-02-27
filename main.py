@@ -2,7 +2,7 @@ import os
 import subprocess
 
 
-MODEL_NAME_OR_PATH="Qwen/Qwen2.5-32B-Instruct"
+MODEL_NAME_OR_PATH="Qwen/Qwen2.5-32B-instruct"
 BENCHMARKS=["aime24", "math", "gpqa", "ifeval", "mmlu", "mmlu_pro"]
 # BENCHMARKS=["mmlu"]
 OUTPUT_DIR = "./results"
@@ -27,11 +27,13 @@ for benchmark in BENCHMARKS:
             # prompt type
             # ./qwen2.5-math/evaluation/utils.py
             # choose from PROMPT_TEMPLATES
-            "qwen25-math-cot",
+            # for qwen2.5-32B, use "qwen25"
+            # for qwen2.5-32B-instruct, use "qwen2.5-instruct"
+            "qwen25-instruct",
             MODEL_NAME_OR_PATH,
             benchmark,
             # max tokens per call
-            "32768",
+            "131072",
             os.path.abspath(OUTPUT_DIR)
         ], check=True)
     # supported by lm-evalulation-harness
