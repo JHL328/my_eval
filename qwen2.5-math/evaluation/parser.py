@@ -386,7 +386,7 @@ def choice_answer_clean(pred: str):
     pred = pred.strip("\n").rstrip(".").rstrip("/").strip(" ").lstrip(":")
 
     # Clean the answer based on the dataset
-    tmp = re.findall(r"\b(A|B|C|D|E)\b", pred.upper())
+    tmp = re.findall(r"\b(A|B|C|D|E|F|G|H|I|J)\b", pred.upper())
     if tmp:
         pred = tmp
     else:
@@ -498,7 +498,7 @@ def extract_theoremqa_answer(pred: str, answer_flag: bool = True):
 
 def extract_answer(pred_str, data_name, use_last_number=True):
     pred_str = pred_str.replace("\u043a\u0438", "")
-    if data_name in ["mmlu_stem", "sat_math", "aqua", "gaokao2023"]:
+    if data_name in ["mmlu_stem", "sat_math", "aqua", "gaokao2023", "mmlu_pro", "mmlu"]:
         # TODO check multiple choice
         return choice_answer_clean(pred_str)
 
@@ -609,7 +609,7 @@ def parse_ground_truth(example: Dict[str, Any], data_name):
                 gt_ans = float(gt_ans)
     elif data_name == "carp_en":
         gt_cot, gt_ans = example["steps"], example["answer"]
-    elif data_name == "mmlu_stem":
+    elif data_name in ["mmlu_stem", "mmlu"]:
         abcd = "ABCD"
         gt_cot, gt_ans = None, abcd[example["answer"]]
     elif data_name == "sat_math":
@@ -634,6 +634,9 @@ def parse_ground_truth(example: Dict[str, Any], data_name):
         "gaokao2024_I",
         "gaokao2024_II",
         "imo2024",
+        "gpqa_main",
+        "gpqa_diamond",
+        "mmlu_pro"
     ]:
         gt_cot, gt_ans = None, example["answer"]
     else:
@@ -672,10 +675,17 @@ def parse_question(example, data_name):
             )
     elif data_name == "carp_en":
         question = example["content"]
-    elif data_name == "mmlu_stem":
+    elif data_name in ["mmlu_stem", "mmlu"]:
         options = example["choices"]
         assert len(options) == 4
         for i, (label, option) in enumerate(zip("ABCD", options)):
+            options[i] = f"({label}) {str(option).strip()}"
+        options = " ".join(options)
+        # question = f"{example['question'].strip()}\nWhat of the following is the right choice? Explain your answer.\n{options}"
+        question = f"{example['question'].strip()}\nAnswer Choices: {options}"
+    elif data_name == "mmlu_pro":
+        options = example["choices"]
+        for i, (label, option) in enumerate(zip("ABCDEFGHIJ", options)):
             options[i] = f"({label}) {str(option).strip()}"
         options = " ".join(options)
         # question = f"{example['question'].strip()}\nWhat of the following is the right choice? Explain your answer.\n{options}"

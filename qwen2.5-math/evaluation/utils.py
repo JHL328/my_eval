@@ -60,7 +60,7 @@ def load_prompt(data_name, prompt_type, num_shots):
         data_name = "gsm8k"
     if data_name in ["math_oai", "hungarian_exam", "math-oai", "aime24", "amc23"]:
         data_name = "math"
-    if data_name in ["sat_math"]:
+    if data_name in ["sat_math", "gpqa_main", "gpqa_diamond", "mmlu"]:
         data_name = "mmlu_stem"
     if data_name in [
         "gaokao2024_I",
@@ -151,6 +151,11 @@ PROMPT_TEMPLATES = {
         "<|im_start|>assistant\n",
         "{output}",
         "\n\n",
+    ),
+    "deepseek-distill-qwen": (
+        "<|begin▁of▁sentence|><|User|>{input}<|Assistant|><think>\n",
+        "{output}",
+        "\n\n"
     ),
     "qwen25-math-cot": (
         "<|im_start|>system\nPlease reason step by step, and put your final answer within \\boxed{{}}.<|im_end|>\n"

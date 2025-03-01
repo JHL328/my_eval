@@ -18,7 +18,7 @@ source /mbz/users/yuqi.wang/miniconda3/bin/activate harness-eval
 # --output_path=$3/$2"
 
 srun bash -c "lm_eval --model vllm \
-    --model_args pretrained=$MODEL_NAME_OR_PATH,tensor_parallel_size=8,dtype=bfloat16,gpu_memory_utilization=0.8,data_parallel_size=1 \
+    --model_args pretrained=$MODEL_NAME_OR_PATH,tensor_parallel_size=8,dtype=bfloat16,max_model_len=4096,gpu_memory_utilization=0.8,data_parallel_size=1 \
     --tasks $2 \
     --batch_size auto \
     --log_samples \
