@@ -7,12 +7,16 @@ import subprocess
 # MODEL_NAME_OR_PATH = "/mbz/users/yuqi.wang/LLaMA-Factory/saves/qwen2.5-32b-instruct/full/iq_sft/checkpoint-1000/"
 # COLDSTART
 # MODEL_NAME_OR_PATH = "/mbz/users/richard.fan/LLaMA-Factory/qwen32b_instruct_coldstart"
+# MODEL_NAME_OR_PATH = "/mbz/users/richard.fan/LLaMA-Factory/saves/qwen2.5-32b-instruct-5epochs/full/sft/checkpoint-80"
+MODEL_NAME_OR_PATH = "/mbz/users/richard.fan/LLaMA-Factory/saves/qwen2.5-32b-instruct-16-gpu-5epochs/full/sft/checkpoint-315"
 # QWEN2.5-32B
-MODEL_NAME_OR_PATH = "Qwen/Qwen2.5-32B"
+# MODEL_NAME_OR_PATH = "Qwen/Qwen2.5-32B"
 # QWEN2.5-32B-instruct
 # MODEL_NAME_OR_PATH =  "Qwen/Qwen2.5-32B-instruct"
 # DEEPSEEK-R1-DISTILL-QWEN-32B
 # MODEL_NAME_OR_PATH =  "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
+# INTERNAL_RL
+# MODEL_NAME_OR_PATH = "/mbz/users/shibo.hao/Reasoning360/checkpoints/Reasoning360/shibo-math-grpo-32nodes-setting2-Qwen2.5-32B/global_step_480/actor/huggingface"
 
 # BENCHMARKS_TO_RUN = ["aime24", "math", "gpqa", "mmlu_pro", "mmlu", "ifeval"]
 BENCHMARKS_TO_RUN = ["math"]
@@ -23,7 +27,7 @@ SUPPORTED_BENCHMARKS = {
         "n_sampling": 1
     },
     "math": {
-        "n_fewshot": 4,
+        "n_fewshot": 0,
         "n_sampling": 1
     },
     "gpqa": {
@@ -70,7 +74,7 @@ for benchmark in BENCHMARKS_TO_RUN:
         print("=" * 50)
         continue
     # supported by qwen2.5-math
-    if benchmark in ["aime24", "math"]:
+    if benchmark in ["aime24", "math", "gpqa"]:
         # prompt_type = SUPPORTED_TEMPLATES.get(MODEL_NAME_OR_PATH, "internal-rl")
         print(f"qwen2.5-math running target benchmark: {benchmark}...")
         print("=" * 50)
@@ -79,7 +83,7 @@ for benchmark in BENCHMARKS_TO_RUN:
         #     "./sbatch_scripts/qwen2.5-math.sh",
         #     # ./qwen2.5-math/evaluation/utils.py
         #     # choose from PROMPT_TEMPLATES
-        #     "qwen25-math-cot",
+        #     "qwen25-instruct-no-sytem",
         #     MODEL_NAME_OR_PATH,
         #     benchmark,
         #     str(SUPPORTED_BENCHMARKS[benchmark]["n_fewshot"]),

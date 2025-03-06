@@ -6,7 +6,8 @@ DATA_NAME=$3
 N_FEWSHOT=$4
 N_SAMPLING=$5
 MAX_TOKENS_PER_CALL=$6
-OUTPUT_DIR=$7
+TEMPERATURE=$7
+OUTPUT_DIR=$8
 
 SPLIT="test"
 NUM_TEST_SAMPLE=-1
@@ -23,7 +24,7 @@ python3 -u math_eval.py \
     --prompt_type ${PROMPT_TYPE} \
     --num_test_sample ${NUM_TEST_SAMPLE} \
     --seed 0 \
-    --temperature 0 \
+    --temperature ${TEMPERATURE} \
     --n_sampling ${N_SAMPLING} \
     --top_p 1 \
     --max_tokens_per_call ${MAX_TOKENS_PER_CALL} \

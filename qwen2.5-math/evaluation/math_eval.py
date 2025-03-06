@@ -76,9 +76,11 @@ def prepare_data(data_name, args):
     if args.shuffle:
         random.seed(datetime.now().timestamp())
         random.shuffle(examples)
+    if args.end == -1:
+        args.end = len(examples)
 
     # select start and end
-    examples = examples[args.start : len(examples) if args.end == -1 else args.end]
+    examples = examples[args.start : args.end]
 
     # get out_file name
     dt_string = datetime.now().strftime("%m-%d_%H-%M")
@@ -88,7 +90,8 @@ def prepare_data(data_name, args):
     output_dir = args.output_dir
     if not os.path.exists(output_dir):
         output_dir = f"outputs/{output_dir}"
-    out_file = f"{output_dir}/{data_name}/{model_name_or_path_re}/{out_file_prefix}_s{args.start}_e{args.end}.jsonl"
+    
+    out_file = f"{output_dir}/{data_name}/{model_name_or_path_re}/{out_file_prefix}_k{args.n_sampling}_s{args.start}_e{args.end}.jsonl"
     os.makedirs(f"{output_dir}/{data_name}", exist_ok=True)
     os.makedirs(f"{output_dir}/{data_name}/{model_name_or_path_re}", exist_ok=True)
 

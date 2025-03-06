@@ -10,4 +10,4 @@
 source /mbz/users/yuqi.wang/miniconda3/bin/activate qwen-eval
 cd ./qwen2.5-math/evaluation
 # it can support multi-gpu
-srun bash -c "export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 && bash sh/eval.sh $1 $2 $3 $4 $5 $6 $7"
+srun bash -c "export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5,6,7 && bash sh/eval.sh $1 $2 $3 $4 $5 $6 $7 $8"

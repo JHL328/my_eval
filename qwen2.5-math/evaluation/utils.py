@@ -145,6 +145,12 @@ PROMPT_TEMPLATES = {
         "{output}",
         "\n\n",
     ),
+     "qwen25-instruct-no-sytem": (
+        "<|im_start|>user\n{input}<|im_end|>\n"
+        "<|im_start|>assistant\n",
+        "{output}",
+        "\n\n",
+    ),
     "qwen25": (
         "<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n"
         "<|im_start|>user\n{input}<|im_end|>\n"
