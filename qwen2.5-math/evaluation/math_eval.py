@@ -125,7 +125,7 @@ def setup(args):
             tensor_parallel_size=len(available_gpus) // args.pipeline_parallel_size,
             pipeline_parallel_size=args.pipeline_parallel_size,
             trust_remote_code=True,
-            max_model_len=args.vllm_maxlen
+            # max_model_len=args.vllm_maxlen
         )
         tokenizer = None
         if args.apply_chat_template:
@@ -243,7 +243,7 @@ def main(llm, tokenizer, data_name, args):
 
     max_func_call = 1 if args.prompt_type in ["cot", "pal"] else 4
 
-    stop_words = ["</s>", "<|im_end|>", "<|endoftext|>"]
+    stop_words = ["</s>", "<|im_end|>", "<|endoftext|>", "</think>"]
 
     if args.prompt_type in ["cot"]:
         stop_words.append("\n\nQuestion:")

@@ -106,7 +106,7 @@ def infer(args):
                                      max_tokens=args.max_tokens, 
                                      n=factor,
                                      top_p=args.top_p,
-                                     stop=["</s>", "<|im_end|>", "<|endoftext|>"]
+                                     stop=["</s>", "<|im_end|>", "<|endoftext|>", "</think>"]
                                      )
     
     examples = load_data(args.data_name, args.split, args.data_dir)

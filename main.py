@@ -8,18 +8,18 @@ import subprocess
 # COLDSTART
 # MODEL_NAME_OR_PATH = "/mbz/users/richard.fan/LLaMA-Factory/qwen32b_instruct_coldstart"
 # MODEL_NAME_OR_PATH = "/mbz/users/richard.fan/LLaMA-Factory/saves/qwen2.5-32b-instruct-5epochs/full/sft/checkpoint-80"
-MODEL_NAME_OR_PATH = "/mbz/users/richard.fan/LLaMA-Factory/saves/qwen2.5-32b-instruct-16-gpu-5epochs/full/sft/checkpoint-315"
+# MODEL_NAME_OR_PATH = "/mbz/users/richard.fan/LLaMA-Factory/saves/qwen2.5-32b-instruct-16-gpu-5epochs/full/sft/checkpoint-315"
 # QWEN2.5-32B
 # MODEL_NAME_OR_PATH = "Qwen/Qwen2.5-32B"
 # QWEN2.5-32B-instruct
 # MODEL_NAME_OR_PATH =  "Qwen/Qwen2.5-32B-instruct"
 # DEEPSEEK-R1-DISTILL-QWEN-32B
-# MODEL_NAME_OR_PATH =  "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
+MODEL_NAME_OR_PATH =  "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
 # INTERNAL_RL
 # MODEL_NAME_OR_PATH = "/mbz/users/shibo.hao/Reasoning360/checkpoints/Reasoning360/shibo-math-grpo-32nodes-setting2-Qwen2.5-32B/global_step_480/actor/huggingface"
 
 # BENCHMARKS_TO_RUN = ["aime24", "math", "gpqa", "mmlu_pro", "mmlu", "ifeval"]
-BENCHMARKS_TO_RUN = ["math"]
+BENCHMARKS_TO_RUN = ["aime24", "math"]
 
 SUPPORTED_BENCHMARKS = {
     "aime24": {
@@ -78,48 +78,21 @@ for benchmark in BENCHMARKS_TO_RUN:
         # prompt_type = SUPPORTED_TEMPLATES.get(MODEL_NAME_OR_PATH, "internal-rl")
         print(f"qwen2.5-math running target benchmark: {benchmark}...")
         print("=" * 50)
-        # subprocess.run([
-        #     "sbatch",
-        #     "./sbatch_scripts/qwen2.5-math.sh",
-        #     # ./qwen2.5-math/evaluation/utils.py
-        #     # choose from PROMPT_TEMPLATES
-        #     "qwen25-instruct-no-sytem",
-        #     MODEL_NAME_OR_PATH,
-        #     benchmark,
-        #     str(SUPPORTED_BENCHMARKS[benchmark]["n_fewshot"]),
-        #     str(SUPPORTED_BENCHMARKS[benchmark]["n_sampling"]),
-        #     # max tokens per call
-        #     "32768",
-        #     str(TEMPERATURE),
-        #     os.path.abspath(OUTPUT_DIR)
-        # ], check=True)
-        if SUPPORTED_BENCHMARKS[benchmark]["n_fewshot"] == 0:
-            subprocess.run([
-                "sbatch",
-                "./sbatch_scripts/qwen2.5-math-limo.sh",
-                MODEL_NAME_OR_PATH,
-                benchmark,
-                "qwen-instruct",
-                str(TEMPERATURE),
-                str(SUPPORTED_BENCHMARKS[benchmark]["n_sampling"]),
-                # max tokens per call
-                "32768",
-                os.path.abspath(OUTPUT_DIR)
-            ], check=True)
-        else:
-            subprocess.run([
-                "sbatch",
-                "./sbatch_scripts/qwen2.5-math-limo.sh",
-                MODEL_NAME_OR_PATH,
-                benchmark,
-                "qwen-instruct",
-                str(TEMPERATURE),
-                str(SUPPORTED_BENCHMARKS[benchmark]["n_sampling"]),
-                # max tokens per call
-                "32768",
-                os.path.abspath(OUTPUT_DIR),
-                str(SUPPORTED_BENCHMARKS[benchmark]["n_fewshot"])
-            ], check=True)
+        subprocess.run([
+            "sbatch",
+            "./sbatch_scripts/qwen2.5-math.sh",
+            # ./qwen2.5-math/evaluation/utils.py
+            # choose from PROMPT_TEMPLATES
+            "qwen25-math-cot",
+            MODEL_NAME_OR_PATH,
+            benchmark,
+            str(SUPPORTED_BENCHMARKS[benchmark]["n_fewshot"]),
+            str(SUPPORTED_BENCHMARKS[benchmark]["n_sampling"]),
+            # max tokens per call
+            "32768",
+            str(TEMPERATURE),
+            os.path.abspath(OUTPUT_DIR)
+        ], check=True)
     # supported by lm-evalulation-harness
     else:
         print(f"lm-evalulation-harness running target benchmark: {benchmark}...")
