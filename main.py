@@ -11,6 +11,7 @@ import subprocess
 # MODEL_NAME_OR_PATH = "/mbz/users/richard.fan/LLaMA-Factory/saves/qwen2.5-32b-instruct-5epochs/full/sft/checkpoint-80"
 # MODEL_NAME_OR_PATH = "/mbz/users/yuqi.wang/RL-eval/models/coldstart-2"
 # MODEL_NAME_OR_PATH = "/mbz/users/yuqi.wang/RL-eval/models/coldstart-3"
+MODEL_NAME_OR_PATH = "/mbz/users/richard.fan/LLaMA-Factory/saves/qwen2.5-32b-instruct-16-gpu-5epochs-20kcutoff-112cpu/full/sft/checkpoint-315"
 # MODEL_NAME_OR_PATH = "/mbz/users/richard.fan/LLaMA-Factory/saves/qwen2.5-32b-instruct-16-gpu-5epochs/full/sft/checkpoint-315"
 # QWEN2.5-32B
 # MODEL_NAME_OR_PATH = "Qwen/Qwen2.5-32B"
@@ -22,10 +23,10 @@ import subprocess
 # MODEL_NAME_OR_PATH = "meta-llama/Llama-3.3-70B-Instruct"
 # MODEL_NAME_OR_PATH = "Qwen/QwQ-32B-Preview"
 # INTERNAL_RL (n = 48, 96, 144, 192, 240, 288)
-MODEL_NAME_OR_PATH = "/mbz/users/shibo.hao/Reasoning360/checkpoints/Reasoning360/shibo-math-grpo-32nodes-setting2-Qwen2.5-32B/global_step_288/actor/huggingface"
+# MODEL_NAME_OR_PATH = "/mbz/users/shibo.hao/Reasoning360/checkpoints/Reasoning360/shibo-math-grpo-32nodes-setting2-Qwen2.5-32B/global_step_288/actor/huggingface"
 
 # BENCHMARKS_TO_RUN = ["aime24", "math", "gpqa_diamond", "mmlu_pro", "mmlu", "ifeval"]
-BENCHMARKS_TO_RUN = ["gpqa_diamond"]
+BENCHMARKS_TO_RUN = ["aime24"]
 
 SUPPORTED_BENCHMARKS = {
     "aime24": {
@@ -103,7 +104,7 @@ for benchmark in BENCHMARKS_TO_RUN:
             str(SUPPORTED_BENCHMARKS[benchmark]["n_fewshot"]),
             str(SUPPORTED_BENCHMARKS[benchmark]["n_sampling"]),
             # max tokens per call
-            "16384",
+            "32768",
             str(TEMPERATURE),
             os.path.abspath(OUTPUT_DIR)
         ], check=True)
