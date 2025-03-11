@@ -53,7 +53,7 @@ def parse_args():
     )
     parser.add_argument(
         "--vllm_maxlen",
-        default=4096,
+        default=16384,
         type=int,
         help="Maximum sequence (prompt + response) length of the vLLM engine"
     )
@@ -61,6 +61,8 @@ def parse_args():
     args.top_p = (
         1 if args.temperature == 0 else args.top_p
     )  # top_p must be 1 when using greedy sampling (vllm)
+    # args.temperature = 0.6
+    # args.top_p = 0.95
     return args
 
 
@@ -86,7 +88,7 @@ def prepare_data(data_name, args):
     dt_string = datetime.now().strftime("%m-%d_%H-%M")
     model_name = "/".join(args.model_name_or_path.split("/")[-2:])
     model_name_or_path_re = args.model_name_or_path.replace("/", "__")
-    out_file_prefix = f"{args.split}_{args.prompt_type}_{args.num_test_sample}_seed{args.seed}_t{args.temperature}"
+    out_file_prefix = f"{args.split}_{args.prompt_type}_{args.num_test_sample}_seed{args.seed}_t{args.temperature}_p{args.top_p}"
     output_dir = args.output_dir
     if not os.path.exists(output_dir):
         output_dir = f"outputs/{output_dir}"
@@ -405,7 +407,7 @@ def main(llm, tokenizer, data_name, args):
     )
 
     with open(
-        out_file.replace(".jsonl", f"_{args.prompt_type}_metrics.json"), "w"
+        out_file.replace(".jsonl", f"_metrics.json"), "w"
     ) as f:
         json.dump(result_json, f, indent=4)
     return result_json

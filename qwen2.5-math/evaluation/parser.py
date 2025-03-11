@@ -498,7 +498,7 @@ def extract_theoremqa_answer(pred: str, answer_flag: bool = True):
 
 def extract_answer(pred_str, data_name, use_last_number=True):
     pred_str = pred_str.replace("\u043a\u0438", "")
-    if data_name in ["mmlu_stem", "sat_math", "aqua", "gaokao2023", "mmlu_pro", "mmlu"]:
+    if data_name in ["mmlu_stem", "sat_math", "aqua", "gaokao2023", "mmlu_pro", "mmlu", "gpqa_main", "gpqa_diamond"]:
         # TODO check multiple choice
         return choice_answer_clean(pred_str)
 
@@ -569,7 +569,7 @@ def extract_answer(pred_str, data_name, use_last_number=True):
     return pred
 
 
-STRIP_EXCEPTIONS = ["carp_en", "minerva_math"]
+STRIP_EXCEPTIONS = ["carp_en", "minerva_math", "gpqa_diamond", "gpqa_main"]
 
 
 def parse_ground_truth(example: Dict[str, Any], data_name):
@@ -675,7 +675,7 @@ def parse_question(example, data_name):
             )
     elif data_name == "carp_en":
         question = example["content"]
-    elif data_name in ["mmlu_stem", "mmlu"]:
+    elif data_name in ["mmlu_stem", "mmlu", "gpqa_main", "gpqa_diamond"]:
         options = example["choices"]
         assert len(options) == 4
         for i, (label, option) in enumerate(zip("ABCD", options)):
