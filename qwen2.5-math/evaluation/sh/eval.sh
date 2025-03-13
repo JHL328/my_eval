@@ -7,9 +7,10 @@ N_FEWSHOT=$4
 N_SAMPLING=$5
 MAX_TOKENS_PER_CALL=$6
 TEMPERATURE=$7
-OUTPUT_DIR=$8
-
+TOP_P=$8
 SPLIT="test"
+OUTPUT_DIR=$9
+
 NUM_TEST_SAMPLE=-1
 
 # English open datasets
@@ -26,7 +27,7 @@ python3 -u math_eval.py \
     --seed 0 \
     --temperature ${TEMPERATURE} \
     --n_sampling ${N_SAMPLING} \
-    --top_p 1 \
+    --top_p ${TOP_P} \
     --max_tokens_per_call ${MAX_TOKENS_PER_CALL} \
     --start 0 \
     --end -1 \

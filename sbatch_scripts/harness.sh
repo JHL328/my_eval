@@ -1,14 +1,15 @@
 #!/bin/bash
 #SBATCH --job-name=eval_harness
-#SBATCH --partition=higherprio
+#SBATCH --partition=mbzuai
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:8
 #SBATCH --output=slurm/%x.%j.out
 #SBATCH --error=slurm/%x.%j.err
-#SBATCH --exclude=mbz-h100-023
+#SBATCH --exclude=g42-odin-h100-220
 
 MODEL_NAME_OR_PATH=$1
 source /mbz/users/yuqi.wang/miniconda3/bin/activate harness-eval
+export HF_TOKEN=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
 
 TASK=$2
 if [[ $TASK = "ifeval" ]]; then
@@ -17,7 +18,7 @@ if [[ $TASK = "ifeval" ]]; then
         --tasks $2 \
         --batch_size auto \
         --log_samples \
-        --gen_kwargs $4,top_p=1 \
+        --gen_kwargs $4 \
         --num_fewshot $3 \
         --apply_chat_template \
         --output_path=$5/$2"

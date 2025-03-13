@@ -498,7 +498,7 @@ def extract_theoremqa_answer(pred: str, answer_flag: bool = True):
 
 def extract_answer(pred_str, data_name, use_last_number=True):
     pred_str = pred_str.replace("\u043a\u0438", "")
-    if data_name in ["mmlu_stem", "sat_math", "aqua", "gaokao2023", "mmlu_pro", "mmlu", "gpqa_main", "gpqa_diamond"]:
+    if data_name in ["mmlu_stem", "sat_math", "aqua", "gaokao2023", "gpqa_main", "gpqa_diamond"]:
         # TODO check multiple choice
         return choice_answer_clean(pred_str)
 
@@ -574,7 +574,7 @@ STRIP_EXCEPTIONS = ["carp_en", "minerva_math", "gpqa_diamond", "gpqa_main"]
 
 def parse_ground_truth(example: Dict[str, Any], data_name):
     if "gt_cot" in example and "gt" in example:
-        if data_name in ["math"]:
+        if data_name in ["math", "math500"]:
             gt_ans = extract_answer(example["gt_cot"], data_name)
         elif data_name in STRIP_EXCEPTIONS:
             gt_ans = example["gt"]
@@ -583,7 +583,7 @@ def parse_ground_truth(example: Dict[str, Any], data_name):
         return example["gt_cot"], gt_ans
 
     # parse ground truth
-    if data_name in ["math", "minerva_math"]:
+    if data_name in ["math", "minerva_math", "math500"]:
         gt_cot = example["solution"]
         gt_ans = extract_answer(gt_cot, data_name)
     elif data_name == "gsm8k":
@@ -629,6 +629,7 @@ def parse_ground_truth(example: Dict[str, Any], data_name):
         gt_cot, gt_ans = None, example["final_answer"][0].strip("$")
     elif data_name in [
         "aime24",
+        "aime25",
         "amc23",
         "cmath",
         "gaokao2024_I",
@@ -636,7 +637,6 @@ def parse_ground_truth(example: Dict[str, Any], data_name):
         "imo2024",
         "gpqa_main",
         "gpqa_diamond",
-        "mmlu_pro"
     ]:
         gt_cot, gt_ans = None, example["answer"]
     else:
@@ -675,17 +675,10 @@ def parse_question(example, data_name):
             )
     elif data_name == "carp_en":
         question = example["content"]
-    elif data_name in ["mmlu_stem", "mmlu", "gpqa_main", "gpqa_diamond"]:
+    elif data_name in ["mmlu_stem", "gpqa_main", "gpqa_diamond"]:
         options = example["choices"]
         assert len(options) == 4
         for i, (label, option) in enumerate(zip("ABCD", options)):
-            options[i] = f"({label}) {str(option).strip()}"
-        options = " ".join(options)
-        # question = f"{example['question'].strip()}\nWhat of the following is the right choice? Explain your answer.\n{options}"
-        question = f"{example['question'].strip()}\nAnswer Choices: {options}"
-    elif data_name == "mmlu_pro":
-        options = example["choices"]
-        for i, (label, option) in enumerate(zip("ABCDEFGHIJ", options)):
             options[i] = f"({label}) {str(option).strip()}"
         options = " ".join(options)
         # question = f"{example['question'].strip()}\nWhat of the following is the right choice? Explain your answer.\n{options}"

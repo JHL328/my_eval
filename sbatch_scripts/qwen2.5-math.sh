@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=eval_qwen2.5_math
-#SBATCH --partition=higherprio
+#SBATCH --partition=mbzuai
 #SBATCH --nodes=1
 #SBATCH --gres=gpu:8
 #SBATCH --output=slurm/%x.%j.out

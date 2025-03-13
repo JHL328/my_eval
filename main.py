@@ -11,7 +11,8 @@ import subprocess
 # MODEL_NAME_OR_PATH = "/mbz/users/richard.fan/LLaMA-Factory/saves/qwen2.5-32b-instruct-5epochs/full/sft/checkpoint-80"
 # MODEL_NAME_OR_PATH = "/mbz/users/yuqi.wang/RL-eval/models/coldstart-2"
 # MODEL_NAME_OR_PATH = "/mbz/users/yuqi.wang/RL-eval/models/coldstart-3"
-MODEL_NAME_OR_PATH = "/mbz/users/richard.fan/LLaMA-Factory/saves/qwen2.5-32b-instruct-16-gpu-5epochs-20kcutoff-112cpu/full/sft/checkpoint-315"
+# MODEL_NAME_OR_PATH = "/mbz/users/yuqi.wang/RL-eval/models/coldstart-4"
+# MODEL_NAME_OR_PATH = "/mbz/users/richard.fan/LLaMA-Factory/saves/qwen2.5-32b-instruct-16-gpu-5epochs-20kcutoff-112cpu/full/sft/checkpoint-315"
 # MODEL_NAME_OR_PATH = "/mbz/users/richard.fan/LLaMA-Factory/saves/qwen2.5-32b-instruct-16-gpu-5epochs/full/sft/checkpoint-315"
 # QWEN2.5-32B
 # MODEL_NAME_OR_PATH = "Qwen/Qwen2.5-32B"
@@ -20,50 +21,86 @@ MODEL_NAME_OR_PATH = "/mbz/users/richard.fan/LLaMA-Factory/saves/qwen2.5-32b-ins
 # DEEPSEEK-R1-DISTILL-QWEN-32B
 # MODEL_NAME_OR_PATH =  "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
 # LLAMA-3.3-70B-instruct
-# MODEL_NAME_OR_PATH = "meta-llama/Llama-3.3-70B-Instruct"
+MODEL_NAME_OR_PATH = "meta-llama/Llama-3.3-70B-Instruct"
 # MODEL_NAME_OR_PATH = "Qwen/QwQ-32B-Preview"
 # INTERNAL_RL (n = 48, 96, 144, 192, 240, 288)
 # MODEL_NAME_OR_PATH = "/mbz/users/shibo.hao/Reasoning360/checkpoints/Reasoning360/shibo-math-grpo-32nodes-setting2-Qwen2.5-32B/global_step_288/actor/huggingface"
 
-# BENCHMARKS_TO_RUN = ["aime24", "math", "gpqa_diamond", "mmlu_pro", "mmlu", "ifeval"]
-BENCHMARKS_TO_RUN = ["aime24"]
+# BENCHMARKS_TO_RUN = ["aime24", "aime25", "math", "math500", "gpqa_diamond", "mmlu_pro", "mmlu", "ifeval"]
+BENCHMARKS_TO_RUN = ["gpqa_diamond"]
 
 SUPPORTED_BENCHMARKS = {
     "aime24": {
         "n_fewshot": 0,
-        "n_sampling": 1
+        "n_sampling": 1,
+        "temperature": 0,
+        "top_p": 1
+        # "n_sampling": 16,
+        # "temperature": 0.6,
+        # "top_p": 0.95
+    },
+    "aime25": {
+        "n_fewshot": 0,
+        "n_sampling": 1,
+        "temperature": 0,
+        "top_p": 1
+        # "n_sampling": 16,
+        # "temperature": 0.6,
+        # "top_p": 0.95
     },
     "math": {
         "n_fewshot": 0,
-        "n_sampling": 1
+        "n_sampling": 1,
+        "temperature": 0,
+        "top_p": 1
+    },
+    "math500": {
+        "n_fewshot": 0,
+        "n_sampling": 1,
+        "temperature": 0,
+        "top_p": 1
     },
     "gpqa_diamond": {
         "n_fewshot": 0,
-        "n_sampling": 1
+        "n_sampling": 1,
+        "temperature": 0,
+        "top_p": 1
     },
     "gpqa_main": {
         "n_fewshot": 0,
-        "n_sampling": 1
+        "n_sampling": 1,
+        "temperature": 0,
+        "top_p": 1
     },
     "gpqa": {
         "n_fewshot": 0,
-        "n_sampling": 1
+        "n_sampling": 1,
+        "temperature": 0,
+        "top_p": 1
     },
     "ifeval": {
         "n_fewshot": 0,
-        "n_sampling": 1
+        "n_sampling": 1,
+        "temperature": 0,
+        "top_p": 1
     },
     "mmlu": {
         "n_fewshot": 0,
-        "n_sampling": 1
+        "n_sampling": 1,
+        "temperature": 0,
+        "top_p": 1
     },
     "mmlu_pro": {
         "n_fewshot": 5,
-        "n_sampling": 1
+        "n_sampling": 1,
+        "temperature": 0,
+        "top_p": 1
     },
     "mmlu_stem": {
         "n_fewshot": 0,
-        "n_sampling": 1
+        "n_sampling": 1,
+        "temperature": 0,
+        "top_p": 1
     }
 }
 # SUPPORTED_TEMPLATES = {
@@ -74,7 +111,6 @@ SUPPORTED_BENCHMARKS = {
 OUTPUT_DIR = "./eval_results"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 SKIP_COMPLETED = False
-TEMPERATURE=0
 
 def is_completed(path):
     return os.path.exists(path) and os.listdir(path) and not os.path.isfile(path)
@@ -89,7 +125,7 @@ for benchmark in BENCHMARKS_TO_RUN:
         print("=" * 50)
         continue
     # supported by qwen2.5-math
-    if benchmark in ["aime24", "math", "gpqa_diamond", "gpqa_main"]:
+    if benchmark in ["aime24", "aime25", "math", "gpqa_diamond", "gpqa_main", "math500"]:
         # prompt_type = SUPPORTED_TEMPLATES.get(MODEL_NAME_OR_PATH, "internal-rl")
         print(f"qwen2.5-math running target benchmark: {benchmark}...")
         print("=" * 50)
@@ -105,7 +141,8 @@ for benchmark in BENCHMARKS_TO_RUN:
             str(SUPPORTED_BENCHMARKS[benchmark]["n_sampling"]),
             # max tokens per call
             "32768",
-            str(TEMPERATURE),
+            str(SUPPORTED_BENCHMARKS[benchmark]["temperature"]),
+            str(SUPPORTED_BENCHMARKS[benchmark]["top_p"]),
             os.path.abspath(OUTPUT_DIR)
         ], check=True)
     # supported by lm-evalulation-harness
@@ -118,7 +155,7 @@ for benchmark in BENCHMARKS_TO_RUN:
             MODEL_NAME_OR_PATH,
             benchmark,
             str(SUPPORTED_BENCHMARKS[benchmark]["n_fewshot"]),
-            f"temperature={TEMPERATURE}",
+            f"temperature={SUPPORTED_BENCHMARKS[benchmark]['temperature']},top_p={SUPPORTED_BENCHMARKS[benchmark]['top_p']}",
             OUTPUT_DIR
         ], check=True)
     print(completed_process.args)

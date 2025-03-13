@@ -61,8 +61,6 @@ def parse_args():
     args.top_p = (
         1 if args.temperature == 0 else args.top_p
     )  # top_p must be 1 when using greedy sampling (vllm)
-    # args.temperature = 0.6
-    # args.top_p = 0.95
     return args
 
 
