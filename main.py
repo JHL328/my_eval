@@ -19,15 +19,15 @@ import subprocess
 # QWEN2.5-32B-instruct
 # MODEL_NAME_OR_PATH =  "Qwen/Qwen2.5-32B-instruct"
 # DEEPSEEK-R1-DISTILL-QWEN-32B
-# MODEL_NAME_OR_PATH =  "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
+MODEL_NAME_OR_PATH =  "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B"
 # LLAMA-3.3-70B-instruct
-MODEL_NAME_OR_PATH = "meta-llama/Llama-3.3-70B-Instruct"
+# MODEL_NAME_OR_PATH = "meta-llama/Llama-3.3-70B-Instruct"
 # MODEL_NAME_OR_PATH = "Qwen/QwQ-32B-Preview"
 # INTERNAL_RL (n = 48, 96, 144, 192, 240, 288)
 # MODEL_NAME_OR_PATH = "/mbz/users/shibo.hao/Reasoning360/checkpoints/Reasoning360/shibo-math-grpo-32nodes-setting2-Qwen2.5-32B/global_step_288/actor/huggingface"
 
 # BENCHMARKS_TO_RUN = ["aime24", "aime25", "math", "math500", "gpqa_diamond", "mmlu_pro", "mmlu", "ifeval"]
-BENCHMARKS_TO_RUN = ["gpqa_diamond"]
+BENCHMARKS_TO_RUN = ["aime24"]
 
 SUPPORTED_BENCHMARKS = {
     "aime24": {
@@ -35,9 +35,9 @@ SUPPORTED_BENCHMARKS = {
         "n_sampling": 1,
         "temperature": 0,
         "top_p": 1
-        # "n_sampling": 16,
-        # "temperature": 0.6,
-        # "top_p": 0.95
+    #     "n_sampling": 16,
+    #     "temperature": 0.6,
+    #     "top_p": 0.95
     },
     "aime25": {
         "n_fewshot": 0,
@@ -56,9 +56,9 @@ SUPPORTED_BENCHMARKS = {
     },
     "math500": {
         "n_fewshot": 0,
-        "n_sampling": 1,
-        "temperature": 0,
-        "top_p": 1
+        "n_sampling": 4,
+        "temperature": 0.6,
+        "top_p": 0.95
     },
     "gpqa_diamond": {
         "n_fewshot": 0,
@@ -103,11 +103,7 @@ SUPPORTED_BENCHMARKS = {
         "top_p": 1
     }
 }
-# SUPPORTED_TEMPLATES = {
-#     "Qwen/Qwen2.5-32B": "qwen25",
-#     "Qwen/Qwen2.5-32B-instruct": "qwen25-instruct",
-#     "deepseek-ai/DeepSeek-R1-Distill-Qwen-32B": "deepseek-distill-qwen"
-# }
+
 OUTPUT_DIR = "./eval_results"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 SKIP_COMPLETED = False
@@ -125,7 +121,7 @@ for benchmark in BENCHMARKS_TO_RUN:
         print("=" * 50)
         continue
     # supported by qwen2.5-math
-    if benchmark in ["aime24", "aime25", "math", "gpqa_diamond", "gpqa_main", "math500"]:
+    if benchmark in ["aime24", "aime25", "math", "gpqa_diamond", "math500"]:
         # prompt_type = SUPPORTED_TEMPLATES.get(MODEL_NAME_OR_PATH, "internal-rl")
         print(f"qwen2.5-math running target benchmark: {benchmark}...")
         print("=" * 50)
