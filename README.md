@@ -15,17 +15,26 @@ pip install transformers
 ```
 
 - For bigcodebench and livecodebench, users need to create an independent conda env `bigcodebench-eval` and `livecodebench-eval`:
-```
-conda create -n qwen-eval python=3.10
-conda activate qwen-eval
-cd ./qwen2.5-math/evaluation/latex2sympy
-pip install -e .
-cd ..
-pip install -r requirements.txt 
-pip install vllm==0.5.1 --no-build-isolation
-pip install transformers
-```
 
+BENCH = ["bigcodebench", "livecodebench"]
+
+```
+conda create -n {BENCH}-eval python=3.10
+conda activate {BENCH}-eval
+cd ./code_eval/{BENCH}
+pip install -r requirements.txt 
+pip install flash-attn --no-build-isolation
+
+For both bigcodebench and livecodebench, the script (`test.sh`) accepts two parameters:
+
+1. **ROOT_DIR**: The root directory for code_eval. It is also where output logs and files will be stored.
+2. **MODEL_DIR**: The absolute path to the model directory.
+
+Submit the job with your desired root directory and model path:
+
+```bash
+sbatch test.sh /path/to/root /absolute/path/to/model
+```
 
 - For other benchmarks, users need to create a conda env `harness-eval`:
 ```
@@ -35,6 +44,9 @@ cd ./lm-evaluation-harness
 pip install -e .
 pip install langdetect, immutabledict
 ```
+
+To run MBPP+ and HumanEval+, lm-evaluation-harness should be updated to the latest version.
+
 > [!IMPORTANT]  
 > Currently we are seeing OOM issues in MMLU evaluation with lm_eval using vllm as backend, this is [a known bug](https://github.com/EleutherAI/lm-evaluation-harness/issues/2490). To bypass this, users need to add `prompt_logprobs=1` to `SamplingParams` in function `_dummy_run` in vllm: `vllm/worker/model_runner.py`.
 
@@ -48,6 +60,9 @@ Currently it supports multiple benchmarks:
 ```
 BENCHMARKS=["aime24", "math", "gpqa", "ifeval", "mmlu", "mmlu_pro", "mbpp", "mbpp_plus", "humaneval", "humaneval_plus"]
 ```
+
+Two other coding benchmarks are supported under `code_eval` folder: BigCodeBench and LiveCodeBench.
+
 remove unnecessary benchmarks from `BENCHMARKS` as needed.
 =======
 # Language Model Evaluation Harness
