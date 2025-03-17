@@ -13,6 +13,19 @@ pip install vllm==0.5.1 --no-build-isolation
 pip install transformers
 ```
 
+- For bigcodebench and livecodebench, users need to create an independent conda env `bigcodebench-eval` and `livecodebench-eval`:
+```
+conda create -n qwen-eval python=3.10
+conda activate qwen-eval
+cd ./qwen2.5-math/evaluation/latex2sympy
+pip install -e .
+cd ..
+pip install -r requirements.txt 
+pip install vllm==0.5.1 --no-build-isolation
+pip install transformers
+```
+
+
 - For other benchmarks, users need to create a conda env `harness-eval`:
 ```
 conda create -n harness-eval python=3.10
@@ -30,8 +43,8 @@ update `MODEL_NAME_OR_PATH` and `BENCHMARKS_TO_RUN` in `main.py` and run
 python main.py
 ```
 
-Currently it supports 5 benchmarks: 
+Currently it supports multiple benchmarks: 
 ```
-BENCHMARKS=["aime24", "math", "gpqa", "ifeval", "mmlu", "mmlu_pro"]
+BENCHMARKS=["aime24", "math", "gpqa", "ifeval", "mmlu", "mmlu_pro", "mbpp", "mbpp_plus", "humaneval", "humaneval_plus"]
 ```
 remove unnecessary benchmarks from `BENCHMARKS` as needed.
