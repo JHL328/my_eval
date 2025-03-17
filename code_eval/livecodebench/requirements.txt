@@ -1,0 +1,8 @@
+pebble
+datasets==2.20.0
+vllm
+google-generativeai
+anthropic
+openai
+mistralai
+pyext
