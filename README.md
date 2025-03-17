@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # RL-eval
 
 ## Pre-requisite
