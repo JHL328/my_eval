@@ -364,16 +364,17 @@ def extract_multi_choice_answer(pred_str):
 direct_answer_trigger_for_fewshot = ("choice is", "answer is")
 
 
-def choice_answer_clean(pred: str):
+def choice_answer_clean(pred: str, mmlu=False):
     pred = pred.strip("\n")
 
+    # TODO: fix this
     # Determine if this is ICL, if so, use \n\n to split the first chunk.
-    ICL = False
-    for trigger in direct_answer_trigger_for_fewshot:
-        if pred.count(trigger) > 1:
-            ICL = True
-    if ICL:
-        pred = pred.split("\n\n")[0]
+    #ICL = False
+    #for trigger in direct_answer_trigger_for_fewshot:
+    #    if pred.count(trigger) > 1:
+    #        ICL = True
+    #if ICL:
+    #    pred = pred.split("\n\n")[0]
 
     # Split the trigger to find the answer.
     preds = re.split("|".join(direct_answer_trigger_for_fewshot), pred)
@@ -382,11 +383,14 @@ def choice_answer_clean(pred: str):
         pred = preds[-1]
     else:
         answer_flag = False
-
-    pred = pred.strip("\n").rstrip(".").rstrip("/").strip(" ").lstrip(":")
+    answer_flag = False
+    #pred = pred.strip("\n").rstrip(".").rstrip("/").strip(" ").lstrip(":")
 
     # Clean the answer based on the dataset
-    tmp = re.findall(r"\b(A|B|C|D|E|F|G|H|I|J)\b", pred.upper())
+    if mmlu:
+        tmp = re.findall(r"\b(A|B|C|D|E|F|G|H|I|J)\b", pred)
+    else:
+        tmp = re.findall(r"\b(A|B|C|D|E)\b", pred)
     if tmp:
         pred = tmp
     else:
@@ -500,7 +504,7 @@ def extract_answer(pred_str, data_name, use_last_number=True):
     pred_str = pred_str.replace("\u043a\u0438", "")
     if data_name in ["mmlu_stem", "sat_math", "aqua", "gaokao2023", "gpqa_main", "gpqa_diamond"]:
         # TODO check multiple choice
-        return choice_answer_clean(pred_str)
+        return choice_answer_clean(pred_str, "mmlu" in data_name)
 
     if "final answer is $" in pred_str and "$. I hope" in pred_str:
         # minerva_math
