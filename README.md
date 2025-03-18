@@ -26,8 +26,8 @@ pip install flash-attn --no-build-isolation
 
 For both bigcodebench and livecodebench, the script (`test.sh`) accepts two parameters:
 
-1. **ROOT_DIR**: The root directory for code_eval. It is also where output logs and files will be stored.
-2. **MODEL_DIR**: The absolute path to the model directory.
+1. ROOT_DIR: The root directory for code_eval. It is also where output logs and files will be stored.
+2. MODEL_DIR: The absolute path to the model directory.
 
 Submit the job with your desired root directory and model path:
 
