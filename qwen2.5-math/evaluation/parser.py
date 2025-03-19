@@ -361,7 +361,7 @@ def extract_multi_choice_answer(pred_str):
     return "placeholder"
 
 
-direct_answer_trigger_for_fewshot = ("choice is", "answer is", "correct {\w+} is")
+direct_answer_trigger_for_fewshot = ("choice is", "answer is", "correct \w+ is")
 
 
 def choice_answer_clean(pred: str, mmlu=False):
