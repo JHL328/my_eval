@@ -678,7 +678,7 @@ def parse_question(example, data_name):
             )
     elif data_name == "carp_en":
         question = example["content"]
-    elif data_name in ["mmlu_stem", "gpqa_main", "gpqa_diamond"]:
+    elif data_name in ["mmlu_stem"]:
         options = example["choices"]
         assert len(options) == 4
         for i, (label, option) in enumerate(zip("ABCD", options)):
