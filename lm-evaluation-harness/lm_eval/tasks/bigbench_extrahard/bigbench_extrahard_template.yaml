@@ -1,0 +1,17 @@
+tag: bigbench_extrahard_tasks
+dataset_path: LLM360/bigbench_extrahard
+output_type: generate_until
+dataset_kwargs:
+  # num_shots: 0 # TODO: num of shots for `bigbench` HF dataset should be controlled through this, not through the typical methods
+  # subtask_name: null
+test_split: test 
+doc_to_text: input
+doc_to_target: target
+generation_kwargs:
+  max_gen_toks: 32768
+  until: []
+metric_list:
+  - metric: bigbench_extrahard 
+    aggregation: mean 
+metadata:
+  version: 1.0
