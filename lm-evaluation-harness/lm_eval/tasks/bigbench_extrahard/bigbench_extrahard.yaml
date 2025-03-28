@@ -1,0 +1,7 @@
+group: bigbench_extrahard 
+task:
+  - bigbench_extrahard_tasks
+aggregate_metric_list:
+  - metric: bigbench_extrahard
+    aggregation: harmonic
+    weight_by_size: True

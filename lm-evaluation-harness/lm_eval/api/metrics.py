@@ -33,6 +33,11 @@ def mean(arr):
     return sum(arr) / len(arr)
 
 
+@register_aggregation("harmonic")
+def harmonic(arr):
+    return len(arr) / (sum([1 / (val + 0.01) for val in arr]))
+
+
 @register_aggregation("median")
 def median(arr):
     return arr[len(arr) // 2]
@@ -576,3 +581,124 @@ def aggregate_subtask_metrics(metrics, sizes, weight_by_size=True):
     assert len(metrics) == len(sizes)
 
     return sum([metric * size for metric, size in zip(metrics, sizes)]) / sum(sizes)
+
+
+def aggregate_harmonic_subtask_metrics(metrics, sizes, weight_by_size=True):
+    if not weight_by_size:
+        sizes = [1] * len(sizes)
+    assert len(metrics) == len(sizes)
+    return sum(sizes) / (sum([size / (val + 0.01) for size, val in zip(sizes, metrics)]))
+
+
+@register_metric(
+    metric="bigbench_extrahard",
+    higher_is_better=True,
+    output_type="loglikelihood",
+    aggregation="mean",
+)
+def bbeh_accuracy(predictions, references):
+
+    """Evaluation functions for BigBench Extra Hard."""
+    def strip_latex(response: str) -> str:
+        if response.startswith("$") and response.endswith("$"):
+            response = response[1:-1]
+        if "boxed{" in response and response.endswith("}"):
+            response = response[0:-1].split("boxed{")[1]
+        if "text{" in response and response.endswith("}"):
+            response = response[0:-1].split("text{")[1]
+        if "texttt{" in response and response.endswith("}"):
+            response = response[0:-1].split("texttt{")[1]
+        return response
+
+    def extract_answer(sample: str) -> str:
+        """Extracts the final answer from the sample."""
+        answer_prefixes = [
+            "</think>",
+            "The answer is:",
+            "The final answer is ",
+            "The final answer is: ",
+            "The correct answer is:",
+            "is:\n",
+            "The answer is ",
+            "**Answer:**",
+            "**Final Answer:**",
+            "Answer:",
+            "boxed{"
+        ]
+        answer = sample
+        for answer_prefix in answer_prefixes:
+            if answer_prefix in answer:
+                answer = answer.split(answer_prefix)[-1].strip()
+            if answer.endswith("."):
+                answer = answer[:-1]
+        return strip_latex(answer)
+
+    def fuzzy_match(prediction: str, reference: str) -> bool:
+        prediction = prediction.strip()
+        reference = reference.strip()
+        import re
+        if "**" in prediction:
+            for m in re.finditer(r"\*\*(.*)\*\*", prediction):
+                if len(m[1]) < len(prediction) and fuzzy_match(m[1], reference):
+                    return True
+
+        """Fuzzy match function for BigBench Extra Hard."""
+        if prediction == reference:
+            return True
+        # (a) vs a
+        if len(prediction) == 3 and prediction[0] == "(" and prediction[2] == ")":
+            return prediction[1] == reference
+        if len(reference) == 3 and reference[0] == "(" and reference[2] == ")":
+            if len(prediction) == 1 or prediction[1] == ")":
+                return reference[1] == prediction[0]
+
+        # Numbers
+        try:
+            if float(prediction) == float(reference):
+                return True
+        except ValueError:
+            pass
+
+        # quote issues
+        if prediction.replace("'", "") == reference.replace("'", ""):
+            return True
+
+        # Bracket issues
+        if f"[{reference}]" == prediction or f"[{prediction}]" == reference:
+            return True
+        # Question mark issues
+        if m := re.match(r"\\text{((\w|\s)*)}", prediction):
+            if len(m.groups()) > 1:
+                inner = m[1]
+                if inner.lower() == reference.lower():
+                    return True
+        if prediction.endswith("?") and prediction[:-1] == reference:
+            return True
+        if prediction.lower().startswith(reference.lower()) or reference.lower().startswith(prediction.lower()):
+            return True
+        if re.sub(r"[^a-z]", "", prediction.lower()) == re.sub(r"[^a-z]", "", reference.lower()):
+            return True
+        return False
+
+    def preprocess_sample(sample: str) -> str:
+        prediction = extract_answer(sample.strip()).lower()
+        prediction = prediction.replace(", ", ",")
+        return prediction
+
+    def preprocess_reference(reference: str) -> str:
+        reference = reference.strip().lower()
+        reference = reference.replace(", ", ",")
+        return reference
+
+    def evaluate_correctness(sample: str, reference: str) -> bool:
+        prediction = preprocess_sample(sample)
+        reference = preprocess_reference(reference)
+        return fuzzy_match(prediction, reference)
+
+    correct = 0
+    total = 0
+    for prediction, reference in zip(predictions, references):
+        total += 1
+        if evaluate_correctness(prediction, reference):
+            correct += 1
+    return correct / total

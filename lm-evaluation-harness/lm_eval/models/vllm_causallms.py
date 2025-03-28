@@ -413,6 +413,7 @@ class VLLM(TemplateLM):
             # set the max length in tokens of inputs ("context_enc")
             # max len for inputs = max length, minus room to generate the max new tokens
             max_ctx_len = self.max_length - max_gen_toks
+            assert (max_ctx_len >= 0), "Max length for evaluation task is longer than the maximum length of the model. Increase max_model_len in model_args"
             context_encoding = [x[-max_ctx_len:] for x in context_encoding]
 
             # perform batched generation

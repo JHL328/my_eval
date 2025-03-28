@@ -8,6 +8,7 @@ from typing import List, Optional, Tuple, Union
 from lm_eval.api.group import ConfigurableGroup
 from lm_eval.api.metrics import (
     aggregate_subtask_metrics,
+    aggregate_harmonic_subtask_metrics,
     mean,
     pooled_sample_stderr,
     stderr_for_metric,
@@ -484,6 +485,8 @@ def consolidate_group_results(
                         # compute group's pooled metric and stderr
                         if metric_config["aggregation"] == "mean":
                             aggregate_fn = aggregate_subtask_metrics
+                        if metric_config["aggregation"] == "harmonic":
+                            aggregate_fn = aggregate_harmonic_subtask_metrics
                         elif callable(metric_config["aggregation"]):
                             aggregate_fn = metric_config["aggregation"]
                         else:

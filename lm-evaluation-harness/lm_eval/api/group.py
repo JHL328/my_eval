@@ -13,7 +13,7 @@ class AggMetricConfig(dict):
     filter_list: Optional[Union[str, list]] = "none"
 
     def __post_init__(self):
-        if self.aggregation != "mean" and not callable(self.aggregation):
+        if not (self.aggregation == "mean" or self.aggregation == "harmonic") and not callable(self.aggregation):
             raise ValueError(
                 f"Currently, 'mean' is the only pre-defined aggregation across groups' subtasks. Got '{self.aggregation}'."
             )
