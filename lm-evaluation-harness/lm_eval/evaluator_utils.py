@@ -485,7 +485,7 @@ def consolidate_group_results(
                         # compute group's pooled metric and stderr
                         if metric_config["aggregation"] == "mean":
                             aggregate_fn = aggregate_subtask_metrics
-                        if metric_config["aggregation"] == "harmonic":
+                        elif metric_config["aggregation"] == "harmonic":
                             aggregate_fn = aggregate_harmonic_subtask_metrics
                         elif callable(metric_config["aggregation"]):
                             aggregate_fn = metric_config["aggregation"]
