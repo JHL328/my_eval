@@ -41,7 +41,7 @@ conda create -n harness-eval python=3.10
 conda activate harness-eval
 cd ./lm-evaluation-harness
 pip install -e .
-pip install langdetect, immutabledict
+pip install langdetect immutabledict
 ```
 
 To run MBPP+ and HumanEval+, lm-evaluation-harness should be updated to the latest version.
