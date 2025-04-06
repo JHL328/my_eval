@@ -1,0 +1,9 @@
+rich
+accelerate
+vllm
+stop-sequencer
+evalplus==0.2.1
+datamodel_code_generator
+anthropic
+mistralai
+google-generativeai
