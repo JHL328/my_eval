@@ -13,9 +13,9 @@ pip install vllm==0.6.6.post1 --no-build-isolation
 pip install transformers
 ```
 
-- For bigcodebench and livecodebench, users need to create an independent conda env `bigcodebench-eval` and `livecodebench-eval`:
+- There are three directories under code evaluation, and eval_plus includes HumanEval, HumanEval+, MBPP, MBPP+. Users need to create an independent conda env `bigcodebench-eval`, `livecodebench-eval`, and `evalplus-eval`:
 
-BENCH = ["bigcodebench", "livecodebench"]
+BENCH = ["bigcodebench", "livecodebench", "evalplus"]
 
 ```
 conda create -n {BENCH}-eval python=3.10
@@ -35,6 +35,18 @@ Submit the job with your desired root directory and model path:
 sbatch test.sh /path/to/root /absolute/path/to/model
 ```
 
+For HumanEval(+) and MBPP(+), the script (`test_humaneval.sh`) or (`test_mbpp.sh`) accepts three parameters:
+
+1. ROOT_DIR: The root directory for code_eval. It is also where output logs and files will be stored.
+2. MODEL_DIR: The absolute path to the model directory.
+3. MODEL: The abbreviation for the model. This parameter only affects the name of the output directory.
+
+Submit the job with your desired root directory and model path:
+
+```bash
+sbatch test_humaneval.sh/test_mbpp.sh /path/to/root /absolute/path/to/model /abbreviation/for/model
+```
+
 - For other benchmarks, users need to create a conda env `harness-eval`:
 ```
 conda create -n harness-eval python=3.10
@@ -44,8 +56,6 @@ pip install -e .
 pip install langdetect immutabledict
 pip install vllm==0.6.6.post1 --no-build-isolation
 ```
-
-To run MBPP+ and HumanEval+, lm-evaluation-harness should be updated to the latest version.
 
 > [!IMPORTANT]  
 > Currently we are seeing OOM issues in MMLU evaluation with lm_eval using vllm as backend, this is [a known bug](https://github.com/EleutherAI/lm-evaluation-harness/issues/2490). To bypass this, users need to add `prompt_logprobs=1` to `SamplingParams` in function `_dummy_run` in vllm: `vllm/worker/model_runner.py`.
@@ -58,7 +68,7 @@ python main.py
 
 Currently it supports multiple benchmarks: 
 ```
-BENCHMARKS=["aime24", "math", "gpqa", "ifeval", "mmlu", "mmlu_pro", "mbpp", "mbpp_plus", "humaneval", "humaneval_plus"]
+BENCHMARKS=["aime24", "math", "gpqa", "ifeval", "mmlu", "mmlu_pro", "mbpp", "mbpp_plus", "humaneval", "humaneval_plus", "bigcodebench", "livecodebench"]
 ```
 
 Two other coding benchmarks are supported under `code_eval` folder: BigCodeBench and LiveCodeBench.
