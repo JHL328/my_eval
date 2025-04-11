@@ -9,7 +9,7 @@ cd ./qwen2.5-math/evaluation/latex2sympy
 pip install -e .
 cd ..
 pip install -r requirements.txt 
-pip install vllm==0.5.1 --no-build-isolation
+pip install vllm==0.6.6.post1 --no-build-isolation
 pip install transformers
 ```
 
@@ -54,6 +54,7 @@ conda activate harness-eval
 cd ./lm-evaluation-harness
 pip install -e .
 pip install langdetect immutabledict
+pip install vllm==0.6.6.post1 --no-build-isolation
 ```
 
 > [!IMPORTANT]  
