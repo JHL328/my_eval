@@ -615,33 +615,35 @@ def bbeh_accuracy(predictions, references):
         answer_prefixes = [
             "</think>",
             "The answer is:",
-            "The final answer is ",
             "The final answer is: ",
             "The correct answer is:",
+            "The correct answer is",
             "is:\n",
             "The answer is ",
             "**Answer:**",
             "**Final Answer:**",
+            "**option ",
             "Answer:",
             "boxed{"
         ]
         answer = sample
         for answer_prefix in answer_prefixes:
-            if answer_prefix in answer:
+            if answer_prefix.lower() in answer.lower():
                 answer = answer.split(answer_prefix)[-1].strip()
             if answer.endswith("."):
                 answer = answer[:-1]
         return strip_latex(answer)
 
     def fuzzy_match(prediction: str, reference: str) -> bool:
+        import copy
+        if not prediction: return False
         prediction = prediction.strip()
         reference = reference.strip()
         import re
         if "**" in prediction:
             for m in re.finditer(r"\*\*(.*)\*\*", prediction):
-                if len(m[1]) < len(prediction) and fuzzy_match(m[1], reference):
+                if len(m.groups()) > 1 and  len(m[1]) < len(prediction) and fuzzy_match(m[1], reference):
                     return True
-
         """Fuzzy match function for BigBench Extra Hard."""
         if prediction == reference:
             return True
@@ -649,8 +651,10 @@ def bbeh_accuracy(predictions, references):
         if len(prediction) == 3 and prediction[0] == "(" and prediction[2] == ")":
             return prediction[1] == reference
         if len(reference) == 3 and reference[0] == "(" and reference[2] == ")":
-            if len(prediction) == 1 or prediction[1] == ")":
+            if len(prediction) == 1 or len(prediction) == 2 and prediction[1] == ")":
                 return reference[1] == prediction[0]
+            elif prediction[0] == reference[1] and (len(prediction) == 1 or not prediction[1].isalnum()):
+                return True
 
         # Numbers
         try:
@@ -676,9 +680,9 @@ def bbeh_accuracy(predictions, references):
             return True
         if prediction.lower().startswith(reference.lower()) or reference.lower().startswith(prediction.lower()):
             return True
-        if re.sub(r"[^a-z]", "", prediction.lower()) == re.sub(r"[^a-z]", "", reference.lower()):
+        if re.sub(r"[^a-z0-9]", "", prediction.lower()) == re.sub(r"[^a-z0-9]", "", reference.lower()):
             return True
-        return False
+        return False 
 
     def preprocess_sample(sample: str) -> str:
         prediction = extract_answer(sample.strip()).lower()
