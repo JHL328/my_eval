@@ -44,21 +44,21 @@ SUPPORTED_BENCHMARKS = {
         "n_sampling": 1,
         "temperature": 0,
         "top_p": 1,
-        "tokens": 4098
+        "tokens": 4096
     },
     "mmlu": {
         "n_fewshot": 0,
         "n_sampling": 1,
         "temperature": 0,
         "top_p": 1,
-        "tokens": 4098
+        "tokens": 4096
     },
     "mmlu_pro": {
         "n_fewshot": 5,
         "n_sampling": 1,
         "temperature": 0,
         "top_p": 1,
-        "tokens": 4098 
+        "tokens": 4096
     },
     "mmlu_stem": {
         "n_fewshot": 0,
@@ -93,6 +93,7 @@ args = parser.parse_args()
 print(args)
 MODEL_NAME_OR_PATH = args.model_path
 BENCHMARKS_TO_RUN = args.benchmarks
+
 
 def is_completed(path):
     return os.path.exists(path) and os.listdir(path) and not os.path.isfile(path)
