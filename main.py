@@ -8,67 +8,78 @@ SUPPORTED_BENCHMARKS = {
         "n_fewshot": 0,
         "n_sampling": 16,
         "temperature": 0.6,
-        "top_p": 0.95
+        "top_p": 0.95,
+        "tokens": 32768
     },
     "aime25": {
         "n_fewshot": 0,
         "n_sampling": 16,
         "temperature": 0.6,
-        "top_p": 0.95
+        "top_p": 0.95,
+        "tokens": 32768
     },
     "math": {
         "n_fewshot": 0,
         "n_sampling": 1,
         "temperature": 0,
-        "top_p": 1
+        "top_p": 1,
+        "tokens": 32768
     },
     "math500": {
         "n_fewshot": 0,
         "n_sampling": 1,
         "temperature": 0,
-        "top_p": 1
+        "top_p": 1,
+        "tokens": 32768
     },
     "gpqa_diamond": {
         "n_fewshot": 0,
         "n_sampling": 1,
         "temperature": 0,
-        "top_p": 1
+        "top_p": 1,
+        "tokens": 32768
     },
     "ifeval": {
         "n_fewshot": 0,
         "n_sampling": 1,
         "temperature": 0,
-        "top_p": 1
+        "top_p": 1,
+        "tokens": 4096
     },
     "mmlu": {
         "n_fewshot": 0,
         "n_sampling": 1,
         "temperature": 0,
-        "top_p": 1
+        "top_p": 1,
+        "tokens": 4096
     },
     "mmlu_pro": {
         "n_fewshot": 5,
         "n_sampling": 1,
         "temperature": 0,
-        "top_p": 1
+        "top_p": 1,
+        "tokens": 4096
     },
     "mmlu_stem": {
         "n_fewshot": 0,
         "n_sampling": 1,
         "temperature": 0,
-        "top_p": 1
+        "top_p": 1,
+        "tokens": 32768
     },
     "bigbench_extrahard": {
         "n_fewshot": 0,
         "n_sampling": 1,
         "temperature": 0,
-        "top_p": 1
+        "top_p": 1,
+        "tokens": 32768
     },
     "bigbench_extrahard_verbal": {
         "n_fewshot": 0,
         "n_sampling": 1,
         "temperature": 0,
-        "top_p": 1
+        "top_p": 1,
+        "tokens": 32768
     }
 }
 
@@ -82,6 +93,7 @@ args = parser.parse_args()
 print(args)
 MODEL_NAME_OR_PATH = args.model_path
 BENCHMARKS_TO_RUN = args.benchmarks
+
 
 def is_completed(path):
     return os.path.exists(path) and os.listdir(path) and not os.path.isfile(path)
@@ -109,8 +121,7 @@ for benchmark in BENCHMARKS_TO_RUN:
             benchmark,
             str(SUPPORTED_BENCHMARKS[benchmark]["n_fewshot"]),
             str(SUPPORTED_BENCHMARKS[benchmark]["n_sampling"]),
-            # max tokens per call
-            "32768",
+            str(SUPPORTED_BENCHMARKS[benchmark]["tokens"]),
             str(SUPPORTED_BENCHMARKS[benchmark]["temperature"]),
             str(SUPPORTED_BENCHMARKS[benchmark]["top_p"]),
             os.path.abspath(OUTPUT_DIR)
@@ -125,7 +136,7 @@ for benchmark in BENCHMARKS_TO_RUN:
             MODEL_NAME_OR_PATH,
             benchmark,
             str(SUPPORTED_BENCHMARKS[benchmark]["n_fewshot"]),
-            "4096",
+            str(SUPPORTED_BENCHMARKS[benchmark]["tokens"]),
             f"temperature={SUPPORTED_BENCHMARKS[benchmark]['temperature']},top_p={SUPPORTED_BENCHMARKS[benchmark]['top_p']}",
             OUTPUT_DIR
         ], check=True)
