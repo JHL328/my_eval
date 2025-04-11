@@ -57,6 +57,18 @@ SUPPORTED_BENCHMARKS = {
         "n_sampling": 1,
         "temperature": 0,
         "top_p": 1
+    },
+    "bigbench_extrahard": {
+        "n_fewshot": 0,
+        "n_sampling": 1,
+        "temperature": 0,
+        "top_p": 1
+    },
+    "bigbench_extrahard_verbal": {
+        "n_fewshot": 0,
+        "n_sampling": 1,
+        "temperature": 0,
+        "top_p": 1
     }
 }
 
