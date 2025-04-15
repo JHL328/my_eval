@@ -145,7 +145,7 @@ PROMPT_TEMPLATES = {
         "{output}",
         "\n\n",
     ),
-     "qwen25-instruct-no-sytem-think-boxed": (
+     "qwen25-instruct-no-sytem": (
         "<|im_start|>user\n{input}<|im_end|>\n"
         "<|im_start|>assistant\n",
         "{output}",
