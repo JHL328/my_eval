@@ -67,8 +67,9 @@ def evaluate(data_name, prompt_type, samples: list=None, file_path: str=None, ma
             score_mat[i] = s + [s[-1]] * (max_len - len(s)) # pad
 
     # output mean of each column of scores
-    col_means= np.array(score_mat).mean(axis=0)
-    mean_score = list(np.round(col_means * 100, decimals=1))
+    # col_means= np.array(score_mat).mean(axis=0)
+    col_means= np.array(score_mat).mean()
+    mean_score = float(np.round(col_means * 100, decimals=1))
     result_json = {
         "num_samples": len(samples),
         "num_scores": len(scores),

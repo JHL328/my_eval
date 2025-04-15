@@ -63,7 +63,11 @@ pip install vllm==0.6.6.post1 --no-build-isolation
 ## Quick Start
 update `MODEL_NAME_OR_PATH` and `BENCHMARKS_TO_RUN` in `main.py` and run
 ```
-python main.py
+python main.py \
+    -p deepseek-ai/DeepSeek-R1-Distill-Qwen-32B \
+    --benchmarks aime24 \
+    --prompt_type deepseek-distill-qwen \
+    --model_size 32
 ```
 
 Currently it supports multiple benchmarks: 

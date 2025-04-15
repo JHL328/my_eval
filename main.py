@@ -89,10 +89,13 @@ SKIP_COMPLETED = False
 parser = argparse.ArgumentParser(prog="RL-eval")
 parser.add_argument("-p", "--model_path", type=str, required=True)
 parser.add_argument("--benchmarks", action="extend", nargs="+", type=str, required=True)
+parser.add_argument("--prompt_type", type=str, required=True)
+parser.add_argument("--model_size", type=float, required=True)
 args = parser.parse_args()
 print(args)
 MODEL_NAME_OR_PATH = args.model_path
 BENCHMARKS_TO_RUN = args.benchmarks
+PROMPT_TYPE = args.prompt_type
 
 
 def is_completed(path):
@@ -116,7 +119,8 @@ for benchmark in BENCHMARKS_TO_RUN:
             "./sbatch_scripts/qwen2.5-math.sh",
             # ./qwen2.5-math/evaluation/utils.py
             # choose from PROMPT_TEMPLATES
-            "qwen25-math-cot",
+            # deepseek-distill-qwen
+            args.prompt_type,
             MODEL_NAME_OR_PATH,
             benchmark,
             str(SUPPORTED_BENCHMARKS[benchmark]["n_fewshot"]),
@@ -124,7 +128,8 @@ for benchmark in BENCHMARKS_TO_RUN:
             str(SUPPORTED_BENCHMARKS[benchmark]["tokens"]),
             str(SUPPORTED_BENCHMARKS[benchmark]["temperature"]),
             str(SUPPORTED_BENCHMARKS[benchmark]["top_p"]),
-            os.path.abspath(OUTPUT_DIR)
+            os.path.abspath(OUTPUT_DIR),
+            args.model_size,
         ], check=True)
     # supported by lm-evalulation-harness
     else:

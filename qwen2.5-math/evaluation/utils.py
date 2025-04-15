@@ -159,7 +159,7 @@ PROMPT_TEMPLATES = {
         "\n\n",
     ),
     "deepseek-distill-qwen": (
-        "<|begin▁of▁sentence|><|User|>{input}<|Assistant|><think>\n",
+        "<|begin▁of▁sentence|><|User|>Please reason step by step, and put your final answer within \\boxed{{}}.\n{input}<|Assistant|><think>\n",
         "{output}",
         "\n\n"
     ),
