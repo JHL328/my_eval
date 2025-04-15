@@ -71,10 +71,20 @@ python main.py \
 ```
 
 Currently it supports multiple benchmarks: 
-```
-BENCHMARKS=["aime24", "math", "gpqa", "ifeval", "mmlu", "mmlu_pro", "mbpp", "mbpp_plus", "humaneval", "humaneval_plus", "bigcodebench", "livecodebench"]
-```
+- aime24
+- aime25
+- math
+- math500
+- gpqa_diamond
+- ifeval
+- mmlu
+- mmlu_pro
+- mmlu_stem
+- bigbench_extrahard
+- bigbench_extrahard_verbal
 
 Two other coding benchmarks are supported under `code_eval` folder: BigCodeBench and LiveCodeBench.
 
-remove unnecessary benchmarks from `BENCHMARKS` as needed.
+## Prompts
+To evaluate qwen 2.5 series models, use `--prompt_type qwen25-math-cot`
+To evaluate RLHF's SFT models, use `--prompt_type qwen25-math-no-sytem-think-boxed`

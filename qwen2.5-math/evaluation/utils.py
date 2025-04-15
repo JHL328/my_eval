@@ -170,6 +170,13 @@ PROMPT_TEMPLATES = {
         "{output}",
         "\n\n",
     ),
+    # suitable for sft models trained by Haonan and Chengqian's team
+    "qwen25-math-no-sytem-think-boxed": (
+        "<|im_start|>user\n{input} Please reason step by step, and put your final answer within \\boxed{{}}.<|im_end|>\n"
+        "<|im_start|>assistant\n<think>\n",
+        "{output}",
+        "\n\n",
+    ),
     "mathstral": (
         "{input}\nPlease reason step by step, and put your final answer within \\boxed{{}}.",
         "{output}",
