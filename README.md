@@ -87,4 +87,5 @@ Two other coding benchmarks are supported under `code_eval` folder: BigCodeBench
 
 ## Prompts
 To evaluate qwen 2.5 series models, use `--prompt_type qwen25-math-cot`
+
 To evaluate RLHF's SFT models, use `--prompt_type qwen25-math-no-sytem-think-boxed`
