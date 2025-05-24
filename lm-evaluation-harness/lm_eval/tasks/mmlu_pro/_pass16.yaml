@@ -1,0 +1,64 @@
+include: "_default_template_yaml"
+group: mmlu_pro_pass16
+
+# Configuration for sampling with temperature
+generation_kwargs:
+  until:
+    - "</s>"
+    - "Q:"
+    - "<|im_end|>"
+  do_sample: true
+  temperature: 0.7
+  max_gen_toks: 2048
+repeats: 16
+
+task:
+  - mmlu_pro_biology
+  - mmlu_pro_business
+  - mmlu_pro_chemistry
+  - mmlu_pro_computer_science
+  - mmlu_pro_economics
+  - mmlu_pro_engineering
+  - mmlu_pro_health
+  - mmlu_pro_history
+  - mmlu_pro_law
+  - mmlu_pro_math
+  - mmlu_pro_other
+  - mmlu_pro_philosophy
+  - mmlu_pro_physics
+  - mmlu_pro_psychology
+
+metric_list:
+  - metric: exact_match
+    aggregation: mean
+    higher_is_better: true
+    ignore_case: true
+    ignore_punctuation: true
+  - metric: pass@k
+    aggregation: mean
+    higher_is_better: true
+    args: {k: 16}
+    name: pass@16
+
+filter_list:
+  - name: "custom-extract1"
+    filter:
+      - function: "regex"
+        regex_pattern: 'answer is \(?([ABCDEFGHIJ])\)?'
+        # regex_pattern: r".*[aA]nswer:\s*([A-J])",
+      # - function: "take_first"
+
+aggregate_metric_list:
+  - metric: exact_match
+    aggregation: mean
+    weight_by_size: true
+    filter_list: custom-extract1
+  - metric: pass@k
+    args: {k: 16}
+    aggregation: mean
+    weight_by_size: true
+    filter_list: custom-extract1
+    name: pass@16
+
+metadata:
+  version: 2.0

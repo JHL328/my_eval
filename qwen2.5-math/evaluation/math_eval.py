@@ -85,13 +85,15 @@ def prepare_data(data_name, args):
     # get out_file name
     dt_string = datetime.now().strftime("%m-%d_%H-%M")
     model_name = "/".join(args.model_name_or_path.split("/")[-2:])
-    model_name_or_path_re = args.model_name_or_path.replace("/", "__")
+    # change the model name, only keep the base name
+    # model_name_or_path_re = args.model_name_or_path.replace("/", "__")
+    model_name_or_path_re = args.model_name_or_path.split("/")[-1]
     out_file_prefix = f"{args.split}_{args.prompt_type}_{args.num_test_sample}_seed{args.seed}_t{args.temperature}_p{args.top_p}"
     output_dir = args.output_dir
     if not os.path.exists(output_dir):
         output_dir = f"outputs/{output_dir}"
     
-    out_file = f"{output_dir}/{data_name}/{model_name_or_path_re}/{out_file_prefix}_k{args.n_sampling}_s{args.start}_e{args.end}.jsonl"
+    out_file = f"{output_dir}/{data_name}/{model_name_or_path_re}/results_{out_file_prefix}_k{args.n_sampling}_s{args.start}_e{args.end}.jsonl"
     os.makedirs(f"{output_dir}/{data_name}", exist_ok=True)
     os.makedirs(f"{output_dir}/{data_name}/{model_name_or_path_re}", exist_ok=True)
 
@@ -119,7 +121,9 @@ def prepare_data(data_name, args):
 def setup(args):
     # load model
     available_gpus = os.environ["CUDA_VISIBLE_DEVICES"].split(",")
+    print(f"Available GPUs: {available_gpus}")
     if args.use_vllm:
+        print(f"Using vLLM with {len(available_gpus)} GPUs, tensor_parallel_size: {len(available_gpus) // args.pipeline_parallel_size}, pipeline_parallel_size: {args.pipeline_parallel_size}")
         llm = LLM(
             model=args.model_name_or_path,
             tensor_parallel_size=len(available_gpus) // args.pipeline_parallel_size,
@@ -129,6 +133,10 @@ def setup(args):
             # max_model_len=args.vllm_maxlen
         )
         tokenizer = None
+        # test whether the tokenizer is already loaded or make difference
+        tokenizer = AutoTokenizer.from_pretrained(
+            args.model_name_or_path, trust_remote_code=True
+        )
         if args.apply_chat_template:
             tokenizer = AutoTokenizer.from_pretrained(
                 args.model_name_or_path, trust_remote_code=True
@@ -145,6 +153,7 @@ def setup(args):
     data_list = args.data_names.split(",")
     results = []
     for data_name in data_list:
+        # this is the main function to get the results
         results.append(main(llm, tokenizer, data_name, args))
 
     # add "avg" result to data_list and results
@@ -182,6 +191,8 @@ def main(llm, tokenizer, data_name, args):
         executor = PythonExecutor(get_answer_from_stdout=True)
 
     samples = []
+
+    # construct samples
     for example in tqdm(examples, total=len(examples)):
         idx = example["idx"]
 
@@ -224,6 +235,15 @@ def main(llm, tokenizer, data_name, args):
             if key in example:
                 sample[key] = example[key]
         samples.append(sample)
+    # samples have already been constructed
+    # why we need repeat n times?
+    # because we need to repeat the prompt n times
+    # and get n different completions
+    # and then we can get n different predictions
+    # and then we can get the final prediction by voting
+    # or averaging the n predictions
+    # so we need to repeat the prompt n times
+    
 
     # repeat n times
     input_prompts = [
@@ -244,7 +264,7 @@ def main(llm, tokenizer, data_name, args):
 
     max_func_call = 1 if args.prompt_type in ["cot", "pal"] else 4
 
-    stop_words = ["</s>", "<|im_end|>", "<|endoftext|>", "</think>"]
+    stop_words = ["</s>", "<|im_end|>", "<|endoftext|>", "</think>", "<|end_of_text|>, <eos>"]
 
     if args.prompt_type in ["cot"]:
         stop_words.append("\n\nQuestion:")
@@ -258,6 +278,8 @@ def main(llm, tokenizer, data_name, args):
         stop_words.append("\n### Problem")
     elif "pure" in args.prompt_type:
         stop_words.append("\n\n\n")
+    elif args.prompt_type == "gemma_cot":
+        stop_words.append("<eos>")
 
     # start inference
     # measure time use
@@ -286,7 +308,6 @@ def main(llm, tokenizer, data_name, args):
                     ),
                 ),
             )
-
             outputs = sorted(
                 outputs, key=lambda x: int(x.request_id)
             )  # sort outputs by request_id

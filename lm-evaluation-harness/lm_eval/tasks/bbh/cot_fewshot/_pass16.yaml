@@ -1,0 +1,49 @@
+group: bbh_cot_fewshot_pass16
+include: _bbh_cot_fewshot.yaml
+# task: 
+# - bbh_cot_fewshot_boolean_expressions
+
+tag:
+  - pass@16
+  - fewshot
+
+generation_kwargs:
+  max_gen_toks: 1024
+  until:
+    - "</s>"
+    - "Q"
+    - "\n\n"
+  do_sample: true
+  temperature: 0.7
+repeats: 16
+
+metric_list:
+  - metric: exact_match
+    aggregation: mean
+    higher_is_better: true
+  - metric: pass@k
+    aggregation: mean
+    higher_is_better: true
+    args: {k: 16}
+    name: pass@16
+
+filter_list:
+  - name: "get-answer"
+    filter:
+      - function: "regex"
+        regex_pattern: "(?<=the answer is )(.*)(?=.)"
+      # - function: "take_first"
+
+
+aggregate_metric_list:
+  - metric: exact_match
+    aggregation: mean
+    weight_by_size: true
+    filter_list: get-answer
+
+  - metric: pass@k
+    args: {k: 16}
+    aggregation: mean
+    weight_by_size: true
+    filter_list: get-answer
+    name: pass@16     

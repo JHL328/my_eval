@@ -11,6 +11,12 @@ from utils import load_jsonl
 from python_executor import PythonExecutor
 
 
+def calculate_pass_at_k(samples):
+    """计算acc_pass@n_sampling，即每个样本中至少有一个正确答案的比例"""
+    pass_at_k_results = [1 if any(sample['score']) else 0 for sample in samples]
+    return float(np.round(np.mean(pass_at_k_results) * 100, decimals=1))
+
+
 def evaluate(data_name, prompt_type, samples: list=None, file_path: str=None, max_num_samples=None, execute=False):
     assert samples or file_path, "samples or file_path must be provided"
     if not samples:
@@ -69,13 +75,16 @@ def evaluate(data_name, prompt_type, samples: list=None, file_path: str=None, ma
     # output mean of each column of scores
     # col_means= np.array(score_mat).mean(axis=0)
     col_means= np.array(score_mat).mean()
+    # calculate acc_pass@n_sampling
+    acc_pass_at_sampling = calculate_pass_at_k(samples)
     mean_score = float(np.round(col_means * 100, decimals=1))
     result_json = {
         "num_samples": len(samples),
         "num_scores": len(scores),
         "timeout_samples": timeout_cnt,
         "empty_samples": len([s for s in samples if not s['pred'][-1]]),
-        "acc": np.mean(mean_score)
+        "acc": np.mean(mean_score),
+        "acc_pass@n_sampling": acc_pass_at_sampling
     }
 
     # each type score

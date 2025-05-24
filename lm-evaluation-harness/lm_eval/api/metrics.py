@@ -4,7 +4,7 @@ import random
 import re
 import string
 from collections.abc import Iterable
-from typing import List
+from typing import List, Optional, Union
 
 import numpy as np
 import sacrebleu
@@ -245,6 +245,60 @@ def exact_match_hf_evaluate(
 )
 def exact_match_fn(**kwargs):
     return exact_match_hf_evaluate(**kwargs)
+
+@register_metric(
+    metric="pass@k",            # use this to call the metric in YAML
+    higher_is_better=True,
+    # likelihood_required=False,  # only process generated content
+    aggregation="mean",         # harness automatically averages over samples
+    output_type="generate_until"  # for generate / MC tasks
+) 
+def pass_at_k(
+    *pos_args,                           # match the fallback position arguments
+    references: Optional[List[str]] = None,
+    predictions: Optional[List[Union[str, List[str]]]] = None,
+    args: Optional[dict] = None,        # YAML will pass {...}
+    k: int = 16,                        # if args is empty, use default 16
+    ignore_case: bool = False,
+    ignore_punctuation: bool = False,
+    regexes_to_ignore: Optional[List[str]] = None,
+    **_,
+) -> float:
+    """
+    Parameters
+    ----------
+    references
+        List[str]; len==1 reference answer.
+    predictions
+        - for `repeats` →   [pred_1, pred_2, ...]  (length >= k)
+        - for `repeats` → [[pred_1, pred_2, ...]]
+        both formats should be compatible.
+    k
+        k in pass@k; in YAML `args:{k: ...}` overwrite.
+    other kwargs
+        same as exact_match.
+    """
+    gold = references[0].strip()
+
+    # compatible with two predictions structures
+    if len(predictions) == 1 and isinstance(predictions[0], list):
+        preds = predictions[0]
+    else:
+        preds = predictions
+
+    # helper same as official exact_match
+    def _is_correct(p: str) -> bool:
+        return bool(
+            exact_match_hf_evaluate(
+                predictions=[p.strip()],
+                references=[gold],
+                ignore_case=ignore_case,
+                ignore_punctuation=ignore_punctuation,
+                regexes_to_ignore=regexes_to_ignore or [],
+            )["exact_match"]
+        )
+
+    return {"pass@k": float(any(_is_correct(p) for p in preds[:k]))}
 
 
 @register_metric(

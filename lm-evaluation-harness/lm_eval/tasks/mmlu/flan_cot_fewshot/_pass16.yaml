@@ -1,0 +1,54 @@
+group: mmlu_flan_cot_fewshot_pass16
+group_alias: mmlu (flan style, fewshot cot, pass@16)
+task:
+  - mmlu_flan_cot_fewshot_stem
+  - mmlu_flan_cot_fewshot_other
+  - mmlu_flan_cot_fewshot_social_sciences
+  - mmlu_flan_cot_fewshot_humanities
+
+# test generation_kwargs
+generation_kwargs:
+  max_gen_toks: 2048
+  until:
+    - "</s>"
+  do_sample: true
+  temperature: 0.7
+repeats: 16
+
+metric_list:
+  - metric: exact_match
+    aggregation: mean
+    higher_is_better: true
+  - metric: pass@k
+    aggregation: mean
+    higher_is_better: true
+    args: {k: 16}
+    name: pass@16
+
+filter_list:
+  - name: "get-answer1"
+    filter:
+      - function: "regex"
+        regex_pattern: "(?<=answer is )(.*)(?=.)"
+
+# aggregate_metric_list:
+#   - aggregation: mean
+#     metric: exact_match
+#     weight_by_size: True
+#     filter_list: get-answer
+
+aggregate_metric_list:
+  - metric: exact_match
+    aggregation: mean
+    weight_by_size: true
+    filter_list: get-answer1
+
+  - metric: pass@k
+    args: {k: 16}
+    aggregation: mean
+    weight_by_size: true
+    filter_list: get-answer1
+    name: pass@16     
+
+metadata:
+  version: 2

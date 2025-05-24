@@ -79,7 +79,7 @@ def load_prompt(data_name, prompt_type, num_shots):
 
 PROMPT_TEMPLATES = {
     "direct": ("Question: {input}\nAnswer: ", "{output}", "\n\n"),
-    "cot": ("Question: {input}\nAnswer: ", "{output}", "\n\n\n"),
+    "cot": ("Question: {input}, let's think step by step.\nSolution: ", "{output}", "\n\n\n"),
     "pal": ("Question: {input}\n\n", "{output}", "\n---\n"),
     "tool-integrated": ("Question: {input}\n\nSolution:\n", "{output}", "\n---\n"),
     "self-instruct": ("<|user|>\n{input}\n<|assistant|>\n", "{output}", "\n"),
@@ -199,6 +199,21 @@ PROMPT_TEMPLATES = {
         "\n\n",
     ),
     "numina": ("### Problem: {input}\n### Solution:", " {output}", "\n\n"),
+    "mistral_cot": (
+        "[INST] {input} Please reason step by step, and put your final answer within \\boxed{{}}.[/INST]",
+        "{output}",
+        "\n\n",
+    ),
+    "llama_cot": (
+        "<|begin_of_text|>user\n{input} Please reason step by step, and put your final answer within \\boxed{{}}.<|end_of_text|>\n<|begin_of_text|>assistant\n",
+        "{output}",
+        "\n\n",
+    ),
+    "gemma_cot": (
+        "<bos>user\n{input} Please reason step by step, and put your final answer within \\boxed{{}}.<eos>\n<bos>model\n",
+        "{output}",
+        "\n\n",
+    ),
 }
 
 
