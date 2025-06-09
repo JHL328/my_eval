@@ -89,6 +89,30 @@ def get_examples():
         ),
     ]
 
+    examples["math500"] = [
+        (
+            "What is $\\frac{2^2 \\cdot 2^{-3}}{2^3 \\cdot 2^{-2}}$?",
+            "We compute that \\[\\frac{2^2 \\cdot 2^{-3}}{2^3 \\cdot 2^{-2}} = \\frac{2^{2 - 3}}{2^{3 - 2}} = \\frac{2^{-1}}{2^1} = 2^{-1 - 1} = 2^{-2} = \\frac{1}{2^2} = \\boxed{\\frac{1}{4}}.\\ The Answer is frac{1}{4}]"
+        ),
+        (
+            "What is the value of $\\dfrac{3 \\times 4}{6}?$",
+            "Calculating the numerator first, $\\dfrac{3 \\times 4}{6} = \\dfrac{12}{6} = \\boxed{2}$. The Answer is 2"
+        ),
+        (
+            "How many positive integers less than $101$ are multiples of either $5$ or $7$, but not both at once?",
+            "There are $20$ positive multiples of $5$ less than $101$. There are $14$ positive multiples of $7$ less than $101$. However, the least common multiple of $5$ and $7$ is $35$, and there are $2$ positive multiples of $35$ less than $101$. This means there are $20 - 2 = 18$ multiples of $5$ that aren't multiples of $7$, and $14 - 2 = 12$ multiples of 7 that aren't multiples of $5$, for a total of $18 + 12 = \\boxed{30}$. The Answer is 30"
+        ),
+        (
+            "What is the product of the two largest one-digit primes and the largest two-digit prime?",
+            "The two largest one-digit primes are 5 and 7; the largest two-digit prime is 97 (98 and 99 are both composite). The product of these three primes is $5 \\cdot 7 \\cdot 97 = 35 \\cdot 97 = 35(100-3)=3500-105=\\boxed{3395}$. The Answer is 3395"
+        ),
+        (
+            "How many digits does the smallest repeating block in the decimal expansion of $\\frac{5}{7}$ contain?",
+            "We use long division to find that the decimal representation of $\\frac{5}{7}$ is $0.\\overline{714285}$, which is a repeating block of $\\boxed{6}$ digits. The Answer is 6"
+        ),
+        
+    ]
+
     examples["math_pal"] = [
         (
             "Display the final result in LaTeX.\n\n Find the coefficient of $x^3$ when $3(x^2 - x^3+x) +3(x +2x^3- 3x^2 + 3x^5+x^3) -5(1+x-4x^3 - x^2)$ is simplifie.",

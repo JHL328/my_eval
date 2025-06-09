@@ -4,6 +4,8 @@ from os import PathLike
 import sys
 eval_plus_path = os.path.dirname(os.path.abspath(__file__)) + "/evalplus/"
 sys.path = [eval_plus_path] + sys.path
+from evalplus.sanitize import sanitize_code
+from evalplus.evaluate import untrusted_check
 from model import DecoderBase, make_model
 from rich.progress import (
     BarColumn,

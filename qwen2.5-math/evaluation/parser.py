@@ -500,6 +500,7 @@ def extract_theoremqa_answer(pred: str, answer_flag: bool = True):
 
 
 def extract_answer(pred_str, data_name, use_last_number=True):
+    pred = ''
     pred_str = pred_str.replace("\u043a\u0438", "")
     if data_name in ["mmlu_stem", "sat_math", "aqua", "gaokao2023", "gpqa_main", "gpqa_diamond"]:
         # TODO check multiple choice
@@ -531,7 +532,10 @@ def extract_answer(pred_str, data_name, use_last_number=True):
             a = ans.split("$")[0].strip()
         pred = a
     elif "he answer is" in pred_str:
-        pred = pred_str.split("he answer is")[-1].strip()
+        # pred = pred_str.split("he answer is")[-1].strip()
+        matches = list(re.finditer(r'he answer is[^0-9-]*(-?\d+)', pred_str))
+        if matches:
+            pred = matches[-1].group(1)
     elif "final answer is" in pred_str:
         pred = pred_str.split("final answer is")[-1].strip()
     elif "答案是" in pred_str:
@@ -539,10 +543,12 @@ def extract_answer(pred_str, data_name, use_last_number=True):
         pred = pred_str.split("答案是")[1].strip().split("\n\n")[0].strip()
     else:  # use the last number
         if use_last_number:
-            pattern = "-?\d*\.?\d+"
+            # pattern = "-?\d*\.?\d+"
+            pattern = "(-?[$0-9.,]{2,})|(-?[0-9]+)"
             pred = re.findall(pattern, pred_str.replace(",", ""))
-            if len(pred) >= 1:
-                pred = pred[-1]
+            numbers = [m[0] if m[0] else m[1] for m in pred]
+            if len(numbers) >= 1:
+                pred = numbers[-1]
             else:
                 pred = ""
         else:
@@ -561,7 +567,8 @@ def extract_answer(pred_str, data_name, use_last_number=True):
 
     # multiple line
     # pred = pred.split("\n")[0]
-    pred = re.sub(r"\n\s*", "", pred)
+    # pred = re.sub(r"\n\s*", "", pred)
+    pred = re.sub(r"\n\s*", "", str(pred) if pred is not None else "")
     if pred != "" and pred[0] == ":":
         pred = pred[1:]
     if pred != "" and pred[-1] == ".":

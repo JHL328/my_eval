@@ -19,4 +19,4 @@ python -u pipeline/main.py "$@"
 
 
 ############### Usage ###############
-#### sbatch pipeline/main.sh --benchmark math500_pass1 --prompt_type cot --gpus_per_task 1 --num_node 1
+#### sbatch pipeline/main.sh --gpus_per_task 1 --num_node 1
