@@ -10,7 +10,7 @@ import sys
 from vllm import LLM, SamplingParams
 
 # Output directory for results
-output_dir = "/mnt/sharefs/users/haolong.jia/result/mmlu_pro_pass16_newpipeline"
+output_dir = "/mnt/sharefs/users/haolong.jia/result/mmlu_pro_pass16"
 os.makedirs(output_dir, exist_ok=True)
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))

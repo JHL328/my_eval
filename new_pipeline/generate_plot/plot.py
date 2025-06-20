@@ -1,23 +1,75 @@
+"""
+This script generates a performance plot from a JSON results file.
+It's designed to visualize the progress of different model configurations (or "groups") over varying numbers of samples/steps,
+and compare them against fixed-performance open-source models.
+
+Usage Example:
+python plot.py --passk /path/to/your/results/passk.json --output /path/to/save/plot.pdf --metric "pass@16" --task "YourBenchmarkName"
+
+Arguments:
+    --passk (str): Path to the JSON file containing experiment results.
+                   The JSON structure is typically:
+                   {
+                       "model_name_or_group_step": {
+                           "metric_name_1": value_1,
+                           "metric_name_2": value_2,
+                           ...
+                       },
+                       ...
+                   }
+    --output (str): Path where the generated plot (PDF format) will be saved.
+    --metric (str): The specific metric name (e.g., "pass@1", "pass@16") to plot from the results.
+    --task (str): The name of the benchmark or task (e.g., "BBH", "MMLU") for which the plot is generated.
+                  This will be used in the plot title.
+"""
 import json
 import argparse
 import re
 import matplotlib.pyplot as plt
 from collections import defaultdict
 
-# group name to label, can add more groups here
-def group_to_label(group):
-    # example: t35-m30-g35 -> txt:35, mm:30, general:35
+def get_canonical_color_key(raw_group):
+    # special case for social_candy_0
+    if raw_group.startswith('social_candy_0'):
+        return 'social_candy_0'
+    # parse parameters
     mapping = {
-        't': 'txt',
+        't': 't',
         'm': 'mm',
-        'g': 'general',
-        'o': 'opencoder',
+        'o': 'code',
         'r': 'reasoning',
         'p': 'planning',
         'a': 'ai',
-        'ma': 'math'
+        'g': 'general',
+        'ma': 'thinking'
     }
-    # note the regex here
+    # support multiple letter parameters (e.g., ma)
+    parts = re.findall(r'([a-z]+)(\d+)', raw_group)
+    # only keep non-zero parameters, t and mm are always kept
+    items = []
+    for k, v in parts:
+        k = k.lower()
+        if k in mapping:
+            if k in ['t', 'm'] or int(v) != 0:
+                items.append(f"{mapping[k]}{v}")
+        else:
+            items.append(f"{k}{v}")
+    return '-'.join(items)
+
+# group name to label, can add more groups here
+def group_to_label(group):
+    if group == 'social_candy_0':
+        return 'test-mix-0'
+    mapping = {
+        't': 't',
+        'm': 'mm',
+        'g': 'general',
+        'o': 'coder',
+        'r': 'reasoning',
+        'p': 'planning',
+        'a': 'ai',
+        'ma': 'thinking'
+    }
     parts = re.findall(r'([a-z]+)(\d+)', group)
     label = []
     for k, v in parts:
@@ -28,10 +80,28 @@ def group_to_label(group):
             label.append(f"{k}:{v}")
     return ', '.join(label)
 
+# can add more colors here
+color_map = {
+    't70-mm30': '#1f77b4',
+    't50-mm30-code20': '#ff7f0e',
+    't35-mm30-general35': '#2ca02c',
+    't60-mm30-reasoning10': '#d62728',
+    't40-mm30-reasoning4-planning3-ai3-general10-thinking10': '#9467bd',
+    't20-mm25-reasoning7-planning7-ai7-general9-thinking25': '#8c564b',
+    't60-mm30-thinking10': '#e377c2',
+    't30-mm15-code10-reasoning5-planning5-general20-thinking15': '#7f7f7f',
+    't70-mm10-thinking20': '#bcbd22',
+    'social_candy_0': '#17becf',
+    'test-mix-0': '#17becf',
+    'Llama-3.2-3B': '#e41a1c',
+    'Qwen3-1.7B-Base': '#377eb8',
+}
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--passk', type=str, required=True, help='Path to passk.json')
 parser.add_argument('--output', type=str, required=True, help='Output PDF path')
 parser.add_argument('--metric', type=str, required=True, help='Metric name in passk.json, e.g., pass@16')
+parser.add_argument('--task', type=str, required=True, help='Benchmark or task name for the plot title, e.g., BBH, MMLU')
 args = parser.parse_args()
 
 with open(args.passk, 'r') as f:
@@ -41,49 +111,56 @@ group_lines = defaultdict(list)  # group -> list of (step, metric)
 open_source_lines = {}           # model_name -> metric
 
 for model_name, result in data.items():
-    # group-step 格式
-    match = re.match(r'([a-z0-9\-]+)-(\d+)$', model_name)
+    # special case for social_candy_0_XXXXX
+    if model_name.startswith('social_candy_0_'):
+        group = 'social_candy_0'
+        step = int(model_name.split('_')[-1])
+        if args.metric in result:
+            group_lines[group].append((step, result[args.metric]))
+        continue
+    # other groups keep the original -digit ending regex logic
+    match = re.match(r'([a-z0-9_\-]+)-(\d+)$', model_name)
     if match and args.metric in result:
-        group = match.group(1)
+        raw_group = match.group(1)
         step = int(match.group(2))
+        group = get_canonical_color_key(raw_group)
         group_lines[group].append((step, result[args.metric]))
     elif args.metric in result:
-        # 只保留 Llama-3.2-3B 和 Qwen3-1.7B-Base
+        # only keep Llama-3.2-3B and Qwen3-1.7B-Base for open source models
         if model_name not in ["Llama-3.2-3B", "Qwen3-1.7B-Base"]:
             continue
         open_source_lines[model_name] = result[args.metric]
 
-plt.figure(figsize=(16, 7))
+plt.figure(figsize=(16, 7), facecolor='#f7f7f7')
 
 # plot group curves
 for group, points in group_lines.items():
     if len(points) < 2:
-        # group with only one point is not plotted
         continue
     points = sorted(points)
     steps, metrics = zip(*points)
     label = group_to_label(group)
-    plt.plot(steps, metrics, marker='o', label=label)
+    color = color_map.get(group, None)
+    plt.plot(steps, metrics, marker='o', label=label, color=color, linewidth=2, markersize=7)
 
-# assign different colors to open source models
-open_source_colors = [
-    '#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00', '#ffff33', '#a65628', '#f781bf', '#999999'
-]
-for idx, (model_name, metric) in enumerate(open_source_lines.items()):
-    color = open_source_colors[idx % len(open_source_colors)]
-    plt.axhline(y=metric, linestyle='--', color=color, label=model_name)
+# assign fixed colors to open source models
+for model_name, metric in open_source_lines.items():
+    color = color_map.get(model_name, None)
+    plt.axhline(y=metric, linestyle='--', color=color, label=model_name, linewidth=2)
 
-plt.xlabel('Step')
-plt.ylabel(args.metric)
-plt.title(f'{args.metric} vs Step')
+plt.xlabel('Number of Samples', fontsize=14)
+plt.ylabel(args.metric.replace('_', '@'), fontsize=14)
+plt.title(f'{args.task} Tokenmix Ablation Progress', fontsize=16, weight='bold')
 plt.legend(
     title='Experiment',
     loc='center left',
     bbox_to_anchor=(1.01, 0.5),
-    fontsize=9,
+    fontsize=11,
+    title_fontsize=12,
+    frameon=False,
     borderaxespad=0.
 )
-plt.grid(True, linestyle='--', alpha=0.7)
+plt.grid(True, linestyle='--', alpha=0.5)
 plt.tight_layout()
-plt.savefig(args.output, format='pdf', bbox_inches='tight')
+plt.savefig(args.output, format='pdf', bbox_inches='tight', facecolor='#f7f7f7')
 print(f'Saved plot to {args.output}')

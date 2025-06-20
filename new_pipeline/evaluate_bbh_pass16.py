@@ -101,7 +101,7 @@ def main():
         max_tokens=512,
         n=16,
         temperature=0.7,
-        stop=["</s>"]
+        # stop=["</s>"]  # stop=["</s>"] will cause the model to stop generating when it sees </s>
     )
 
     gens = llm.generate(prompts, sampling_params, use_tqdm=True)

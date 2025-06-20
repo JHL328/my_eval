@@ -120,7 +120,7 @@ def main():
         max_tokens=1024,
         n=16,
         temperature=0.7,
-        stop=["</s>"]
+        # stop=["</s>"]
     )
 
     # generate

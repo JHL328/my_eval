@@ -1,0 +1,112 @@
+#!/bin/bash
+
+# =============================================================================
+# Universal Benchmark Submitter Script (No Arg Passthrough)
+# =============================================================================
+# This script is a unified entry point for submitting all benchmark batch jobs.
+# It dispatches to the correct batch script (evaluate_gsm8k.sh, evaluate_likelihood.sh, evaluate.sh)
+# based on the --task argument, and passes only hardcoded arguments for each task.
+#
+# USAGE:
+#   bash submitter.sh --task <TASK_NAME>
+#
+# EXAMPLES:
+#   bash submitter.sh --task gsm8k
+#   bash submitter.sh --task math500
+#   bash submitter.sh --task drop
+#   bash submitter.sh --task arc_challenge
+#   bash submitter.sh --task mmlu_flan_cot_fewshot_pass16
+#
+# All sbatch commands and arguments are hardcoded per task below.
+# =============================================================================
+
+# Parse --task argument
+TASK_NAME=""
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --task)
+            if [[ -n "$2" && ! "$2" =~ ^-- ]]; then
+                TASK_NAME="$2"
+                shift 2
+            else
+                shift
+            fi
+            ;;
+        --task=*)
+            TASK_NAME="${1#*=}"
+            shift
+            ;;
+        *)
+            shift
+            ;;
+    esac
+done
+
+if [[ -z "$TASK_NAME" ]]; then
+    echo "[submitter.sh] ERROR: --task argument is required."
+    echo "Usage: bash submitter.sh --task <TASK_NAME>"
+    exit 1
+fi
+
+# One-task-one-branch, all sbatch commands and arguments are hardcoded below
+##############################
+###### MATH Tasks ###########
+##############################
+if [[ "$TASK_NAME" == "gsm8k" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_gsm8k.sh --task gsm8k"
+elif [[ "$TASK_NAME" == "math500" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_gsm8k.sh --task math500"
+
+##############################
+###### Likelihood eval #######
+##############################
+elif [[ "$TASK_NAME" == "drop" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_likelihood.sh --task drop"
+elif [[ "$TASK_NAME" == "arc_easy" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_likelihood.sh --task arc_easy"
+elif [[ "$TASK_NAME" == "arc_challenge" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_likelihood.sh --task arc_challenge"
+elif [[ "$TASK_NAME" == "hellaswag" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_likelihood.sh --task hellaswag"
+elif [[ "$TASK_NAME" == "piqa" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_likelihood.sh --task piqa"
+elif [[ "$TASK_NAME" == "winogrande" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_likelihood.sh --task winogrande"
+elif [[ "$TASK_NAME" == "triviaqa" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_likelihood.sh --task triviaqa"
+elif [[ "$TASK_NAME" == "nq_open" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_likelihood.sh --task nq_open"
+elif [[ "$TASK_NAME" == "commonsense_qa" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_likelihood.sh --task commonsense_qa"
+elif [[ "$TASK_NAME" == "agieval" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_likelihood.sh --task agieval"
+elif [[ "$TASK_NAME" == "openbookqa" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_likelihood.sh --task openbookqa"
+elif [[ "$TASK_NAME" == "social_iqa" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_likelihood.sh --task social_iqa"
+elif [[ "$TASK_NAME" == "truthfulqa_mc2" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_likelihood.sh --task truthfulqa_mc2"
+##############################
+#### MMLU and BBH Tasks ######
+##############################
+elif [[ "$TASK_NAME" == "mmlu_flan_cot_fewshot_pass16" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate.sh --task mmlu_flan_cot_fewshot_pass16 --force"
+elif [[ "$TASK_NAME" == "mmlu_pro_pass16" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate.sh --task mmlu_pro_pass16 --force"
+elif [[ "$TASK_NAME" == "bbh_pass16" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate.sh --task bbh_pass16 --force"
+elif [[ "$TASK_NAME" == "mmlu" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate.sh --task mmlu --force"
+##############################
+###### GQA Tasks #############
+##############################
+# TODO: add gpqa support
+elif [[ "$TASK_NAME" == "gpqa" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate.sh --task gpqa --force"
+else
+    echo "[submitter.sh] ERROR: Unknown or unsupported task: $TASK_NAME"
+    echo "Supported tasks: gsm8k, math500, drop, arc_easy, arc_challenge, hellaswag, piqa, winogrande, triviaqa, nq_open, commonsense_qa, agieval, openbookqa, social_iqa, truthfulqa_mc1, truthfulqa_mc2, mmlu_flan_cot_fewshot_pass16, mmlu_pro_pass16, bbh_pass16, mmlu, gpqa"
+    exit 2
+fi
+echo "[submitter.sh] Will run: $CMD"
+eval "$CMD"

@@ -105,7 +105,7 @@ def main():
         max_tokens=1024,
         n=16,
         temperature=0.7,
-        stop=["</s>"]
+        # stop=["</s>"]
     )
 
     gens = llm.generate(prompts, sampling_params, use_tqdm=True)
