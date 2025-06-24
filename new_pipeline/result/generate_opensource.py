@@ -5,10 +5,6 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from model import Model_map
 
-# =====================
-# config
-# =====================
-# metric name mapping: original metric name -> display name
 METRIC_NAME_MAP = {
     'pass@1': 'pass@1',
     'pass@2': 'pass@2',
@@ -22,7 +18,6 @@ METRIC_NAME_MAP = {
     'exact_match,remove_whitespace': 'exact_match',
 }
 
-# each benchmark's result.json path and metrics to extract
 BENCHMARKS = {
     'bbh_3shot_cot': {
         'path': '/mnt/sharefs/users/haolong.jia/result/bbh_pass16/passk.json',
@@ -102,50 +97,21 @@ BENCHMARKS = {
     },
 }
 
-# =====================
-# dynamically generate model list (name, index, 71525)
-# =====================
-MODEL_INFOS = []
-TARGET_SUFFIX = '_71525'
-for model_name_full in Model_map.values():
-    if model_name_full.endswith(TARGET_SUFFIX):
-        base = model_name_full[:-len(TARGET_SUFFIX)]
-        parts = base.rsplit('_', 1)
-        if len(parts) == 2:
-            name = parts[0]
-            try:
-                index = int(parts[1])
-                MODEL_INFOS.append((name, index, 71525))
-            except Exception:
-                print(f"⚠️ Warning: index parse failed for {model_name_full}")
-        else:
-            print(f"⚠️ Warning: model name {model_name_full} does not match 'name_index_71525' pattern.")
+OPEN_SOURCE_MODEL_NAMES = [
+    "Llama-3.2-3B","Qwen2.5-1.5B","SmolLM2-1.7B","Llama-3.2-1B",
+    "Mistral-7B","Qwen2.5-3B","Qwen3-1.7B-Base","Qwen3-4B-Base"
+]
 
-# sort by index, ensure Index column is increasing
-MODEL_INFOS.sort(key=lambda x: x[1])
-
-# =====================
-# generate header order
-# =====================
-header = ['Index']
+header = ['Model']
 for bench, info in BENCHMARKS.items():
     for metric in info['metrics']:
         display_metric = METRIC_NAME_MAP.get(metric, metric)
         header.append(f"{bench}_{display_metric}")
 
-# =====================
-# main table generation
-# =====================
-def make_model_key(name, index, suffix):
-    return f"{name}_{index}_{suffix}"
-
-# result table
 rows = []
-for name, index, suffix in MODEL_INFOS:
-    row = {'Index': index}
-    model_key = make_model_key(name, index, suffix)
+for model_name in OPEN_SOURCE_MODEL_NAMES:
+    row = {'Model': model_name}
     for bench, info in BENCHMARKS.items():
-        # 读取json
         try:
             with open(info['path'], 'r') as f:
                 data = json.load(f)
@@ -153,26 +119,21 @@ for name, index, suffix in MODEL_INFOS:
             print(f"⚠️ Failed to load {info['path']}: {e}")
             for metric in info['metrics']:
                 display_metric = METRIC_NAME_MAP.get(metric, metric)
-                row[f"{bench}_{display_metric}"] = -1
+                row[f"{bench}_{display_metric}"] = "-1"
             continue
         for metric in info['metrics']:
             display_metric = METRIC_NAME_MAP.get(metric, metric)
-            value = -1
-            if model_key in data and metric in data[model_key]:
-                value = data[model_key][metric]
+            value = "-1"
+            if model_name in data and metric in data[model_name]:
+                value = str(data[model_name][metric])
             else:
-                print(f"⚠️ Missing {model_key} {metric} in {info['path']}")
+                print(f"⚠️ Missing {model_name} {metric} in {info['path']}")
             row[f"{bench}_{display_metric}"] = value
     rows.append(row)
 
-# =====================
-# save as csv, column order consistent with header
-# =====================
-out_path = '/mnt/sharefs/users/haolong.jia/result/mixup_1_summary.csv'
+out_path = '/mnt/sharefs/users/haolong.jia/result/opensource.csv'
 df = pd.DataFrame(rows)
-df = df[header] # force column order
-
-# save as csv
+df = df[header]
 os.makedirs(os.path.dirname(out_path), exist_ok=True)
 df.to_csv(out_path, index=False)
 print(f"🎉 Saved to {out_path}")

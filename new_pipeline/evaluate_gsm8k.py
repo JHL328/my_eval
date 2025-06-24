@@ -479,6 +479,7 @@ def summarize_passk_for_all_models(task_name, task_config):
     with open(passk_json, 'w') as f:
         json.dump(all_results, f, indent=2, ensure_ascii=False)
     print(f"\n✅ all models pass@k results saved to: {passk_json}")
+    print(f"🎉 evaluation completed!")
 
 # =====================
 # Main Entry

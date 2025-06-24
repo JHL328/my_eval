@@ -49,10 +49,19 @@ if [[ -z "$TASK_NAME" ]]; then
 fi
 
 # One-task-one-branch, all sbatch commands and arguments are hardcoded below
+
+##############################
+###### Code Tasks ###########
+##############################
+if [[ "$TASK_NAME" == "mbpp" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_code.sh --task mbpp"
+elif [[ "$TASK_NAME" == "humaneval" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_code.sh --task humaneval"
+    
 ##############################
 ###### MATH Tasks ###########
 ##############################
-if [[ "$TASK_NAME" == "gsm8k" ]]; then
+elif [[ "$TASK_NAME" == "gsm8k" ]]; then
     CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_gsm8k.sh --task gsm8k"
 elif [[ "$TASK_NAME" == "math500" ]]; then
     CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_gsm8k.sh --task math500"
@@ -105,7 +114,7 @@ elif [[ "$TASK_NAME" == "gpqa" ]]; then
     CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate.sh --task gpqa --force"
 else
     echo "[submitter.sh] ERROR: Unknown or unsupported task: $TASK_NAME"
-    echo "Supported tasks: gsm8k, math500, drop, arc_easy, arc_challenge, hellaswag, piqa, winogrande, triviaqa, nq_open, commonsense_qa, agieval, openbookqa, social_iqa, truthfulqa_mc1, truthfulqa_mc2, mmlu_flan_cot_fewshot_pass16, mmlu_pro_pass16, bbh_pass16, mmlu, gpqa"
+    echo "Supported tasks: gsm8k, math500, drop, arc_easy, arc_challenge, hellaswag, piqa, winogrande, triviaqa, nq_open, commonsense_qa, agieval, openbookqa, social_iqa, truthfulqa_mc2, mmlu_flan_cot_fewshot_pass16, mmlu_pro_pass16, bbh_pass16, mmlu, gpqa"
     exit 2
 fi
 echo "[submitter.sh] Will run: $CMD"
