@@ -23,6 +23,7 @@ def parse_args():
     parser.add_option("--model", type="str", dest="model")
     parser.add_option("--task", type="str", dest="task")
     parser.add_option("--cot_prompts_path", type="str", dest="cot_prompts_path", default="/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/bbh_cot_prompts.json")
+    parser.add_option("--tp_size", type="int", dest="tp_size", default=1, help="Tensor parallel size for VLLM")
     (options, args) = parser.parse_args()
     return options
 
@@ -88,7 +89,7 @@ def main():
     max_retries = 10
     for attempt in range(max_retries):
         try:
-            llm = LLM(model=model_path, gpu_memory_utilization=0.95, tensor_parallel_size=1, enable_prefix_caching=True)
+            llm = LLM(model=model_path, gpu_memory_utilization=0.95, tensor_parallel_size=options.tp_size, enable_prefix_caching=True, dtype="auto")
             break
         except Exception as e:
             print(f"Attempt {attempt + 1} to load model failed: {e}")

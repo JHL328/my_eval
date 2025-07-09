@@ -30,9 +30,11 @@ def create_job_script(script_path, exp_name, log_path, command_args, time_limit=
 #SBATCH -n 1
 #SBATCH --mem=180G
 #SBATCH --gres=gpu:1
+#SBATCH --cpus-per-task=16
 #SBATCH --job-name={exp_name}
 #SBATCH --time={time_limit}
-#SBATCH --partition=main
+#SBATCH --partition=lowprio
+#SBATCH --qos=lowprio
 #SBATCH -o {log_path}%j_%x.out
 #SBATCH -e {log_path}%j_%x.err
 
@@ -292,6 +294,7 @@ def run_bbh_pass16(max_model=10, force=False):
             last_status_time = time.time()
         while queue.can_submit():
             model_path, model_name = queue.submit_next()
+            tp_size = 1  # 固定为1，运行1 gpu per model的时候注意改为1
             if model_path is None:
                 break
             model_dir = os.path.join(output_dir, str(model_name))
@@ -317,7 +320,7 @@ def run_bbh_pass16(max_model=10, force=False):
                     command_args = (
                         f"python {abs_eval_script} "
                         f"--model {model_path} --task {task} --idx_start {idx_start} --idx_end {idx_end} "
-                        f"--cot_prompts_path {cot_prompts_path}"
+                        f"--cot_prompts_path {cot_prompts_path} --tp_size {tp_size}"
                     )
                     create_job_script(script_path, exp_name, log_path, command_args, time_limit="0:10:00")
                     # 等待脚本真正写入磁盘
@@ -871,13 +874,13 @@ if __name__ == "__main__":
     # set default max_model for each task
     if args.max_model is None:
         if args.task == "mmlu_flan_cot_fewshot_pass16":
-            args.max_model = 6
+            args.max_model = 4
         elif args.task == "mmlu":
             args.max_model = 4
         elif args.task == "bbh_pass16":
             args.max_model = 4
         elif args.task == "mmlu_pro_pass16":
-            args.max_model = 6
+            args.max_model = 4
         elif args.task == "gpqa":
             args.max_model = 8
         else:

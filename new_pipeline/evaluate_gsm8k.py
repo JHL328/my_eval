@@ -56,7 +56,7 @@ TASK_CONFIGS = {
         "TIME_LIMIT": "12:00:00",
         "PARTITION": "lowprio",
         "QOS": "lowprio",
-        "MEM": "150G",
+        "MEM": "400G",
         "FEWSHOT_EXAMPLES": None,
         "CONDA_ACTIVATE_PATH": "source /mnt/weka/home/haolong.jia/miniconda3/bin/activate qwen-eval",
         "CD_PATH_IN_JOB_SCRIPT": "/mnt/weka/home/haolong.jia/eval/RL-eval/qwen2.5-math/evaluation",

@@ -74,8 +74,53 @@ class ModelQueue:
 
 Model_map = {
     #######################################################
-    ########## below are the open source models ##########
+    ########## below are the final 587bins models ##########
     #######################################################
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_final4/tokenmix_ablation_usable_model_0/usable_model_0_71525": "usable_model_0_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_final4/tokenmix_ablation_solitary_instruction_1/solitary_instruction_1_71525": "solitary_instruction_1_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_final4/tokenmix_ablation_adorable_axis_2/adorable_axis_2_71525": "adorable_axis_2_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_final4/tokenmix_ablation_cooperative_matrix_3/cooperative_matrix_3_71525": "cooperative_matrix_3_71525",
+    #######################################################
+    ########## below are the iter2 587bins models #########
+    #######################################################
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_abstracted_wozniak_1/abstracted_wozniak_1_71525": "abstracted_wozniak_1_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_adapting_legato_24/adapting_legato_24_71525": "adapting_legato_24_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_admiring_postmodernism_3/admiring_postmodernism_3_71525": "admiring_postmodernism_3_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_adoring_ratio_8/adoring_ratio_8_71525": "adoring_ratio_8_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_ashamed_havarti_12/ashamed_havarti_12_71525": "ashamed_havarti_12_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_certain_pattern_7/certain_pattern_7_71525": "certain_pattern_7_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_circular_inkstone_16/circular_inkstone_16_71525": "circular_inkstone_16_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_classical_eggs_32/classical_eggs_32_71525": "classical_eggs_32_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_colorful_waffle_22/colorful_waffle_22_71525": "colorful_waffle_22_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_courageous_monoid_6/courageous_monoid_6_71525": "courageous_monoid_6_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_dreadful_os_14/dreadful_os_14_71525": "dreadful_os_14_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_eminent_abscissa_11/eminent_abscissa_11_71525": "eminent_abscissa_11_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_equilateral_opera_10/equilateral_opera_10_71525": "equilateral_opera_10_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_futuristic_cube_13/futuristic_cube_13_71525": "futuristic_cube_13_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_generative_icecream_20/generative_icecream_20_71525": "generative_icecream_20_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_goodly_matrix_26/goodly_matrix_26_71525": "goodly_matrix_26_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_grumpy_c++_33/grumpy_c++_33_71525": "grumpy_c++_33_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_hurt_sandwich_9/hurt_sandwich_9_71525": "hurt_sandwich_9_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_lethargic_alpha_27/lethargic_alpha_27_71525": "lethargic_alpha_27_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_liberal_habanera_25/liberal_habanera_25_71525": "liberal_habanera_25_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_penitent_omelette_30/penitent_omelette_30_71525": "penitent_omelette_30_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_plastic_calligraphy_31/plastic_calligraphy_31_71525": "plastic_calligraphy_31_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_promoted_c++_23/promoted_c++_23_71525": "promoted_c++_23_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_reasonable_grid_15/reasonable_grid_15_71525": "reasonable_grid_15_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_remaining_zucchini_5/remaining_zucchini_5_71525": "remaining_zucchini_5_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_ridiculous_mezzoforte_2/ridiculous_mezzoforte_2_71525": "ridiculous_mezzoforte_2_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_sick_point_0/sick_point_0_71525": "sick_point_0_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_sincere_stew_17/sincere_stew_17_71525": "sincere_stew_17_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_sorry_marimba_18/sorry_marimba_18_71525": "sorry_marimba_18_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_spiritual_calligraphy_21/spiritual_calligraphy_21_71525": "spiritual_calligraphy_21_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_surrounding_mayonnaise_19/surrounding_mayonnaise_19_71525": "surrounding_mayonnaise_19_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_taxonomic_monograph_4/taxonomic_monograph_4_71525": "taxonomic_monograph_4_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_thirsty_opacity_23/thirsty_opacity_23_71525": "thirsty_opacity_23_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_unchanged_freddiemercury_28/unchanged_freddiemercury_28_71525": "unchanged_freddiemercury_28_71525",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_zesty_triangle_29/zesty_triangle_29_71525": "zesty_triangle_29_71525",
+    ######################################################
+    ######### below are the open source models ###########
+    ######################################################
     "/mnt/sharefs/users/haolong.jia/checkpoint/Llama-3.2-3B": "Llama-3.2-3B",
     "/mnt/sharefs/users/haolong.jia/checkpoint/Qwen2.5-1.5B": "Qwen2.5-1.5B",
     "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM2-1.7B": "SmolLM2-1.7B",
@@ -84,9 +129,9 @@ Model_map = {
     "/mnt/sharefs/users/haolong.jia/checkpoint/Qwen2.5-3B": "Qwen2.5-3B",
     "/mnt/sharefs/users/haolong.jia/checkpoint/Qwen3-1.7B-Base": "Qwen3-1.7B-Base",
     "/mnt/sharefs/users/haolong.jia/checkpoint/Qwen3-4B-Base": "Qwen3-4B-Base",
-    ##########################################################################
-    ########## below are the tokenmix ablation models with 587 bins ##########
-    ##########################################################################
+    ########################################################################
+    ######## below are the tokenmix ablation models with 587 bins ##########
+    ########################################################################
     "/mnt/sharefs/users/haolong.jia/checkpoint_587bins/tokenmix_ablation_abstract_determinant_16/abstract_determinant_16_71525": "abstract_determinant_16_71525",
     "/mnt/sharefs/users/haolong.jia/checkpoint_587bins/tokenmix_ablation_accurate_method_12/accurate_method_12_71525": "accurate_method_12_71525",
     "/mnt/sharefs/users/haolong.jia/checkpoint_587bins/tokenmix_ablation_alluring_calculator_13/alluring_calculator_13_71525": "alluring_calculator_13_71525",
@@ -164,9 +209,9 @@ Model_map = {
     "/mnt/sharefs/users/haolong.jia/checkpoint_587bins/tokenmix_ablation_weekly_polynomial_36/weekly_polynomial_36_71525": "weekly_polynomial_36_71525",
     "/mnt/sharefs/users/haolong.jia/checkpoint_587bins/tokenmix_ablation_weird_eminem_22/weird_eminem_22_71525": "weird_eminem_22_71525",
     "/mnt/sharefs/users/haolong.jia/checkpoint_587bins/tokenmix_ablation_willing_violin_31/willing_violin_31_71525": "willing_violin_31_71525",
-    ##########################################################################
-    ########## below are the tokenmix ablation models with low bins ##########
-    ##########################################################################
+    #########################################################################
+    ######### below are the tokenmix ablation models with low bins ##########
+    #########################################################################
     "/mnt/sharefs/users/haolong.jia/checkpoint/tokenmix_ablation_awesome_kilby/awesome_kilby_102802": "t35-m30-g35-102802",
     "/mnt/sharefs/users/haolong.jia/checkpoint/tokenmix_ablation_awesome_kilby/awesome_kilby_110145": "t35-m30-g35-110145",
     "/mnt/sharefs/users/haolong.jia/checkpoint/tokenmix_ablation_awesome_kilby/awesome_kilby_117488": "t35-m30-g35-117488",

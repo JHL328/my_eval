@@ -106,7 +106,7 @@ mkdir -p "$OUTPUT_DIR" # ensure directory exists
 
 # --- add monitoring ---
 CHECK_INTERVAL=60   # check every 60 seconds
-TIMEOUT=600         # 10 minutes = 600 seconds
+TIMEOUT=600         # 600 seconds = 10 minutes
 
 # Function to check if all models are complete based on result.json files
 check_all_models_complete() {
