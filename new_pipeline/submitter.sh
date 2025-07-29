@@ -54,8 +54,18 @@ fi
 ###### Code Tasks ###########
 ##############################
 if [[ "$TASK_NAME" == "mbpp" ]]; then
-    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_code.sh --task mbpp"
+    # Two-stage submission: GPU for generation, then CPU for sanitize/evaluate
+    echo "[submitter.sh] Submitting two-stage pipeline for mbpp"
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/generate_code_gpu.sh --task mbpp"
 elif [[ "$TASK_NAME" == "humaneval" ]]; then
+    # Two-stage submission: GPU for generation, then CPU for sanitize/evaluate
+    echo "[submitter.sh] Submitting two-stage pipeline for humaneval"
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/generate_code_gpu.sh --task humaneval"
+elif [[ "$TASK_NAME" == "mbpp_old" ]]; then
+    # Old single-job submission for backward compatibility
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_code.sh --task mbpp"
+elif [[ "$TASK_NAME" == "humaneval_old" ]]; then
+    # Old single-job submission for backward compatibility
     CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_code.sh --task humaneval"
     
 ##############################
@@ -114,7 +124,8 @@ elif [[ "$TASK_NAME" == "gpqa" ]]; then
     CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate.sh --task gpqa --force"
 else
     echo "[submitter.sh] ERROR: Unknown or unsupported task: $TASK_NAME"
-    echo "Supported tasks: gsm8k, math500, drop, arc_easy, arc_challenge, hellaswag, piqa, winogrande, triviaqa, nq_open, commonsense_qa, agieval, openbookqa, social_iqa, truthfulqa_mc2, mmlu_flan_cot_fewshot_pass16, mmlu_pro_pass16, bbh_pass16, mmlu, gpqa"
+    echo "Supported tasks: mbpp, humaneval, mbpp_old, humaneval_old, gsm8k, math500, drop, arc_easy, arc_challenge, hellaswag, piqa, winogrande, triviaqa, nq_open, commonsense_qa, agieval, openbookqa, social_iqa, truthfulqa_mc2, mmlu_flan_cot_fewshot_pass16, mmlu_pro_pass16, bbh_pass16, mmlu, gpqa"
+    echo "Note: Use mbpp/humaneval for two-stage GPU+CPU pipeline, or mbpp_old/humaneval_old for single-job pipeline"
     exit 2
 fi
 echo "[submitter.sh] Will run: $CMD"
