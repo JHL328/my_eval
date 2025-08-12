@@ -119,9 +119,6 @@ elif [[ "$TASK_NAME" == "mmlu" ]]; then
 ##############################
 ###### GQA Tasks #############
 ##############################
-# TODO: add gpqa support
-elif [[ "$TASK_NAME" == "gpqa" ]]; then
-    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate.sh --task gpqa --force"
 else
     echo "[submitter.sh] ERROR: Unknown or unsupported task: $TASK_NAME"
     echo "Supported tasks: mbpp, humaneval, mbpp_old, humaneval_old, gsm8k, math500, drop, arc_easy, arc_challenge, hellaswag, piqa, winogrande, triviaqa, nq_open, commonsense_qa, agieval, openbookqa, social_iqa, truthfulqa_mc2, mmlu_flan_cot_fewshot_pass16, mmlu_pro_pass16, bbh_pass16, mmlu, gpqa"

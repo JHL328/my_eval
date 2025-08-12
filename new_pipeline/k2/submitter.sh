@@ -15,7 +15,7 @@ TASK=""
 if [[ "$1" == "--task" ]] && [[ -n "$2" ]]; then
     TASK="$2"
 else
-    echo "Error: Please specify the task using --task [bbh|mmlu|mmlu_flan|mmlu_pro|gsm8k|math500]"
+    echo "Error: Please specify the task using --task [bbh|mmlu|mmlu_flan|mmlu_pro|gsm8k|math500|drop|arc_easy|arc_challenge|hellaswag|piqa|winogrande|triviaqa|nq_open|commonsense_qa|agieval|openbookqa|social_iqa|truthfulqa_mc2]"
     exit 1
 fi
 

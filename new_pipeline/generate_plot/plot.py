@@ -28,6 +28,23 @@ import re
 import matplotlib.pyplot as plt
 from collections import defaultdict
 
+# Define which model groups to include in the plot
+# Only models matching these patterns will be processed
+ALLOWED_MODEL_GROUPS = [
+    't60-m30-r10',
+    't70-m30', 
+    't35-m30-g35',
+    't40-m30-o0-r4-p3-a3-g10-ma10',
+    't20-m25-o0-r7-p7-a7-g9-ma25',
+    't60-m30-o0-g0-r0-p0-ma10',
+    't70-m10-o0-g0-r0-p0-ma20',
+    't30-m15-o10-r5-p5-g20-ma15',
+    't50-m30-o20-r0-p0-g0-ma0',
+    'social_candy_0',
+    'lonely_cone_0',
+    # Add more model groups here as needed
+]
+
 def get_canonical_color_key(raw_group):
     # special case for social_candy_0
     if raw_group.startswith('social_candy_0'):
@@ -59,7 +76,9 @@ def get_canonical_color_key(raw_group):
 # group name to label, can add more groups here
 def group_to_label(group):
     if group == 'social_candy_0':
-        return 'test-mix-0'
+        return 'test-mix'
+    if group == 'lonely_cone_0':
+        return 'final-mix'
     mapping = {
         't': 't',
         'm': 'mm',
@@ -92,7 +111,9 @@ color_map = {
     't30-mm15-code10-reasoning5-planning5-general20-thinking15': '#7f7f7f',
     't70-mm10-thinking20': '#bcbd22',
     'social_candy_0': '#17becf',
-    'test-mix-0': '#17becf',
+    'test-mix': '#17becf',
+    'lonely_cone_0': '#ffd700',  # Gold
+    'final-mix': '#ffd700',      # Gold
     'Llama-3.2-3B': '#e41a1c',
     'Qwen3-1.7B-Base': '#377eb8',
 }
@@ -114,14 +135,32 @@ for model_name, result in data.items():
     # special case for social_candy_0_XXXXX
     if model_name.startswith('social_candy_0_'):
         group = 'social_candy_0'
+        # Check if this group is allowed
+        if group not in ALLOWED_MODEL_GROUPS:
+            continue
         step = int(model_name.split('_')[-1])
         if args.metric in result:
             group_lines[group].append((step, result[args.metric]))
         continue
+    
+    # special case for lonely_cone_0_XXXXX
+    if model_name.startswith('lonely_cone_0_'):
+        group = 'lonely_cone_0'
+        # Check if this group is allowed
+        if group not in ALLOWED_MODEL_GROUPS:
+            continue
+        step = int(model_name.split('_')[-1])
+        if args.metric in result:
+            group_lines[group].append((step, result[args.metric]))
+        continue
+    
     # other groups keep the original -digit ending regex logic
     match = re.match(r'([a-z0-9_\-]+)-(\d+)$', model_name)
     if match and args.metric in result:
         raw_group = match.group(1)
+        # Check if this group is allowed
+        if raw_group not in ALLOWED_MODEL_GROUPS:
+            continue
         step = int(match.group(2))
         group = get_canonical_color_key(raw_group)
         group_lines[group].append((step, result[args.metric]))

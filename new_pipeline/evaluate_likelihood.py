@@ -266,20 +266,6 @@ for model_path, model_name in Model_map.items():
                     # Extract overall agieval score
                     metric = data["results"]["agieval"][metric_field]
                     overall_summary[model_name] = {metric_field: metric}
-                # elif task == "truthfulqa":
-                #     # Handle truthfulqa subtasks
-                #     metrics = {}
-                #     for subtask, (metric_field_sub, result_key_sub) in {
-                #         "mc1_acc": ("acc,none", "truthfulqa_mc1"),
-                #         "mc2_acc": ("acc,none", "truthfulqa_mc2"),
-                #         "gen_bleu": ("bleu_max,none", "truthfulqa_gen"),
-                #         "gen_rouge1": ("rouge1_max,none", "truthfulqa_gen"),
-                #     }.items():
-                #         try:
-                #             metrics[subtask] = data["results"][result_key_sub][metric_field_sub]
-                #         except Exception as e:
-                #             print(f"Error reading {metric_field_sub} for {model} subtask {subtask}: {e}")
-                #     overall_summary[model_name] = metrics
                 else:
                     metric = data["results"][result_key][metric_field]
                     overall_summary[model_name] = {metric_field: metric}

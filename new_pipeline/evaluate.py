@@ -331,7 +331,7 @@ def run_bbh_pass16(max_model=10, force=False):
                     else:
                         print(f"[ERROR] Job script {script_path} not found after write!")
                         continue
-                    # 新增：再次检查脚本是否存在
+                    # ADD：再次检查脚本是否存在
                     if not os.path.exists(script_path):
                         print(f"[ERROR] Script {script_path} disappeared before sbatch!")
                         continue
@@ -874,13 +874,13 @@ if __name__ == "__main__":
     # set default max_model for each task
     if args.max_model is None:
         if args.task == "mmlu_flan_cot_fewshot_pass16":
-            args.max_model = 4
+            args.max_model = 8
         elif args.task == "mmlu":
-            args.max_model = 4
+            args.max_model = 8
         elif args.task == "bbh_pass16":
-            args.max_model = 4
+            args.max_model = 8
         elif args.task == "mmlu_pro_pass16":
-            args.max_model = 4
+            args.max_model = 8
         elif args.task == "gpqa":
             args.max_model = 8
         else:

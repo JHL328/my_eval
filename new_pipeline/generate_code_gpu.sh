@@ -42,17 +42,20 @@ done
 PYTHON_OUT_FILE="/mnt/weka/home/haolong.jia/eval/runs/${TASK_NAME}_gpu.out"
 PYTHON_ERR_FILE="/mnt/weka/home/haolong.jia/eval/runs/${TASK_NAME}_gpu.err"
 
-echo "Running code generation (Step 1) for task: ${TASK_NAME}"
+echo "Running all steps (generation, sanitize, evaluate) on GPU node for task: ${TASK_NAME}"
 echo "Python output will be saved to: ${PYTHON_OUT_FILE}"
 echo "Python errors will be saved to: ${PYTHON_ERR_FILE}"
 
-# Call the main Python orchestration script with --step generation flag
-python -u new_pipeline/evaluate_code.py "${ORIGINAL_ARGS[@]}" --step generation > "${PYTHON_OUT_FILE}" 2> "${PYTHON_ERR_FILE}"
+# Run all steps: Generate code samples, sanitize, and evaluate
+echo "=========================================="
+echo "Running Code Generation + Sanitize + Evaluate"
+echo "=========================================="
+python -u new_pipeline/evaluate_code_simple.py "${ORIGINAL_ARGS[@]}" > "${PYTHON_OUT_FILE}" 2> "${PYTHON_ERR_FILE}"
 
 if [ $? -eq 0 ]; then
-    echo "Code generation (Step 1) completed successfully for task: ${TASK_NAME}"
-    echo "Note: Individual model CPU jobs will be submitted by each GPU job automatically."
+    echo "All steps completed successfully for task: ${TASK_NAME}"
+    echo "Note: Each model job runs generation + sanitize + evaluate on the same GPU node."
 else
-    echo "Code generation (Step 1) failed for task: ${TASK_NAME}"
+    echo "Pipeline failed for task: ${TASK_NAME}"
     exit 1
 fi

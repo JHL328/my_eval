@@ -64,6 +64,85 @@ TASK_CONFIGS = {
         "time_limit": "12:00:00",
         "n_sampling": 16,
         "conda_activate_path": "source /mnt/weka/home/haolong.jia/miniconda3/bin/activate qwen-eval"
+    },
+    # Likelihood evaluation tasks
+    "drop": {
+        "handler": "default_handler",
+        "eval_script_path": "/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/k2/likelihood.py",
+        "output_dir": os.path.join(OUTPUT_BASE_DIR, 'drop'),
+        "time_limit": "4:00:00"
+    },
+    "arc_easy": {
+        "handler": "default_handler",
+        "eval_script_path": "/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/k2/likelihood.py",
+        "output_dir": os.path.join(OUTPUT_BASE_DIR, 'arc_easy'),
+        "time_limit": "4:00:00"
+    },
+    "arc_challenge": {
+        "handler": "default_handler",
+        "eval_script_path": "/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/k2/likelihood.py",
+        "output_dir": os.path.join(OUTPUT_BASE_DIR, 'arc_challenge'),
+        "time_limit": "4:00:00"
+    },
+    "hellaswag": {
+        "handler": "default_handler",
+        "eval_script_path": "/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/k2/likelihood.py",
+        "output_dir": os.path.join(OUTPUT_BASE_DIR, 'hellaswag'),
+        "time_limit": "4:00:00"
+    },
+    "piqa": {
+        "handler": "default_handler",
+        "eval_script_path": "/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/k2/likelihood.py",
+        "output_dir": os.path.join(OUTPUT_BASE_DIR, 'piqa'),
+        "time_limit": "4:00:00"
+    },
+    "winogrande": {
+        "handler": "default_handler",
+        "eval_script_path": "/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/k2/likelihood.py",
+        "output_dir": os.path.join(OUTPUT_BASE_DIR, 'winogrande'),
+        "time_limit": "4:00:00"
+    },
+    "triviaqa": {
+        "handler": "default_handler",
+        "eval_script_path": "/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/k2/likelihood.py",
+        "output_dir": os.path.join(OUTPUT_BASE_DIR, 'triviaqa'),
+        "time_limit": "4:00:00"
+    },
+    "nq_open": {
+        "handler": "default_handler",
+        "eval_script_path": "/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/k2/likelihood.py",
+        "output_dir": os.path.join(OUTPUT_BASE_DIR, 'nq_open'),
+        "time_limit": "4:00:00"
+    },
+    "commonsense_qa": {
+        "handler": "default_handler",
+        "eval_script_path": "/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/k2/likelihood.py",
+        "output_dir": os.path.join(OUTPUT_BASE_DIR, 'commonsense_qa'),
+        "time_limit": "4:00:00"
+    },
+    "agieval": {
+        "handler": "default_handler",
+        "eval_script_path": "/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/k2/likelihood.py",
+        "output_dir": os.path.join(OUTPUT_BASE_DIR, 'agieval'),
+        "time_limit": "4:00:00"
+    },
+    "openbookqa": {
+        "handler": "default_handler",
+        "eval_script_path": "/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/k2/likelihood.py",
+        "output_dir": os.path.join(OUTPUT_BASE_DIR, 'openbookqa'),
+        "time_limit": "4:00:00"
+    },
+    "social_iqa": {
+        "handler": "default_handler",
+        "eval_script_path": "/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/k2/likelihood.py",
+        "output_dir": os.path.join(OUTPUT_BASE_DIR, 'social_iqa'),
+        "time_limit": "4:00:00"
+    },
+    "truthfulqa_mc2": {
+        "handler": "default_handler",
+        "eval_script_path": "/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/k2/likelihood.py",
+        "output_dir": os.path.join(OUTPUT_BASE_DIR, 'truthfulqa_mc2'),
+        "time_limit": "4:00:00"
     }
 }
 
@@ -144,13 +223,41 @@ def aggregate_final_results(models, task_name, task_output_dir):
     print(f"\n📝 Aggregating final results for task '{task_name}'...")
     overall_summary = {}
 
+    # Define likelihood tasks and their metrics
+    LIKELIHOOD_TASK_METRICS = {
+        'drop': ('f1,none', 'drop'),
+        'arc_easy': ('acc_norm,none', 'arc_easy'),
+        'arc_challenge': ('acc_norm,none', 'arc_challenge'),
+        'hellaswag': ('acc_norm,none', 'hellaswag'),
+        'piqa': ('acc_norm,none', 'piqa'),
+        'winogrande': ('acc_norm,none', 'winogrande'),
+        'triviaqa': ('exact_match,remove_whitespace', 'triviaqa'),
+        'nq_open': ('exact_match,remove_whitespace', 'nq_open'),
+        'commonsense_qa': ('acc_norm,none', 'commonsense_qa'),
+        'agieval': ('acc_norm,none', 'agieval_en'),
+        'openbookqa': ('acc_norm,none', 'openbookqa'),
+        'social_iqa': ('acc_norm,none', 'social_iqa'),
+        'truthfulqa_mc2': ('acc_norm,none', 'truthfulqa_mc2')
+    }
+
     for _, model_name in models.items():
         model_result_path = os.path.join(task_output_dir, model_name, "result.json")
         if os.path.exists(model_result_path):
             try:
                 with open(model_result_path, 'r') as f:
                     data = json.load(f)
-                    overall_summary[model_name] = data
+                    
+                    # For likelihood tasks, extract just the metric
+                    if task_name in LIKELIHOOD_TASK_METRICS:
+                        metric_field, result_key = LIKELIHOOD_TASK_METRICS[task_name]
+                        if task_name == "agieval":
+                            metric = data["results"]["agieval"][metric_field]
+                        else:
+                            metric = data["results"][result_key][metric_field]
+                        overall_summary[model_name] = {metric_field: metric}
+                    else:
+                        # For other tasks, keep the full result
+                        overall_summary[model_name] = data
             except (json.JSONDecodeError, KeyError) as e:
                 print(f"Warning: Could not read or parse result.json for {model_name}: {e}")
         else:
@@ -167,7 +274,7 @@ def parse_args():
     """Parse command-line arguments"""
     parser = argparse.ArgumentParser(description="K2+ Model Evaluation Dispatcher")
     parser.add_argument("--eval_task", type=str, required=True, choices=list(TASK_CONFIGS.keys()),
-                        help="The evaluation task to run (e.g., 'bbh', 'mmlu', 'livecodebench').")
+                        help="The evaluation task to run (e.g., 'bbh', 'mmlu', 'drop', 'arc_easy', etc.).")
     return parser.parse_args()
 
 def main():
@@ -213,6 +320,10 @@ def main():
         
         # If the script is k2_math.py, it requires a task_name argument
         if "k2_math.py" in config['eval_script_path']:
+            command_parts.append(f"--task_name {task}")
+        
+        # If the script is likelihood.py, it also requires a task_name argument
+        if "likelihood.py" in config['eval_script_path']:
             command_parts.append(f"--task_name {task}")
         
         # This generic loop adds any additional parameters from the config

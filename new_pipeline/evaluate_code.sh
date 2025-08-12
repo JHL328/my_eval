@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=eval_manager_code_${TASK_NAME}
+#SBATCH --job-name=manager_${TASK_NAME}
 #SBATCH --output=/mnt/weka/home/haolong.jia/eval/runs/eval_manager_%j.out
 #SBATCH --error=/mnt/weka/home/haolong.jia/eval/runs/eval_manager_%j.err
 #SBATCH --ntasks=1

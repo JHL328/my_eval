@@ -1,3 +1,9 @@
+#!/usr/bin/env python3
+"""
+evaluate_code.py - Backup version for old mode (mbpp_old, humaneval_old)
+For new optimized pipeline, use evaluate_code_simple.py
+"""
+
 import os
 import time
 import sys
@@ -5,12 +11,14 @@ import argparse
 import subprocess
 import json
 import re
-import multiprocessing
 import numpy as np
-from concurrent.futures import ProcessPoolExecutor, as_completed
 
 # Import necessary parts from evalplus for pass@k calculation
 from evalplus.eval import estimate_pass_at_k, PASS # Import PASS for status check
+
+# Import optimization config
+sys.path.insert(0, '/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline')
+from optimize_config import get_sanitize_command, get_evaluate_command, get_optimal_config
 
 # dynamic import model list
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -24,9 +32,9 @@ except ImportError:
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--task', type=str, required=True, help='Task name for evaluation: humaneval or mbpp')
-parser.add_argument('--step', type=str, default='all', choices=['all', 'generation', 'sanitize_evaluate'], 
-                   help='Which step(s) to execute: all (default), generation (Step 1 only), sanitize_evaluate (Steps 2-3 only)')
-parser.add_argument('--model', type=str, default=None, help='Specific model name to process (for single model mode)')
+parser.add_argument('--step', type=str, default='all', choices=['all', 'sanitize_evaluate'], 
+                   help='Which step(s) to run: all (default), sanitize_evaluate (for internal use)')
+parser.add_argument('--model', type=str, default=None, help='Specific model name (for sanitize_evaluate step)')
 args = parser.parse_args()
 task = args.task
 step_mode = args.step
@@ -40,7 +48,7 @@ os.makedirs(job_dir, exist_ok=True)
 os.makedirs(log_dir, exist_ok=True)
 
 # parameters
-N_SAMPLES = 64 # For faster debugging, revert to 64 for actual runs
+N_SAMPLES = 16 # For faster debugging, revert to 64 for actual runs
 TEMPERATURE = 0.6
 TP_SIZE = 1 # Tensor Parallel size for LLM instantiation in generate_code.py
 MAX_TOKENS = 1024 # Max tokens for generation
@@ -61,15 +69,28 @@ def sanitize_model_samples(model_info):
     if not os.path.exists(raw_samples_jsonl):
         return f"Warning: Raw samples not found for {model_name}"
     
+    # Count number of samples for logging
     try:
-        # Run sanitize command
-        cmd = f"python -m evalplus.sanitize --samples {raw_samples_jsonl}"
+        with open(raw_samples_jsonl, 'r') as f:
+            num_samples = sum(1 for _ in f)
+        print(f"  Sanitizing {num_samples} samples for {model_name}...")
+    except:
+        num_samples = "unknown"
+    
+    try:
+        # Use optimized sanitize with optimal configuration
+        start_time = time.time()
+        # Get optimal config based on sample count
+        config = get_optimal_config(task=task, num_samples=num_samples if isinstance(num_samples, int) else None)
+        cmd = get_sanitize_command(raw_samples_jsonl, config=config['sanitize'], use_optimized=True)
+        print(f"  Using optimized sanitize: {config['sanitize']['n_workers']} workers, batch_size={config['sanitize']['batch_size']}")
         result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+        elapsed = time.time() - start_time
         
         if result.returncode != 0:
             return f"Error sanitizing {model_name}: {result.stderr}"
         
-        return f"Successfully sanitized {model_name}"
+        return f"Successfully sanitized {model_name} ({num_samples} samples in {elapsed:.1f}s)"
     except Exception as e:
         return f"Exception sanitizing {model_name}: {str(e)}"
 
@@ -91,63 +112,39 @@ def evaluate_model_samples(model_info):
     if not os.path.exists(samples_to_eval):
         return f"Warning: No samples found for {model_name}"
     
+    # Count number of samples for logging
     try:
-        # Run evaluate command
-        cmd = f"python -m evalplus.evaluate --dataset {task} --samples {samples_to_eval}"
+        with open(samples_to_eval, 'r') as f:
+            num_samples = sum(1 for _ in f)
+        print(f"  Evaluating {num_samples} samples for {model_name}...")
+    except:
+        num_samples = "unknown"
+    
+    try:
+        # Use optimized evaluate with optimal configuration
+        start_time = time.time()
+        # Get optimal config based on sample count
+        config = get_optimal_config(task=task, num_samples=num_samples if isinstance(num_samples, int) else None)
+        cmd = get_evaluate_command(task, samples_to_eval, config=config['evaluate'], use_optimized=True)
+        print(f"  Using optimized evaluate: {config['evaluate']['parallel']} workers, batch_size={config['evaluate']['batch_size']}")
         with open(results_txt_path, 'w') as f:
             result = subprocess.run(cmd, shell=True, stdout=f, stderr=subprocess.PIPE, text=True)
+        elapsed = time.time() - start_time
         
         if result.returncode != 0:
             return f"Error evaluating {model_name}: {result.stderr}"
         
-        return f"Successfully evaluated {model_name}"
+        # Convert elapsed time to readable format
+        hours = int(elapsed // 3600)
+        minutes = int((elapsed % 3600) // 60)
+        seconds = int(elapsed % 60)
+        time_str = f"{hours}h{minutes}m{seconds}s" if hours > 0 else f"{minutes}m{seconds}s"
+        
+        return f"Successfully evaluated {model_name} ({num_samples} samples in {time_str})"
     except Exception as e:
         return f"Exception evaluating {model_name}: {str(e)}"
 
-# Template for GPU jobs (Step 1 only)
-SBATCH_GPU_TEMPLATE = """#!/bin/bash
-#SBATCH --job-name={task}_gen_{model_name}
-#SBATCH --output={log_dir}/{model_name}_gen.out
-#SBATCH --error={log_dir}/{model_name}_gen.err
-#SBATCH --gres=gpu:1
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=32
-#SBATCH --time=4:00:00
-# SBATCH --partition=main
-#SBATCH --mem=300G
-
-cd /mnt/weka/home/haolong.jia/eval/RL-eval
-source /mnt/weka/home/haolong.jia/miniconda3/bin/activate evalplus-eval
-
-# Set task-specific cache directory to avoid conflicts
-export TORCH_COMPILE_CACHE_DIR="/mnt/weka/home/haolong.jia/.cache/vllm/torch_compile_cache_{task}_{model_name}"
-echo "[INFO] Using torch compile cache: $TORCH_COMPILE_CACHE_DIR"
-mkdir -p "$TORCH_COMPILE_CACHE_DIR"
-
-# Step 1: Generate code samples
-echo "[Step 1] Generating code samples for {model_name}..."
-python new_pipeline/generate_code.py \
-  --model_path {model_path} \
-  --dataset {task} \
-  --n_samples {n_samples} \
-  --temperature {temperature} \
-  --tensor_parallel_size {tp_size} \
-  --output_dir {raw_samples_dir} \
-  --max_tokens {max_tokens}
-if [ $? -ne 0 ]; then
-    echo "Error: Step 1 (generate_code.py) failed for {model_name}. Exiting."
-    exit 1
-fi
-echo "Step 1 completed. Samples generated at: {raw_samples_dir}"
-
-# Submit CPU job for this specific model
-echo "Submitting CPU job for sanitize and evaluate of {model_name}..."
-LOG_FILE="/mnt/sharefs/users/haolong.jia/result/{task}/logs/{model_name}_sanitize.out"
-ERR_FILE="/mnt/sharefs/users/haolong.jia/result/{task}/logs/{model_name}_sanitize.err"
-sbatch --job-name=san_eval_{model_name} --output=${{LOG_FILE}} --error=${{ERR_FILE}} /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/sanitize_evaluate_single_model.sh --task {task} --model {model_name}
-"""
-
-# Original template for backward compatibility
+# SBATCH template for old mode (backward compatibility)
 SBATCH_TEMPLATE = """#!/bin/bash
 #SBATCH --job-name={task}_{model_name}
 #SBATCH --output={log_dir}/{model_name}.out
@@ -191,9 +188,14 @@ fi
 echo "Step 1 completed. Listing contents of raw_samples_dir: {raw_samples_dir}"
 
 
+# Set parallel processing environment variables (optimized for batch processing)
+export OMP_NUM_THREADS=12
+export MKL_NUM_THREADS=12
+export NUMEXPR_NUM_THREADS=12
+
 # Step 2: Sanitize the generated samples
 echo "[Step 2] Sanitizing code samples for {model_name}..."
-python -m evalplus.sanitize --samples {raw_samples_dir}/samples.jsonl
+python -m evalplus.sanitize_optimized {raw_samples_dir}/samples.jsonl --n-workers 12 --batch-size 500
 if [ $? -ne 0 ]; then
     echo "Error: Step 2 (evalplus.sanitize) failed for {model_name}. Exiting."
     exit 1
@@ -210,9 +212,10 @@ echo "Will use $SAMPLES_TO_EVAL for evaluation."
 
 # Step 3: Evaluate the samples
 echo "[Step 3] Evaluating code samples for {model_name} using $SAMPLES_TO_EVAL ..."
-python -m evalplus.evaluate \
+python -m evalplus.evaluate_optimized \
   --dataset {task} \
-  --samples "$SAMPLES_TO_EVAL" > {results_txt_path}
+  --samples "$SAMPLES_TO_EVAL" \
+  --parallel 12 --batch-size 500 > {results_txt_path}
 if [ $? -ne 0 ]; then
     echo "Error: Step 3 (evalplus.evaluate) failed for {model_name}. Exiting."
     exit 1
@@ -253,73 +256,6 @@ if step_mode == 'all':
         with open(job_script, "w") as f:
             f.write(sbatch_script_content)
         sbatch_commands.append((f"sbatch {job_script}", model_name))
-
-elif step_mode == 'generation':
-    # Step 1 only - Generate code samples
-    print(f"[Generation Mode] Processing {len(Model_map)} models from Model_map")
-    
-    # Track models that need CPU jobs
-    models_need_cpu = []
-    
-    for model_path, model_name in Model_map.items():
-        model_out_dir = os.path.join(output_dir, model_name)
-        raw_samples_dir = os.path.join(model_out_dir, "raw_samples")
-        results_txt_path = os.path.join(model_out_dir, "results.txt")
-        samples_file = os.path.join(raw_samples_dir, "samples.jsonl")
-        
-        # Check if already completed
-        if os.path.exists(results_txt_path):
-            models_skipped.append(model_name)
-            print(f"  Skipping {model_name} - already completed (results.txt exists)")
-            continue
-            
-        # Check if samples exist but not evaluated
-        if os.path.exists(samples_file):
-            models_need_cpu.append((model_name, model_path))
-            print(f"  {model_name} - samples exist, needs CPU job for sanitize/evaluate")
-            continue
-        
-        # Need to generate samples
-        models_to_run.append(model_name)
-        print(f"  {model_name} - needs GPU job for generation")
-        os.makedirs(model_out_dir, exist_ok=True)
-        os.makedirs(raw_samples_dir, exist_ok=True)
-        job_script = os.path.join(job_dir, f"job_gen_{model_name}.sh")
-
-        sbatch_script_content = SBATCH_GPU_TEMPLATE.format(
-            model_name=model_name,
-            model_path=model_path,
-            log_dir=log_dir,
-            task=task,
-            n_samples=N_SAMPLES,
-            temperature=TEMPERATURE,
-            tp_size=TP_SIZE,
-            max_tokens=MAX_TOKENS,
-            raw_samples_dir=raw_samples_dir
-        )
-        with open(job_script, "w") as f:
-            f.write(sbatch_script_content)
-        sbatch_commands.append((f"sbatch {job_script}", model_name))
-    
-    # Submit CPU jobs for models that already have samples
-    if models_need_cpu:
-        print(f"\n📝 Submitting CPU jobs for {len(models_need_cpu)} models that already have samples...")
-        for model_name, model_path in models_need_cpu:
-            log_file = f"/mnt/sharefs/users/haolong.jia/result/{task}/logs/{model_name}_sanitize.out"
-            err_file = f"/mnt/sharefs/users/haolong.jia/result/{task}/logs/{model_name}_sanitize.err"
-            cmd = f"sbatch --job-name=san_eval_{model_name} --output={log_file} --error={err_file} /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/sanitize_evaluate_single_model.sh --task {task} --model {model_name}"
-            try:
-                result = subprocess.check_output(cmd, shell=True, text=True)
-                match = re.search(r'Submitted batch job (\d+)', result)
-                if match:
-                    job_id = match.group(1)
-                    submitted_slurm_job_ids.append(job_id)
-                    print(f"  Submitted CPU job for {model_name} (Job ID: {job_id})")
-                else:
-                    print(f"  Submitted CPU job for {model_name} but could not parse job ID")
-            except subprocess.CalledProcessError as e:
-                print(f"  Failed to submit CPU job for {model_name}: {e}")
-            time.sleep(0.2)
 
 elif step_mode == 'sanitize_evaluate':
     # Steps 2-3 only - Sanitize and evaluate
@@ -390,19 +326,13 @@ elif step_mode == 'sanitize_evaluate':
         if models_to_process:
             print(f"\n📊 Processing {len(models_to_process)} models...")
             
-            # Step 2: Parallel sanitize
-            print("\n[Step 2] Sanitizing samples in parallel...")
-            with ProcessPoolExecutor(max_workers=min(MAX_WORKERS, len(models_to_process))) as executor:
-                future_to_model = {executor.submit(sanitize_model_samples, model_info): model_info[1] 
-                                  for model_info in models_to_process}
-                
-                for future in as_completed(future_to_model):
-                    model_name = future_to_model[future]
-                    try:
-                        result = future.result()
-                        print(result)
-                    except Exception as e:
-                        print(f"Error processing {model_name}: {str(e)}")
+            # Step 2: Parallel sanitize - but since sanitize itself is now parallel,
+            # we should limit concurrent models to avoid oversubscription
+            print("\n[Step 2] Sanitizing samples...")
+            # Process models sequentially since each model now uses 96 cores internally
+            for model_info in models_to_process:
+                result = sanitize_model_samples(model_info)
+                print(result)
             
             # Step 3: Evaluate (can also be parallelized but evalplus might have resource constraints)
             print("\n[Step 3] Evaluating samples...")
@@ -488,7 +418,7 @@ if step_mode in ['all', 'sanitize_evaluate']:
     overall_plus_summary = {}
 
     # We iterate using Model_map to ensure all defined models are processed
-    ALL_PASS_K_VALUES = [1, 4, 8, 10, 16, 32, 64] # Define desired K values
+    ALL_PASS_K_VALUES = [1, 8, 16] # Define desired K values
 
     for _, model_name in Model_map.items(): 
         model_out_dir = os.path.join(output_dir, model_name)

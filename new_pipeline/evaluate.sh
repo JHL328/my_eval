@@ -18,7 +18,6 @@
 #                         - mmlu_pro_pass16
 #                         - bbh_pass16
 #                         - mmlu
-#                         - gpqa
 #
 # EXAMPLES:
 #   # Evaluate all models on the BBH benchmark
@@ -94,8 +93,6 @@ elif [[ "$TASK_NAME" == "bbh_pass16" ]]; then
     OUTPUT_DIR="/mnt/sharefs/users/haolong.jia/result/bbh_pass16"
 elif [[ "$TASK_NAME" == "mmlu" ]]; then
     OUTPUT_DIR="/mnt/sharefs/users/haolong.jia/result/mmlu"
-elif [[ "$TASK_NAME" == "gpqa" ]]; then
-    OUTPUT_DIR="/mnt/sharefs/users/haolong.jia/result/gpqa_pass32_new"
 else
     echo "Error: Unknown task name '$TASK_NAME' for setting OUTPUT_DIR in evaluate.sh."
     exit 1
@@ -110,24 +107,51 @@ TIMEOUT=600         # 600 seconds = 10 minutes
 
 # Function to check if all models are complete based on result.json files
 check_all_models_complete() {
-    # only count model folders (exclude job_scripts logs scripts)
-    local model_dirs=($(find "$OUTPUT_DIR" -maxdepth 1 -mindepth 1 -type d \
-        ! -name 'job_scripts' \
-        ! -name 'logs' \
-        ! -name 'scripts'))
-    if [[ "${#model_dirs[@]}" -eq 0 ]]; then
-        # no model folders, means not started, not complete
+    # Get all model names from Model_map by parsing model.py
+    local python_output=$(python3 -c "
+import sys
+sys.path.append('new_pipeline')
+from model import Model_map
+for model_path, model_name in Model_map.items():
+    print(model_name)
+")
+    
+    # Convert python output to array
+    local all_model_names=()
+    while IFS= read -r line; do
+        if [[ -n "$line" ]]; then
+            all_model_names+=("$line")
+        fi
+    done <<< "$python_output"
+    
+    if [[ "${#all_model_names[@]}" -eq 0 ]]; then
+        echo "Warning: No models found in Model_map"
         return 1
     fi
+    
     local incomplete_count=0
-    for dir in "${model_dirs[@]}"; do
-        if [[ ! -f "$dir/result.json" ]]; then
+    local incomplete_models=()
+    
+    for model_name in "${all_model_names[@]}"; do
+        local model_dir="$OUTPUT_DIR/$model_name"
+        local result_file="$model_dir/result.json"
+        if [[ ! -f "$result_file" ]]; then
             ((incomplete_count++))
+            incomplete_models+=("$model_name")
         fi
     done
+    
     if [[ "$incomplete_count" -eq 0 ]]; then
+        echo "✅ All ${#all_model_names[@]} models are complete!"
         return 0 # True, all complete
     else
+        echo "📊 $incomplete_count/${#all_model_names[@]} models still incomplete"
+        # Optionally show first few incomplete models for debugging
+        if [[ "${#incomplete_models[@]}" -le 10 ]]; then
+            echo "Incomplete models: ${incomplete_models[*]}"
+        else
+            echo "First 10 incomplete models: ${incomplete_models[*]:0:10}"
+        fi
         return 1 # False, not complete
     fi
 }

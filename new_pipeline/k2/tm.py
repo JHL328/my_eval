@@ -15,13 +15,12 @@ from k2 import k2_evaluate # Import k2_evaluate to get task configs
 # Selected models - only these 6 models
 # =====================
 SELECTED_MODELS = {
-   "/mnt/sharefs/users/mikhail.yurochkin/checkpoints_to_eval/k2+_midtraining_mix_final/final-a:10-bp:5-g:5-m:30-mm:0-oc:15-p:10-qa:5-r1:10-r:10/hf_format/samples_3773124.0":"final-a-10-bp-5-g-5-m-30-mm-0-oc-15-p-10-qa-5-r1-10-r-10-3773124",
-   "/mnt/sharefs/users/mikhail.yurochkin/checkpoints_to_eval/k2+_midtraining_mix_final/final-a:10-bp:5-g:5-m:30-mm:0-oc:15-p:10-qa:5-r1:10-r:10/hf_format/samples_7546248.0":"final-a-10-bp-5-g-5-m-30-mm-0-oc-15-p-10-qa-5-r1-10-r-10-7546248",
-   "/mnt/sharefs/users/mikhail.yurochkin/checkpoints_to_eval/k2+_midtraining_mix_final/final-a:7-bp:5-g:5-m:30-mm:2-oc:10-p:7-qa:5-r1:20-r:7/hf_format/samples_3674102.0":"final-a-7-bp-5-g-5-m-30-mm-2-oc-10-p-7-qa-5-r1-20-r-7-3674102",
-   "/mnt/sharefs/users/mikhail.yurochkin/checkpoints_to_eval/k2+_midtraining_mix_final/final-a:7-bp:5-g:5-m:30-mm:2-oc:10-p:7-qa:5-r1:20-r:7/hf_format/samples_7348204.0":"final-a-7-bp-5-g-5-m-30-mm-2-oc-10-p-7-qa-5-r1-20-r-7-7348204",
-   "/mnt/sharefs/users/mikhail.yurochkin/checkpoints_to_eval/k2+_midtraining_mix_final/final-a:20-bp:17-g:5-m:17-mm:2-oc:10-p:7-qa:5-r1:7-r:7/hf_format/samples_3667672.0":"final-a-20-bp-17-g-5-m-17-mm-2-oc-10-p-7-qa-5-r1-7-r-7-3667672",
-   "/mnt/sharefs/users/mikhail.yurochkin/checkpoints_to_eval/k2+_midtraining_mix_final/final-a:20-bp:17-g:5-m:17-mm:2-oc:10-p:7-qa:5-r1:7-r:7/hf_format/samples_7335344.0":"final-a-20-bp-17-g-5-m-17-mm-2-oc-10-p-7-qa-5-r1-7-r-7-7335344",
-}
+    "/mnt/sharefs/users/mikhail.yurochkin/checkpoints_to_eval/k2+_midtraining_mix_lr_check/lr-a:10-bp:5-g:5-m:30-mm:0-oc:15-p:10-qa:5-r1:10-r:10/hf_format/samples_3773124.0": "lr-a-10-bp-5-g-5-m-30-mm-0-oc-15-p-10-qa-5-r1-10-r-10-3773124",
+    "/mnt/sharefs/users/mikhail.yurochkin/checkpoints_to_eval/k2+_midtraining_mix_lr_check/lr-a:10-bp:5-g:5-m:30-mm:0-oc:15-p:10-qa:5-r1:10-r:10/hf_format/samples_7546248.0": "lr-a-10-bp-5-g-5-m-30-mm-0-oc-15-p-10-qa-5-r1-10-r-10-7546248",
+    "/mnt/sharefs/users/haolong.jia/checkpoint/Qwen2.5-72B": "Qwen2.5-72B",
+    "/mnt/sharefs/users/yuqi.wang/k2_plus_ckpts/huggingface/iter_1000000": "k2_plus_1000000",
+    "/mnt/sharefs/users/yuqi.wang/k2_plus_ckpts/huggingface/iter_1100000": "k2_plus_1100000",
+    }
 
 # =====================
 # config
@@ -35,34 +34,67 @@ METRIC_NAME_MAP = {
     'pass@16': 'pass@16',
     'pass@32': 'pass@32',
     'pass@64': 'pass@64',
+    # Likelihood metrics
+    'f1,none': 'f1',
+    'acc_norm,none': 'acc_norm',
+    'exact_match,remove_whitespace': 'exact_match',
 }
 
 # Benchmarks including the new LiveCodeBench
 K2_BENCHMARKS = {
-    'bbh': {
-        'path': os.path.join(k2_evaluate.TASK_CONFIGS['bbh']['output_dir'], "result.json"),
-        'metrics': ['pass@1'],
+    # Likelihood benchmarks
+    'drop': {
+        'path': os.path.join(k2_evaluate.TASK_CONFIGS['drop']['output_dir'], "result.json"),
+        'metrics': ['f1,none'],
     },
-    'mmlu': {
-        'path': os.path.join(k2_evaluate.TASK_CONFIGS['mmlu']['output_dir'], "result.json"),
-        'metrics': ['pass@1'],
+    'arc_easy': {
+        'path': os.path.join(k2_evaluate.TASK_CONFIGS['arc_easy']['output_dir'], "result.json"),
+        'metrics': ['acc_norm,none'],
     },
-    'mmlu_flan': {
-        'path': os.path.join(k2_evaluate.TASK_CONFIGS['mmlu_flan']['output_dir'], "result.json"),
-        'metrics': ['pass@1'],
+    'arc_challenge': {
+        'path': os.path.join(k2_evaluate.TASK_CONFIGS['arc_challenge']['output_dir'], "result.json"),
+        'metrics': ['acc_norm,none'],
     },
-    'mmlu_pro': {
-        'path': os.path.join(k2_evaluate.TASK_CONFIGS['mmlu_pro']['output_dir'], "result.json"),
-        'metrics': ['pass@1'],
+    'hellaswag': {
+        'path': os.path.join(k2_evaluate.TASK_CONFIGS['hellaswag']['output_dir'], "result.json"),
+        'metrics': ['acc_norm,none'],
     },
-    'gsm8k': {
-        'path': os.path.join(k2_evaluate.TASK_CONFIGS['gsm8k']['output_dir'], "result.json"),
-        'metrics': ['pass@1', 'pass@4', 'pass@16'],
+    'piqa': {
+        'path': os.path.join(k2_evaluate.TASK_CONFIGS['piqa']['output_dir'], "result.json"),
+        'metrics': ['acc_norm,none'],
     },
-    'math500': {
-        'path': os.path.join(k2_evaluate.TASK_CONFIGS['math500']['output_dir'], "result.json"),
-        'metrics': ['pass@1', 'pass@4', 'pass@16'],
-    }
+    'winogrande': {
+        'path': os.path.join(k2_evaluate.TASK_CONFIGS['winogrande']['output_dir'], "result.json"),
+        'metrics': ['acc_norm,none'],
+    },
+    'triviaqa': {
+        'path': os.path.join(k2_evaluate.TASK_CONFIGS['triviaqa']['output_dir'], "result.json"),
+        'metrics': ['exact_match,remove_whitespace'],
+    },
+    'nq_open': {
+        'path': os.path.join(k2_evaluate.TASK_CONFIGS['nq_open']['output_dir'], "result.json"),
+        'metrics': ['exact_match,remove_whitespace'],
+    },
+    'commonsense_qa': {
+        'path': os.path.join(k2_evaluate.TASK_CONFIGS['commonsense_qa']['output_dir'], "result.json"),
+        'metrics': ['acc_norm,none'],
+    },
+    'agieval': {
+        'path': os.path.join(k2_evaluate.TASK_CONFIGS['agieval']['output_dir'], "result.json"),
+        'metrics': ['acc_norm,none'],
+    },
+    'openbookqa': {
+        'path': os.path.join(k2_evaluate.TASK_CONFIGS['openbookqa']['output_dir'], "result.json"),
+        'metrics': ['acc_norm,none'],
+    },
+    'social_iqa': {
+        'path': os.path.join(k2_evaluate.TASK_CONFIGS['social_iqa']['output_dir'], "result.json"),
+        'metrics': ['acc_norm,none'],
+    },
+    'truthfulqa_mc2': {
+        'path': os.path.join(k2_evaluate.TASK_CONFIGS['truthfulqa_mc2']['output_dir'], "result.json"),
+        'metrics': ['acc_norm,none'],
+    },
 }
 
 # LiveCodeBench configuration
@@ -76,6 +108,10 @@ def parse_model_groups():
     groups = {}
     
     for model_name in SELECTED_MODELS.values():
+        # Only process lr models
+        if not model_name.startswith('lr-'):
+            continue
+            
         # Extract the base name without the final number
         match = re.match(r'^(.*)-(\d+)$', model_name)
         if match:
@@ -102,6 +138,11 @@ def parse_model_groups():
 
 def format_model_name(model_name, suffix):
     """Format model name by replacing parameter-value separators with : while keeping group separators as -"""
+    # Check if this is an lr model
+    if not model_name.startswith('lr-'):
+        # For Qwen and k2_plus models, just return as is (no suffix needed)
+        return model_name
+    
     # Remove the final number
     match = re.match(r'^(.*)-(\d+)$', model_name)
     if match:
@@ -111,10 +152,10 @@ def format_model_name(model_name, suffix):
         parts = base_name.split('-')
         formatted_parts = []
         
-        # First part is 'final', keep it as is
+        # First part is 'lr', keep it as is
         formatted_parts.append(parts[0])
         
-        # Known parameter names
+        # Known parameter names for lr models
         param_names = {'a', 'bp', 'g', 'm', 'mm', 'oc', 'p', 'qa', 'r1', 'r'}
         
         # Process the rest of the parts
@@ -165,7 +206,7 @@ for bench, info in K2_BENCHMARKS.items():
         header.append(f"{bench}_{display_metric}")
 
 # Add LiveCodeBench columns
-header.extend(['livecodebench_pass@4', 'livecodebench_pass@16'])
+# header.extend(['livecodebench_pass@4', 'livecodebench_pass@16'])
 
 # Process each model
 rows = []
@@ -208,20 +249,20 @@ for model_path, model_name in SELECTED_MODELS.items():
                 row[f"{bench}_{display_metric}"] = -1
     
     # Process LiveCodeBench results - also use original model_name (with -)
-    livecodebench_data = read_livecodebench_results(model_name)
-    if livecodebench_data:
-        row['livecodebench_pass@4'] = livecodebench_data.get('pass@4', -1)
-        row['livecodebench_pass@16'] = livecodebench_data.get('pass@16', -1)
-        print(f"  ✓ livecodebench_pass@4: {row['livecodebench_pass@4']}")
-        print(f"  ✓ livecodebench_pass@16: {row['livecodebench_pass@16']}")
-    else:
-        row['livecodebench_pass@4'] = -1
-        row['livecodebench_pass@16'] = -1
+    # livecodebench_data = read_livecodebench_results(model_name)
+    # if livecodebench_data:
+    #     row['livecodebench_pass@4'] = livecodebench_data.get('pass@4', -1)
+    #     row['livecodebench_pass@16'] = livecodebench_data.get('pass@16', -1)
+    #     print(f"  ✓ livecodebench_pass@4: {row['livecodebench_pass@4']}")
+    #     print(f"  ✓ livecodebench_pass@16: {row['livecodebench_pass@16']}")
+    # else:
+    #     row['livecodebench_pass@4'] = -1
+    #     row['livecodebench_pass@16'] = -1
     
     rows.append(row)
 
 # Create DataFrame and save
-out_path = '/mnt/sharefs/users/haolong.jia/result-k2/k2_final_format.csv'
+out_path = '/mnt/sharefs/users/haolong.jia/result-k2/k2_likelihood_results.csv'
 df = pd.DataFrame(rows)
 df = df[header]  # Force column order
 

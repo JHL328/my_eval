@@ -5,23 +5,38 @@ from tqdm import tqdm
 from vllm import LLM, SamplingParams
 import json
 
+# Set task-specific torch compile cache to avoid conflicts between humaneval and mbpp
+def setup_cache_dir(dataset_name, model_name):
+    cache_base = os.path.expanduser("~/.cache/vllm/torch_compile_cache")
+    cache_dir = os.path.join(cache_base, f"{dataset_name}_{model_name.replace('/', '_')}")
+    os.makedirs(cache_dir, exist_ok=True)
+    os.environ["TORCH_COMPILE_CACHE_DIR"] = cache_dir
+    print(f"[INFO] Using torch compile cache: {cache_dir}")
+    return cache_dir
+
 # Define EOS tokens based on EvalPlus practices
 # Common EOS tokens relevant for code generation
-GENERAL_EOS_TOKENS = ["<|file_separator|>"]
-PY_EOS_TOKENS = GENERAL_EOS_TOKENS + [
-    "\nclass", "\ndef", "\n#", "\n@", "\nprint", "\nif",
-    # Additional common stop words for Python code completion
-    "\n```", "\n    return", "\n    pass",
+EOS = [
+    "<|endoftext|>",
+    "<|endofmask|>",
+    "</s>",
+    "\nif __name__",
+    "\ndef main(",
+    "\nprint(",
+    "\n#"
 ]
-MBPP_EOS_TOKENS = GENERAL_EOS_TOKENS + ["\n###", "\nassert", "\n```"]
+MBPP_EOS_TOKENS = EOS + ["\n###", "\nassert", "\n```"]
+HUMANEVAL_EOS_TOKENS = EOS + ["\ndef", "\nclass ", "\nimport ", "\nfrom ", "\nassert "]
 
 def get_dataset_problems(dataset_name):
     """Loads dataset problems from evalplus.data."""
     if dataset_name == "humaneval":
         from evalplus.data import get_human_eval_plus
+        print("[INFO] Loading humaneval(+) dataset")
         return get_human_eval_plus()
     elif dataset_name == "mbpp":
         from evalplus.data import get_mbpp_plus
+        print("[INFO] Loading mbpp(+) dataset")
         return get_mbpp_plus()
     else:
         raise ValueError(f"Unknown dataset: {dataset_name}")
@@ -29,10 +44,10 @@ def get_dataset_problems(dataset_name):
 def get_stop_tokens_for_dataset(dataset_name):
     """Returns a list of stop tokens specific to the dataset."""
     if dataset_name == "humaneval":
-        return PY_EOS_TOKENS
+        return HUMANEVAL_EOS_TOKENS
     elif dataset_name == "mbpp":
         return MBPP_EOS_TOKENS
-    return GENERAL_EOS_TOKENS
+    return EOS
 
 def main():
     parser = argparse.ArgumentParser(description="Generate code samples using vLLM.")
@@ -54,7 +69,11 @@ def main():
     dataset_problems = get_dataset_problems(args.dataset)
     stop_tokens = get_stop_tokens_for_dataset(args.dataset)
 
-    print(f"Loading model: {args.model_path} with TP={args.tensor_parallel_size}")
+    # Setup task-specific cache directory
+    model_name = os.path.basename(args.model_path)
+    setup_cache_dir(args.dataset, model_name)
+
+    print(f"[INFO] Loading model: {args.model_path} with TP={args.tensor_parallel_size}")
     llm = LLM(
         model=args.model_path,
         tensor_parallel_size=args.tensor_parallel_size,
@@ -77,7 +96,7 @@ def main():
         # However, EvalPlus might still expect n_samples files for pass@k. We'll generate one and duplicate if needed, or just generate one.
         # For now, let's adjust n to 1 if temp is 0 and print a warning, assuming user wants diverse samples if n_samples > 1.
         if args.n_samples > 1:
-            print("Warning: Temperature is 0 (greedy decoding), but n_samples > 1. Only one unique sample will be generated. "
+            print("[WARN] Temperature is 0 (greedy decoding), but n_samples > 1. Only one unique sample will be generated. "
                   "If multiple identical files are needed for pass@k, this script will generate only one.")
             # To strictly generate N identical files, one would replicate the single output N times.
             # For simplicity, we'll let vLLM generate n=1 if temp=0 and n_samples>1 to avoid identical computation, 
@@ -113,11 +132,14 @@ def main():
                 elif "```" in generated_text: # Handle cases where only ``` is present
                      generated_text = generated_text.split("```",1)[1].split("\n```",1)[0]
 
+                # Since we're using base models, we need to prepend the prompt to make a complete solution
+                complete_solution = prompt + generated_text
+                
                 # add sample to all_samples
                 all_samples.append({
                     "task_id": task_id,
                     "_identifier": f"{task_id}_{i}",
-                    "completion": generated_text
+                    "solution": complete_solution  # Use "solution" instead of "completion"
                 })
             # If vLLM returned fewer samples than requested, create placeholder samples for the remainder
             for i in range(len(completions), args.n_samples):
@@ -125,7 +147,7 @@ def main():
                 all_samples.append({
                     "task_id": task_id,
                     "_identifier": f"{task_id}_{i}",
-                    "completion": "# Generation failed or not provided by vLLM"
+                    "solution": prompt + "# Generation failed or not provided by vLLM"  # Include prompt for consistency
                 })
         else:
             print(f"Warning: No output generated by vLLM for task {task_id}. Creating {args.n_samples} placeholder samples.")
@@ -133,7 +155,7 @@ def main():
                 all_samples.append({
                     "task_id": task_id,
                     "_identifier": f"{task_id}_{i}",
-                    "completion": "# Generation failed - no output from vLLM"
+                    "solution": prompt + "# Generation failed - no output from vLLM"  # Include prompt for consistency
                 })
 
     # save all samples to samples.jsonl
