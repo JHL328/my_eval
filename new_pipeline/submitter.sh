@@ -20,8 +20,9 @@
 # All sbatch commands and arguments are hardcoded per task below.
 # =============================================================================
 
-# Parse --task argument
+# Parse --task and --type arguments
 TASK_NAME=""
+MODEL_TYPE="base"  # Default to base
 while [[ $# -gt 0 ]]; do
     case $1 in
         --task)
@@ -36,6 +37,18 @@ while [[ $# -gt 0 ]]; do
             TASK_NAME="${1#*=}"
             shift
             ;;
+        --type)
+            if [[ -n "$2" && ! "$2" =~ ^-- ]]; then
+                MODEL_TYPE="$2"
+                shift 2
+            else
+                shift
+            fi
+            ;;
+        --type=*)
+            MODEL_TYPE="${1#*=}"
+            shift
+            ;;
         *)
             shift
             ;;
@@ -44,7 +57,13 @@ done
 
 if [[ -z "$TASK_NAME" ]]; then
     echo "[submitter.sh] ERROR: --task argument is required."
-    echo "Usage: bash submitter.sh --task <TASK_NAME>"
+    echo "Usage: bash submitter.sh --task <TASK_NAME> [--type <base|sft>]"
+    exit 1
+fi
+
+# Validate --type argument
+if [[ "$MODEL_TYPE" != "base" && "$MODEL_TYPE" != "sft" ]]; then
+    echo "[submitter.sh] ERROR: --type must be 'base' or 'sft' (got: $MODEL_TYPE)"
     exit 1
 fi
 
@@ -109,13 +128,13 @@ elif [[ "$TASK_NAME" == "truthfulqa_mc2" ]]; then
 #### MMLU and BBH Tasks ######
 ##############################
 elif [[ "$TASK_NAME" == "mmlu_flan_cot_fewshot_pass16" ]]; then
-    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate.sh --task mmlu_flan_cot_fewshot_pass16 --force"
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate.sh --task mmlu_flan_cot_fewshot_pass16 --type $MODEL_TYPE --force"
 elif [[ "$TASK_NAME" == "mmlu_pro_pass16" ]]; then
-    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate.sh --task mmlu_pro_pass16 --force"
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate.sh --task mmlu_pro_pass16 --type $MODEL_TYPE --force"
 elif [[ "$TASK_NAME" == "bbh_pass16" ]]; then
-    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate.sh --task bbh_pass16 --force"
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate.sh --task bbh_pass16 --type $MODEL_TYPE --force"
 elif [[ "$TASK_NAME" == "mmlu" ]]; then
-    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate.sh --task mmlu --force"
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate.sh --task mmlu --type $MODEL_TYPE --force"
 ##############################
 ###### GQA Tasks #############
 ##############################

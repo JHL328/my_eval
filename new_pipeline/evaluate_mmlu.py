@@ -10,12 +10,11 @@ from vllm import LLM, SamplingParams
 import os
 import sys
 
-output_dir = "/mnt/sharefs/users/haolong.jia/result/mmlu"
-os.makedirs(output_dir, exist_ok=True)
+# output_dir will be set based on model type
 
 # load Model_map
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from model import Model_map
+from model import get_model_map_by_type
 
 def load_fewshot_from_json(subject, prompts_path, num_fewshot=5):
     with open(prompts_path, 'r', encoding='utf-8') as f:
@@ -56,6 +55,7 @@ def parse_args():
     parser.add_option("--model", type="str", dest="model")
     parser.add_option("--subject", type="str", dest="subject")
     parser.add_option("--prompts_path", type="str", dest="prompts_path", default="/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/mmlu_prompts.json")
+    parser.add_option("--type", type="str", dest="type", default="base", help="Model type: base or sft")
     (options, args) = parser.parse_args()
     return options
 
@@ -67,8 +67,17 @@ def main():
     model_path = options.model  
     subject = options.subject
     prompts_path = options.prompts_path
+    model_type = options.type
 
-    model_name = Model_map[model_path]
+    # Set output dir based on model type
+    if model_type == "sft":
+        output_dir = "/mnt/sharefs/users/haolong.jia/result/mmlu_sft"
+    else:
+        output_dir = "/mnt/sharefs/users/haolong.jia/result/mmlu"
+    os.makedirs(output_dir, exist_ok=True)
+
+    model_map = get_model_map_by_type(model_type)
+    model_name = model_map[model_path]
     model_dir = os.path.join(output_dir, model_name)
     os.makedirs(model_dir, exist_ok=True)
 
@@ -84,6 +93,21 @@ def main():
 
     prompts = [build_prompt(fewshot, ex) for ex in data]
     targets = [build_target(ex) for ex in data]
+
+    # [TODO] try 0-shot with chat template
+    if model_type == "sft":
+        from transformers import AutoTokenizer
+        tokenizer = AutoTokenizer.from_pretrained(model_path)
+        formatted_prompts = []
+        for prompt in prompts:
+            messages = [{"role": "user", "content": prompt}]
+            formatted_prompt = tokenizer.apply_chat_template(
+                messages, 
+                tokenize=False, 
+                add_generation_prompt=True
+            )
+            formatted_prompts.append(formatted_prompt)
+        prompts = formatted_prompts
 
     print("==== First Prompt Example ====")
     print(prompts[0])

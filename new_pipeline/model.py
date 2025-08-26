@@ -60,7 +60,7 @@ class ModelQueue:
     def is_active(self):
         return bool(self.model_queue) or bool(self.running_models)
 
-    def wait_for_slot(self, interval=30):
+    def wait_for_slot(self, interval=60):
         while not self.can_submit() and self.is_active():
             self.update_finished()
             time.sleep(interval)
@@ -70,6 +70,33 @@ class ModelQueue:
         print(f"Running: {sorted(self.running_models)}")
         print(f"Failed: {sorted(self.fail)}")
         print(f"Queued: {[name for _, name in self.model_queue]}")
+
+
+def get_model_map_by_type(model_type="base"):
+    """
+    Get the model map by type
+    """
+    if model_type == "sft":
+        return SFT_MODEL_MAP
+    else:
+        return Model_map
+
+
+SFT_MODEL_MAP = {
+    ##############################################
+    ########## below are the SFT models ##########
+    ##############################################
+    "/mnt/sharefs/users/haolong.jia/RL-model/sft/confident_booth/checkpoint-5472": "confident_booth_5472",
+    "/mnt/sharefs/users/haolong.jia/RL-model/sft/brave_noether/checkpoint-5472": "brave_noether_5472",
+    "/mnt/sharefs/users/haolong.jia/RL-model/sft/awesome_kilby/checkpoint-5472": "awesome_kilby_5472",
+    "/mnt/sharefs/users/haolong.jia/RL-model/sft/driven_spectacle/checkpoint-5472": "driven_spectacle_5472",
+    "/mnt/sharefs/users/haolong.jia/RL-model/sft/electoral_lithography/checkpoint-5472": "electoral_lithography_5472",
+    "/mnt/sharefs/users/haolong.jia/RL-model/sft/gullible_aperitif/checkpoint-5472": "gullible_aperitif_5472",
+    "/mnt/sharefs/users/haolong.jia/RL-model/sft/lonely_cone_0/checkpoint-5472": "lonely_cone_0_5472",
+    "/mnt/sharefs/users/haolong.jia/RL-model/sft/near_habanera/checkpoint-5472": "near_habanera_5472",
+    "/mnt/sharefs/users/haolong.jia/RL-model/sft/resulting_eggs/checkpoint-5472": "resulting_eggs_5472",
+    "/mnt/sharefs/users/haolong.jia/RL-model/sft/steel_lamb/checkpoint-5472": "steel_lamb_5472",
+}
 
 
 Model_map = {
