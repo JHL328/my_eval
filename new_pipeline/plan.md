@@ -1,6 +1,73 @@
-# BBH评估脚本修改计划
+# 评估脚本修改计划
 
-## 修改目标
+## 一、Math-Verify Integration Plan for GSM8K and Math500 Evaluation
+
+### 📋 Overview
+Replace current evaluation methods (regex-based for GSM8K, sympy-based for Math500) with math_verify library for more robust mathematical equivalence checking.
+
+### 🎯 Objectives
+1. Integrate math_verify into GSM8K evaluation pipeline
+2. Create new Math500 evaluation script using math_verify
+3. Maintain all existing generation settings (temperature, top_p, few-shot prompts)
+4. Keep output format compatibility (result.csv, passk.json)
+
+### 📁 Files to Modify/Create
+
+#### 1. **evaluate_gsm8k.py** (Modify)
+- ✅ Already imported `from math_verify import parse, verify`
+- Replace `parse_answer()` function logic with math_verify
+- Update evaluation logic in `run_single_model_evaluation()`:
+  - Parse gold answers using `parse()`
+  - Parse model predictions using `parse()`  
+  - Use `verify()` for mathematical equivalence checking
+
+#### 2. **evaluate_math500.py** (New File)
+Create a simplified evaluation script specifically for Math500:
+- Import vLLM for generation (same as GSM8K)
+- Use same sampling parameters:
+  - temperature=0.6
+  - top_p=0.95
+  - n_sampling=64
+  - max_tokens=4096
+- Use 4-shot prompts from examples.py (math500 examples)
+- Implement math_verify for answer checking
+- Generate compatible output format (sample.jsonl, result.csv)
+
+#### 3. **evaluate_gsm8k.sh** (Modify if needed)
+Add support for calling the new evaluate_math500.py when task is math500
+
+### 🔧 Implementation Details
+
+#### Math500 Script Key Components:
+1. Load Math500 data from appropriate path
+2. Generate 4-shot prompt using examples["math500"] from examples.py
+3. Use vLLM with exact same parameters as original math_eval.py
+4. Parse answers with math_verify.parse()
+5. Verify with math_verify.verify()
+6. Calculate pass@k metrics (k=[1,2,4,8,16,32,64])
+7. Save outputs in compatible format
+
+### Key Configuration Preservation
+- **GSM8K**: 8-shot, n_sampling=16, temp=0.6, top_p=0.95
+- **Math500**: 4-shot, n_sampling=64, temp=0.6, top_p=0.95
+- Both use same prompt format from original scripts
+- Maintain SLURM job settings (GPU, memory, time limits)
+
+### ⚠️ Important Considerations
+- Handle edge cases where math_verify might fail to parse
+- Fall back to string comparison if parsing fails
+- Ensure backward compatibility with existing results
+- Keep all generation hyperparameters identical
+
+### ✅ Benefits
+- More robust mathematical equivalence checking
+- Handles various mathematical notations better
+- Reduces false negatives from formatting differences
+- Unified evaluation approach for both datasets
+
+## 二、BBH评估脚本修改计划
+
+### 修改目标
 修改evaluate_bbh_pass16.py以支持SFT模型的正确评估，解决当前存在的三个主要问题：
 1. SFT模型prompt构建格式混乱
 2. 需要支持0-shot评估（而非fewshot）

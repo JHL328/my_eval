@@ -42,6 +42,8 @@ ALLOWED_MODEL_GROUPS = [
     't50-m30-o20-r0-p0-g0-ma0',
     'social_candy_0',
     'lonely_cone_0',
+    'rolling_inverse_0',
+    'mountainous_extension_0',
     # Add more model groups here as needed
 ]
 
@@ -79,6 +81,10 @@ def group_to_label(group):
         return 'test-mix'
     if group == 'lonely_cone_0':
         return 'final-mix'
+    if group == 'rolling_inverse_0':
+        return 'final-math-gpt'
+    if group == 'mountainous_extension_0':
+        return 'final-math-rewrite'
     mapping = {
         't': 't',
         'm': 'mm',
@@ -116,6 +122,10 @@ color_map = {
     'final-mix': '#ffd700',      # Gold
     'Llama-3.2-3B': '#e41a1c',
     'Qwen3-1.7B-Base': '#377eb8',
+    'rolling_inverse_0': '#9b59b6',  # Purple
+    'final-math-gpt': '#9b59b6',     # Purple
+    'mountainous_extension_0': '#e67e22',  # Orange
+    'final-math-rewrite': '#e67e22',       # Orange
 }
 
 parser = argparse.ArgumentParser()
@@ -146,6 +156,28 @@ for model_name, result in data.items():
     # special case for lonely_cone_0_XXXXX
     if model_name.startswith('lonely_cone_0_'):
         group = 'lonely_cone_0'
+        # Check if this group is allowed
+        if group not in ALLOWED_MODEL_GROUPS:
+            continue
+        step = int(model_name.split('_')[-1])
+        if args.metric in result:
+            group_lines[group].append((step, result[args.metric]))
+        continue
+    
+    # special case for rolling_inverse_0_XXXXX
+    if model_name.startswith('rolling_inverse_0_'):
+        group = 'rolling_inverse_0'
+        # Check if this group is allowed
+        if group not in ALLOWED_MODEL_GROUPS:
+            continue
+        step = int(model_name.split('_')[-1])
+        if args.metric in result:
+            group_lines[group].append((step, result[args.metric]))
+        continue
+    
+    # special case for mountainous_extension_0_XXXXX
+    if model_name.startswith('mountainous_extension_0_'):
+        group = 'mountainous_extension_0'
         # Check if this group is allowed
         if group not in ALLOWED_MODEL_GROUPS:
             continue

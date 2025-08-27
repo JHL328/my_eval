@@ -38,4 +38,34 @@ source /mnt/weka/home/haolong.jia/miniconda3/bin/activate qwen-eval
 
 echo "🚀 Running evaluation batch manager for task: $@"
 
-python -u evaluate_gsm8k.py --submit_jobs "$@"
+# Parse task argument
+TASK_NAME=""
+for arg in "$@"; do
+    if [[ "$prev_arg" == "--task" ]]; then
+        TASK_NAME="$arg"
+        break
+    fi
+    prev_arg="$arg"
+done
+
+# Route to appropriate script based on task
+if [[ "$TASK_NAME" == "math500" ]]; then
+    echo "Routing to evaluate_math500.py for Math500 evaluation"
+    # Filter out --task argument when calling evaluate_math500.py
+    ARGS_WITHOUT_TASK=""
+    skip_next=false
+    for arg in "$@"; do
+        if [[ "$skip_next" == true ]]; then
+            skip_next=false
+            continue
+        fi
+        if [[ "$arg" == "--task" ]]; then
+            skip_next=true
+            continue
+        fi
+        ARGS_WITHOUT_TASK="$ARGS_WITHOUT_TASK $arg"
+    done
+    python -u evaluate_math500.py --submit_jobs $ARGS_WITHOUT_TASK
+else
+    python -u evaluate_gsm8k.py --submit_jobs "$@"
+fi

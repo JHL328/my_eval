@@ -9,8 +9,10 @@ def test_basic():
     print(f"集合运算测试: {result}")  # 应该是 True
     
     # 测试数值比较
-    gold2 = parse("$\\sqrt{2}$")
-    answer2 = parse("1.4142135623730951")
+    gold2 = parse("18")
+    answer2 = parse("Janet has 16 eggs per day. She eats 3 for breakfast and bakes 4 muffins. That is 3 + 4 = 7 eggs. The remainder is 16 - 7 = 9 eggs. She sells 9 eggs at $2 per fresh duck egg. 9 x 2 = $18. The answer is $18.")
+    print("gold2:{}".format(gold2), type(gold2))
+    print("answer2:{}".format(answer2), type(answer2))
     result2 = verify(gold2, answer2)
     print(f"数值比较测试: {result2}")  # 应该是 True
     
