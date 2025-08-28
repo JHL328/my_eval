@@ -42,9 +42,9 @@ commands=(
     # "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/mmlu_pro_pass16/passk.json --output ${PLOT_DIR}/mmlu_pro_pass@1.pdf --metric pass@1 --task mmlu_pro"
 
     # # --- MATH & Code Plots (pass@k) ---
-    # "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/math500_pass64/passkback.json --output ${PLOT_DIR}/math500_pass@1.pdf --metric pass@1 --task math500"
-    # "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/math500_pass64/passkback.json --output ${PLOT_DIR}/math500_pass@32.pdf --metric pass@32 --task math500"
-    # "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/math500_pass64/passkback.json --output ${PLOT_DIR}/math500_pass@64.pdf --metric pass@64 --task math500"
+    "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/math500_pass64/passkback.json --output ${PLOT_DIR}/math500_pass@1.pdf --metric pass@1 --task math500"
+    "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/math500_pass64/passkback.json --output ${PLOT_DIR}/math500_pass@32.pdf --metric pass@32 --task math500"
+    "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/math500_pass64/passkback.json --output ${PLOT_DIR}/math500_pass@64.pdf --metric pass@64 --task math500"
     "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/gsm8k_pass16/math-verify-passk.json --output ${PLOT_DIR}/gsm8k_pass@1.pdf --metric pass@1 --task gsm8k"
     "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/gsm8k_pass16/math-verify-passk.json --output ${PLOT_DIR}/gsm8k_pass@8.pdf --metric pass@8 --task gsm8k"
     "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/gsm8k_pass16/math-verify-passk.json --output ${PLOT_DIR}/gsm8k_pass@16.pdf --metric pass@16 --task gsm8k"
@@ -63,6 +63,12 @@ commands=(
     "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/openbookqa/result.json --output ${PLOT_DIR}/openbookqa_acc_norm.pdf --metric acc_norm,none --task openbookqa"
     "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/social_iqa/result.json --output ${PLOT_DIR}/social_iqa_acc_norm.pdf --metric acc_norm,none --task social_iqa"
     "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/truthfulqa_mc2/result.json --output ${PLOT_DIR}/truthfulqa_mc2_acc_norm.pdf --metric acc_norm,none --task truthfulqa_mc2"
+
+    # --- humaneval based plots ---
+    "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/humaneval/base_passk.json --output ${PLOT_DIR}/humaneval_base_pass16.pdf --metric pass@16 --task humaneval"
+    "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/humaneval/plus_passk.json --output ${PLOT_DIR}/humaneval_plus_pass16.pdf --metric pass@16 --task humaneval+"
+    "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/humaneval/base_passk.json --output ${PLOT_DIR}/humaneval_base_pass1.pdf --metric pass@1 --task humaneval"
+    "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/humaneval/plus_passk.json --output ${PLOT_DIR}/humaneval_plus_pass1.pdf --metric pass@1 --task humaneval+"
 
     # --- Smol (Token-based) Plots ---
     # These plots use the smol.py script which converts steps to token counts for better comparison
