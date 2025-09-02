@@ -64,11 +64,15 @@ commands=(
     "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/social_iqa/result.json --output ${PLOT_DIR}/social_iqa_acc_norm.pdf --metric acc_norm,none --task social_iqa"
     "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/truthfulqa_mc2/result.json --output ${PLOT_DIR}/truthfulqa_mc2_acc_norm.pdf --metric acc_norm,none --task truthfulqa_mc2"
 
-    # --- humaneval based plots ---
+    # --- humaneval and mbpp based plots ---
     "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/humaneval/base_passk.json --output ${PLOT_DIR}/humaneval_base_pass16.pdf --metric pass@16 --task humaneval"
     "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/humaneval/plus_passk.json --output ${PLOT_DIR}/humaneval_plus_pass16.pdf --metric pass@16 --task humaneval+"
     "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/humaneval/base_passk.json --output ${PLOT_DIR}/humaneval_base_pass1.pdf --metric pass@1 --task humaneval"
     "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/humaneval/plus_passk.json --output ${PLOT_DIR}/humaneval_plus_pass1.pdf --metric pass@1 --task humaneval+"
+    "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/mbpp/base_passk.json --output ${PLOT_DIR}/mbpp_base_pass16.pdf --metric pass@16 --task mbpp"
+    "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/mbpp/plus_passk.json --output ${PLOT_DIR}/mbpp_plus_pass16.pdf --metric pass@16 --task mbpp+"
+    "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/mbpp/base_passk.json --output ${PLOT_DIR}/mbpp_base_pass64.pdf --metric pass@64 --task mbpp"
+    "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/mbpp/plus_passk.json --output ${PLOT_DIR}/mbpp_plus_pass64.pdf --metric pass@64 --task mbpp+"
 
     # --- Smol (Token-based) Plots ---
     # These plots use the smol.py script which converts steps to token counts for better comparison

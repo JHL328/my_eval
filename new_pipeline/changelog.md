@@ -1,5 +1,128 @@
 # Changelog
 
+## [2025-09-01] - MMLU-Redux 评估脚本实现
+
+### 背景
+需要对 MMLU-Redux 2.0 数据集进行评估，该数据集包含57个subjects，每个subject有标注的error_type字段，用于分析数据质量问题。原始脚本使用API调用进行错误分类任务，现需要改写为标准问答任务，使用vLLM本地推理。
+
+### 实现方案
+将 `mmlu-redux/scripts/few_shot_cot_taxonomy.py` 改写为符合现有代码库风格的评估脚本，实现标准的MMLU问答任务。
+
+### 新增文件
+
+#### 1. **evaluate_mmlu_redux.py**
+主要功能：
+- **数据集**：使用 `edinburgh-dawg/mmlu-redux-2.0` (57个subjects)
+- **推理引擎**：vLLM 本地推理（替代原始的API调用）
+- **任务类型**：标准MMLU问答任务（Few-shot CoT）
+- **采样策略**：单次采样（n=1），温度0.7
+- **评估指标**：准确率（Accuracy）
+
+核心特性：
+- **Few-shot CoT Prompting**：
+  - 4个通用示例，包含推理过程
+  - 格式：`"The following are multiple choice questions (with answers) about {subject}..."`
+  - 每个示例包含完整的推理链
+
+- **答案提取Parser**：
+  - 支持多种答案格式："The answer is (A)"、"Therefore, B"、"So the answer is C"等
+  - 逐级匹配策略，确保高准确率
+  - 兼容CoT推理输出
+
+- **批量作业管理**：
+  - 为每个model×subject组合创建独立SLURM作业
+  - 自动检测和跳过已完成的评估
+  - 支持断点续跑
+
+#### 2. **evaluate_mmlu_redux.sh**
+批量提交脚本：
+```bash
+#!/bin/bash
+# 使用方式：
+# ./evaluate_mmlu_redux.sh [base|sft] [submit|summarize]
+```
+- 支持base和sft两种模型类型
+- submit：提交评估作业
+- summarize：汇总结果
+
+### 技术实现细节
+
+#### 1. **配置结构**
+```python
+TASK_CONFIGS = {
+    "mmlu_redux": {
+        "BASE_OUT": "/mnt/sharefs/users/haolong.jia/result/mmlu_redux",
+        "BASE_OUT_SFT": "/mnt/sharefs/users/haolong.jia/result/mmlu_redux_sft",
+        "DATASET": "edinburgh-dawg/mmlu-redux-2.0",
+        "N_SAMPLING": 1,  # 单次采样
+        "TEMPERATURE": 0.7,
+        "TOP_P": 0.95,
+        "MAX_TOKENS": 1024,
+        "NUM_SHOTS": 4
+    }
+}
+```
+
+#### 2. **输出文件结构**
+```
+/mnt/sharefs/users/haolong.jia/result/mmlu_redux/
+├── {model_name}/
+│   ├── {subject}.csv              # 详细评估结果
+│   ├── {subject}_metrics.json     # 单个subject的指标
+│   ├── {subject}.out              # SLURM输出日志
+│   └── {subject}.sh               # SLURM作业脚本
+└── accuracy_summary.json          # 所有模型的汇总结果
+```
+
+#### 3. **评估流程**
+1. 加载subject数据（edinburgh-dawg/mmlu-redux-2.0）
+2. 构建Few-shot CoT prompts
+3. vLLM批量推理
+4. 解析答案并计算准确率
+5. 保存结果和metrics
+6. 汇总所有subjects的平均准确率
+
+### 与现有代码的主要差异
+
+相比其他评估脚本（如gsm8k、mmlu_flan）：
+1. **单次采样**：n=1而非n=16，因为MMLU是知识性任务
+2. **评估指标**：准确率而非Pass@k
+3. **作业粒度**：每个subject独立作业，而非整个数据集
+4. **错误分析**：保留error_type字段，支持后续质量分析
+
+### 使用方式
+
+```bash
+# 批量评估所有base模型
+bash evaluate_mmlu_redux.sh base submit
+
+# 批量评估所有sft模型  
+bash evaluate_mmlu_redux.sh sft submit
+
+# 汇总结果
+bash evaluate_mmlu_redux.sh base summarize
+
+# 单个subject测试
+python evaluate_mmlu_redux.py \
+    --subject abstract_algebra \
+    --model_path /path/to/model \
+    --model_name model_name \
+    --output_dir /output/path \
+    --type base
+```
+
+### 性能优化
+- **并行作业**：不同subjects可并行评估
+- **资源配置**：每个作业1 GPU, 150GB内存
+- **时间限制**：单个subject最多8小时
+- **自动恢复**：支持从中断点继续
+
+### 注意事项
+1. **Subject列表**：代码中硬编码了57个subjects，如有更新需手动修改
+2. **SFT模型**：自动应用chat template格式化
+3. **答案格式**：必须以A/B/C/D字母形式提取答案
+4. **结果汇总**：需要所有subjects完成后才能得到准确的平均分
+
 ## [2025-08-25] - BBH评估脚本修改以支持SFT模型0-shot评估
 
 ### 背景
