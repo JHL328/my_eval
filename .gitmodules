@@ -1,0 +1,3 @@
+[submodule "mmlu-redux"]
+	path = mmlu-redux
+	url = https://github.com/aryopg/mmlu-redux

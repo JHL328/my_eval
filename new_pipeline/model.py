@@ -80,6 +80,8 @@ Model_map = {
     "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-rewrite/tokenmix_ablation_mountainous_extension_0/mountainous_extension_0_143051": "mountainous_extension_0_143051",
     "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-rewrite/tokenmix_ablation_rolling_inverse_0/rolling_inverse_0_73430": "rolling_inverse_0_73430",
     "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-rewrite/tokenmix_ablation_rolling_inverse_0/rolling_inverse_0_143051": "rolling_inverse_0_143051",
+    "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-rewrite/tokenmix_ablation_weary_alias_0/weary_alias_0_73430": "weary_alias_0_73430",
+    "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-rewrite/tokenmix_ablation_weary_alias_0/weary_alias_0_143051": "weary_alias_0_143051",
 
     ##########################################################
     ########## below are the SmolLM3-3B Base series ##########
