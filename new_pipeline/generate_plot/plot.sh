@@ -14,7 +14,7 @@
 # =================================================================
 
 # Ensure the output directory for plots exists
-PLOT_DIR="/mnt/weka/home/haolong.jia/eval/RL-eval/plot"
+PLOT_DIR="/mnt/weka/home/haolong.jia/eval/plot"
 mkdir -p "$PLOT_DIR"
 
 # Path to the Python plotting scripts
@@ -28,18 +28,18 @@ RESULT_DIR="/mnt/sharefs/users/haolong.jia/result"
 # Add your plotting commands here.
 commands=(
     # # --- BBH Plots (pass@k) ---
-    # "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/bbh_pass16/passk.json --output ${PLOT_DIR}/bbh_pass@1.pdf --metric pass@1 --task bbh"
+    "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/bbh_pass16/passk.json --output ${PLOT_DIR}/bbh_pass@1.pdf --metric pass@1 --task bbh"
     # "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/bbh_pass16/passk.json --output ${PLOT_DIR}/bbh_pass@2.pdf --metric pass@2 --task bbh"
     
 
     # # --- MMLU (Standard) Plots (pass@k) ---
-    # "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/mmlu/passk.json --output ${PLOT_DIR}/mmlu_std_pass@1.pdf --metric pass@1 --task mmlu_std"
+    "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/mmlu/passk.json --output ${PLOT_DIR}/mmlu_std_pass@1.pdf --metric pass@1 --task mmlu_std"
 
     # # --- MMLU (CoT) Plots (pass@k) ---
-    # "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/mmlu_flan_pass16/passk.json --output ${PLOT_DIR}/mmlu_cot_pass@1.pdf --metric pass@1 --task mmlu_cot"
+    "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/mmlu_flan_pass16/passk.json --output ${PLOT_DIR}/mmlu_cot_pass@1.pdf --metric pass@1 --task mmlu_cot"
     
     # # --- MMLU-Pro Plots (pass@k) ---
-    # "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/mmlu_pro_pass16/passk.json --output ${PLOT_DIR}/mmlu_pro_pass@1.pdf --metric pass@1 --task mmlu_pro"
+    "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/mmlu_pro_pass16/passk.json --output ${PLOT_DIR}/mmlu_pro_pass@1.pdf --metric pass@1 --task mmlu_pro"
 
     # # --- MATH & Code Plots (pass@k) ---
     "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/math500_pass64/passkback.json --output ${PLOT_DIR}/math500_pass@1.pdf --metric pass@1 --task math500"
@@ -65,14 +65,14 @@ commands=(
     "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/truthfulqa_mc2/result.json --output ${PLOT_DIR}/truthfulqa_mc2_acc_norm.pdf --metric acc_norm,none --task truthfulqa_mc2"
 
     # --- humaneval and mbpp based plots ---
-    "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/humaneval/base_passk.json --output ${PLOT_DIR}/humaneval_base_pass16.pdf --metric pass@16 --task humaneval"
-    "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/humaneval/plus_passk.json --output ${PLOT_DIR}/humaneval_plus_pass16.pdf --metric pass@16 --task humaneval+"
-    "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/humaneval/base_passk.json --output ${PLOT_DIR}/humaneval_base_pass1.pdf --metric pass@1 --task humaneval"
-    "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/humaneval/plus_passk.json --output ${PLOT_DIR}/humaneval_plus_pass1.pdf --metric pass@1 --task humaneval+"
-    "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/mbpp/base_passk.json --output ${PLOT_DIR}/mbpp_base_pass16.pdf --metric pass@16 --task mbpp"
-    "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/mbpp/plus_passk.json --output ${PLOT_DIR}/mbpp_plus_pass16.pdf --metric pass@16 --task mbpp+"
-    "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/mbpp/base_passk.json --output ${PLOT_DIR}/mbpp_base_pass64.pdf --metric pass@64 --task mbpp"
-    "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/mbpp/plus_passk.json --output ${PLOT_DIR}/mbpp_plus_pass64.pdf --metric pass@64 --task mbpp+"
+    # "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/humaneval/base_passk.json --output ${PLOT_DIR}/humaneval_base_pass16.pdf --metric pass@16 --task humaneval"
+    # "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/humaneval/plus_passk.json --output ${PLOT_DIR}/humaneval_plus_pass16.pdf --metric pass@16 --task humaneval+"
+    # "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/humaneval/base_passk.json --output ${PLOT_DIR}/humaneval_base_pass1.pdf --metric pass@1 --task humaneval"
+    # "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/humaneval/plus_passk.json --output ${PLOT_DIR}/humaneval_plus_pass1.pdf --metric pass@1 --task humaneval+"
+    # "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/mbpp/base_passk.json --output ${PLOT_DIR}/mbpp_base_pass16.pdf --metric pass@16 --task mbpp"
+    # "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/mbpp/plus_passk.json --output ${PLOT_DIR}/mbpp_plus_pass16.pdf --metric pass@16 --task mbpp+"
+    # "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/mbpp/base_passk.json --output ${PLOT_DIR}/mbpp_base_pass64.pdf --metric pass@64 --task mbpp"
+    # "python ${PLOT_SCRIPT} --passk ${RESULT_DIR}/mbpp/plus_passk.json --output ${PLOT_DIR}/mbpp_plus_pass64.pdf --metric pass@64 --task mbpp+"
 
     # --- Smol (Token-based) Plots ---
     # These plots use the smol.py script which converts steps to token counts for better comparison

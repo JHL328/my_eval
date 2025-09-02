@@ -44,6 +44,7 @@ ALLOWED_MODEL_GROUPS = [
     'lonely_cone_0',
     'rolling_inverse_0',
     'mountainous_extension_0',
+    "weary_alias_0",
     # Add more model groups here as needed
 ]
 
@@ -85,6 +86,8 @@ def group_to_label(group):
         return 'final-math-gpt'
     if group == 'mountainous_extension_0':
         return 'final-math-rewrite'
+    if group == 'weary_alias_0':
+        return 'data_v2'
     mapping = {
         't': 't',
         'm': 'mm',
@@ -126,6 +129,8 @@ color_map = {
     'final-math-gpt': '#9b59b6',     # Purple
     'mountainous_extension_0': '#e67e22',  # Orange
     'final-math-rewrite': '#e67e22',       # Orange
+    'weary_alias_0': '#45b1e8',  # Blue
+    'data_v2': '#45b1e8',       # Blue
 }
 
 parser = argparse.ArgumentParser()
@@ -178,6 +183,17 @@ for model_name, result in data.items():
     # special case for mountainous_extension_0_XXXXX
     if model_name.startswith('mountainous_extension_0_'):
         group = 'mountainous_extension_0'
+        # Check if this group is allowed
+        if group not in ALLOWED_MODEL_GROUPS:
+            continue
+        step = int(model_name.split('_')[-1])
+        if args.metric in result:
+            group_lines[group].append((step, result[args.metric]))
+        continue
+    
+    # special case for weary_alias_0_XXXXX
+    if model_name.startswith('weary_alias_0_'):
+        group = 'weary_alias_0'
         # Check if this group is allowed
         if group not in ALLOWED_MODEL_GROUPS:
             continue
