@@ -1,5 +1,104 @@
 # Changelog
 
+## [2025-09-08] - Math500 SFT模型支持
+
+### 背景
+需要为Math500评估任务添加SFT模型支持，类似于之前BBH任务的改造。SFT模型需要：
+1. 使用0-shot评估（不使用few-shot examples）
+2. 使用chat template格式化输入
+3. 添加system prompt引导数学推理
+4. 独立的输出目录避免与base模型冲突
+
+### 修改内容
+
+#### 1. **submitter.sh**（小改动）
+- 第95-96行：为math500任务添加--type参数传递
+  ```bash
+  elif [[ "$TASK_NAME" == "math500" ]]; then
+      CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_gsm8k.sh --task math500 --type $MODEL_TYPE"
+  ```
+
+#### 2. **evaluate_gsm8k.py**（主要修改）
+
+##### 添加SFT支持基础设施
+- **导入模块**（第15行）：添加 `from model import Model_map, get_model_map_by_type`
+- **命令行参数**（第498行）：添加 `--type` 参数，支持 base/sft 选择
+- **动态配置**（第520-525行）：
+  ```python
+  if args.task == "math500" and hasattr(args, 'type') and args.type == "sft":
+      task_config["BASE_OUT"] = "/mnt/sharefs/users/haolong.jia/result/math500_pass16_sft"
+      task_config["NUM_SHOTS"] = 0  # 0-shot
+      task_config["PROMPT_TYPE"] = "qwen25"  # 使用qwen25模板
+      task_config["N_SAMPLING"] = 16  # 减少采样次数
+      task_config["K_LIST"] = [1, 8, 16]  # 调整pass@k列表
+  ```
+
+##### 模型映射和任务提交
+- **submit_jobs_for_all_models函数**（第310-314行）：根据type选择正确的模型映射
+- **任务脚本生成**（第356-393行）：SFT模型添加--apply_chat_template标志
+- **后处理支持**（第531-534行）：使用正确的model_map进行后处理
+- **summarize函数改进**（第462-476行）：添加model_map参数支持
+
+#### 3. **math_eval.py**（可选优化）
+
+- **System Prompt支持**（第254-277行）：
+  ```python
+  if args.apply_chat_template:
+      if args.prompt_type == "qwen25":
+          # SFT模型使用专门的system prompt
+          system_prompt = "You are a helpful assistant skilled in mathematical problem-solving. Please solve the problem step by step and put your final answer within \\boxed{}."
+          input_prompts = [
+              tokenizer.apply_chat_template(
+                  [
+                      {"role": "system", "content": system_prompt},
+                      {"role": "user", "content": prompt.strip()}
+                  ],
+                  tokenize=False,
+                  add_generation_prompt=True,
+              )
+              for prompt in input_prompts
+          ]
+  ```
+
+### 技术细节
+
+#### SFT模型特殊配置
+- **输出目录**：`/mnt/sharefs/users/haolong.jia/result/math500_pass16_sft`（独立于base模型）
+- **Few-shot设置**：NUM_SHOTS = 0（零样本学习）
+- **Prompt类型**：qwen25（触发chat template应用）
+- **采样参数**：N_SAMPLING = 16，K_LIST = [1, 8, 16]（优化计算资源）
+- **Chat Template**：通过--apply_chat_template标志自动应用
+
+#### 实现策略
+- **最小化修改**：主要逻辑集中在evaluate_gsm8k.py，math_eval.py基本不动
+- **利用现有机制**：复用math_eval.py的apply_chat_template和prompt_type机制
+- **向后兼容**：完全兼容现有base模型评估流程
+
+### 使用方式
+
+```bash
+# 评估Base模型（默认）
+bash submitter.sh --task math500
+# 或
+bash submitter.sh --task math500 --type base
+
+# 评估SFT模型
+bash submitter.sh --task math500 --type sft
+```
+
+### 预期效果
+- SFT模型通过system prompt获得更好的数学推理引导
+- 0-shot评估避免few-shot examples对SFT模型的干扰  
+- 独立输出目录确保base和SFT结果不冲突
+- 减少的采样次数提高评估效率
+
+### 注意事项
+1. **环境依赖**：确保qwen-eval环境已安装所有requirements.txt中的依赖
+2. **不需要pip install -e**：math_eval.py使用本地导入，在正确工作目录下即可运行
+3. **结果位置**：
+   - Base模型：`/mnt/sharefs/users/haolong.jia/result/math500_pass64/`
+   - SFT模型：`/mnt/sharefs/users/haolong.jia/result/math500_pass16_sft/`
+
 ## [2025-08-25] - BBH评估脚本修改以支持SFT模型0-shot评估
 
 ### 背景

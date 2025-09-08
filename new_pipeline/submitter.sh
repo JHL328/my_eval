@@ -93,7 +93,7 @@ elif [[ "$TASK_NAME" == "humaneval_old" ]]; then
 elif [[ "$TASK_NAME" == "gsm8k" ]]; then
     CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_gsm8k.sh --task gsm8k"
 elif [[ "$TASK_NAME" == "math500" ]]; then
-    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_gsm8k.sh --task math500"
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_gsm8k.sh --task math500 --type $MODEL_TYPE"
 
 ##############################
 ###### Likelihood eval #######
