@@ -45,6 +45,7 @@ ALLOWED_MODEL_GROUPS = [
     'rolling_inverse_0',
     'mountainous_extension_0',
     "weary_alias_0",
+    "enthusiastic_minimalism_0",
     # Add more model groups here as needed
 ]
 
@@ -88,6 +89,8 @@ def group_to_label(group):
         return 'final-math-rewrite'
     if group == 'weary_alias_0':
         return 'data_v2'
+    if group == 'enthusiastic_minimalism_0':
+        return 'Web-High'
     mapping = {
         't': 't',
         'm': 'mm',
@@ -131,6 +134,7 @@ color_map = {
     'final-math-rewrite': '#e67e22',       # Orange
     'weary_alias_0': '#45b1e8',  # Blue
     'data_v2': '#45b1e8',       # Blue
+    'Web-High': '#1f77b4',
 }
 
 parser = argparse.ArgumentParser()
@@ -194,6 +198,17 @@ for model_name, result in data.items():
     # special case for weary_alias_0_XXXXX
     if model_name.startswith('weary_alias_0_'):
         group = 'weary_alias_0'
+        # Check if this group is allowed
+        if group not in ALLOWED_MODEL_GROUPS:
+            continue
+        step = int(model_name.split('_')[-1])
+        if args.metric in result:
+            group_lines[group].append((step, result[args.metric]))
+        continue
+    
+    # special case for enthusiastic_minimalism_0_XXXXX
+    if model_name.startswith('enthusiastic_minimalism_0_'):
+        group = 'enthusiastic_minimalism_0'
         # Check if this group is allowed
         if group not in ALLOWED_MODEL_GROUPS:
             continue
