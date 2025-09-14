@@ -31,21 +31,22 @@ from collections import defaultdict
 # Define which model groups to include in the plot
 # Only models matching these patterns will be processed
 ALLOWED_MODEL_GROUPS = [
-    't60-m30-r10',
-    't70-m30', 
-    't35-m30-g35',
-    't40-m30-o0-r4-p3-a3-g10-ma10',
+    # 't60-m30-r10',
+    # 't70-m30', 
+    # 't35-m30-g35',
+    # 't40-m30-o0-r4-p3-a3-g10-ma10',
     't20-m25-o0-r7-p7-a7-g9-ma25',
-    't60-m30-o0-g0-r0-p0-ma10',
-    't70-m10-o0-g0-r0-p0-ma20',
-    't30-m15-o10-r5-p5-g20-ma15',
-    't50-m30-o20-r0-p0-g0-ma0',
-    'social_candy_0',
+    # 't60-m30-o0-g0-r0-p0-ma10',
+    # 't70-m10-o0-g0-r0-p0-ma20',
+    # 't30-m15-o10-r5-p5-g20-ma15',
+    # 't50-m30-o20-r0-p0-g0-ma0',
+    # 'social_candy_0',
     'lonely_cone_0',
     'rolling_inverse_0',
     'mountainous_extension_0',
     "weary_alias_0",
     "enthusiastic_minimalism_0",
+    "courageous_congruence_0",
     # Add more model groups here as needed
 ]
 
@@ -91,6 +92,8 @@ def group_to_label(group):
         return 'data_v2'
     if group == 'enthusiastic_minimalism_0':
         return 'Web-High'
+    if group == 'courageous_congruence_0':
+        return 'Web-Medium'
     mapping = {
         't': 't',
         'm': 'mm',
@@ -135,6 +138,7 @@ color_map = {
     'weary_alias_0': '#45b1e8',  # Blue
     'data_v2': '#45b1e8',       # Blue
     'Web-High': '#1f77b4',
+    'Web-Medium': '#1fff77', 
 }
 
 parser = argparse.ArgumentParser()
@@ -209,6 +213,17 @@ for model_name, result in data.items():
     # special case for enthusiastic_minimalism_0_XXXXX
     if model_name.startswith('enthusiastic_minimalism_0_'):
         group = 'enthusiastic_minimalism_0'
+        # Check if this group is allowed
+        if group not in ALLOWED_MODEL_GROUPS:
+            continue
+        step = int(model_name.split('_')[-1])
+        if args.metric in result:
+            group_lines[group].append((step, result[args.metric]))
+        continue
+    
+    # special case for courageous_congruence_0_XXXXX
+    if model_name.startswith('courageous_congruence_0_'):
+        group = 'courageous_congruence_0'
         # Check if this group is allowed
         if group not in ALLOWED_MODEL_GROUPS:
             continue
