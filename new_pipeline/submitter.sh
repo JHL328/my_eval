@@ -136,11 +136,18 @@ elif [[ "$TASK_NAME" == "bbh_pass16" ]]; then
 elif [[ "$TASK_NAME" == "mmlu" ]]; then
     CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate.sh --task mmlu --type $MODEL_TYPE --force"
 ##############################
+###### Lighteval Tasks #######
+##############################
+elif [[ "$TASK_NAME" == "mmlu_redux" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_lighteval.sh --task mmlu_redux --type $MODEL_TYPE"
+elif [[ "$TASK_NAME" == "gpqa_diamond" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_lighteval.sh --task gpqa_diamond --type $MODEL_TYPE"
+##############################
 ###### GQA Tasks #############
 ##############################
 else
     echo "[submitter.sh] ERROR: Unknown or unsupported task: $TASK_NAME"
-    echo "Supported tasks: mbpp, humaneval, mbpp_old, humaneval_old, gsm8k, math500, drop, arc_easy, arc_challenge, hellaswag, piqa, winogrande, triviaqa, nq_open, commonsense_qa, agieval, openbookqa, social_iqa, truthfulqa_mc2, mmlu_flan_cot_fewshot_pass16, mmlu_pro_pass16, bbh_pass16, mmlu, gpqa"
+    echo "Supported tasks: mbpp, humaneval, mbpp_old, humaneval_old, gsm8k, math500, drop, arc_easy, arc_challenge, hellaswag, piqa, winogrande, triviaqa, nq_open, commonsense_qa, agieval, openbookqa, social_iqa, truthfulqa_mc2, mmlu_flan_cot_fewshot_pass16, mmlu_pro_pass16, bbh_pass16, mmlu, mmlu_redux, gpqa_diamond"
     echo "Note: Use mbpp/humaneval for two-stage GPU+CPU pipeline, or mbpp_old/humaneval_old for single-job pipeline"
     exit 2
 fi

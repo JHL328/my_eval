@@ -86,16 +86,16 @@ SFT_MODEL_MAP = {
     ##############################################
     ########## below are the SFT models ##########
     ##############################################
-    "/mnt/sharefs/users/haolong.jia/RL-model/sft/confident_booth/checkpoint-5472": "confident_booth_5472",
-    "/mnt/sharefs/users/haolong.jia/RL-model/sft/brave_noether/checkpoint-5472": "brave_noether_5472",
-    "/mnt/sharefs/users/haolong.jia/RL-model/sft/awesome_kilby/checkpoint-5472": "awesome_kilby_5472",
-    "/mnt/sharefs/users/haolong.jia/RL-model/sft/driven_spectacle/checkpoint-5472": "driven_spectacle_5472",
-    "/mnt/sharefs/users/haolong.jia/RL-model/sft/electoral_lithography/checkpoint-5472": "electoral_lithography_5472",
-    "/mnt/sharefs/users/haolong.jia/RL-model/sft/gullible_aperitif/checkpoint-5472": "gullible_aperitif_5472",
-    "/mnt/sharefs/users/haolong.jia/RL-model/sft/lonely_cone_0/checkpoint-5472": "lonely_cone_0_5472",
-    "/mnt/sharefs/users/haolong.jia/RL-model/sft/near_habanera/checkpoint-5472": "near_habanera_5472",
-    "/mnt/sharefs/users/haolong.jia/RL-model/sft/resulting_eggs/checkpoint-5472": "resulting_eggs_5472",
-    "/mnt/sharefs/users/haolong.jia/RL-model/sft/steel_lamb/checkpoint-5472": "steel_lamb_5472",
+    "/mnt/sharefs/users/haolong.jia/RL-model/sft/lonely_cone_0/checkpoint-27358": "lonely_cone_0_27358",
+    "/mnt/sharefs/users/haolong.jia/RL-model/sft/awesome_kilby/checkpoint-27358": "awesome_kilby_27358",
+    "/mnt/sharefs/users/haolong.jia/RL-model/sft/brave_noether/checkpoint-27358": "brave_noether_27358",
+    "/mnt/sharefs/users/haolong.jia/RL-model/sft/confident_booth/checkpoint-27358": "confident_booth_27358",
+    "/mnt/sharefs/users/haolong.jia/RL-model/sft/driven_spectacle/checkpoint-27358": "driven_spectacle_27358",
+    "/mnt/sharefs/users/haolong.jia/RL-model/sft/steel_lamb/checkpoint-27358": "steel_lamb_27358",
+    "/mnt/sharefs/users/haolong.jia/RL-model/sft/gullible_aperitif/checkpoint-27358": "gullible_aperitif_27358",
+    "/mnt/sharefs/users/haolong.jia/RL-model/sft/resulting_eggs/checkpoint-27358": "resulting_eggs_27358",
+    "/mnt/sharefs/users/haolong.jia/RL-model/sft/electoral_lithography/checkpoint-27358": "electoral_lithography_27358",
+    "/mnt/sharefs/users/haolong.jia/RL-model/sft/near_habanera/checkpoint-27358": "near_habanera_27358",
 }
 
 

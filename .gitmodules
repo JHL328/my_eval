@@ -1,3 +1,6 @@
 [submodule "mmlu-redux"]
 	path = mmlu-redux
 	url = https://github.com/aryopg/mmlu-redux
+[submodule "lighteval"]
+	path = lighteval
+	url = https://github.com/huggingface/lighteval
