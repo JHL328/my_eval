@@ -1,134 +1,29 @@
-# Implementation Plan for MMLU Redux & GPQA Diamond Evaluation
+计划
 
-## Overview
-Implement MMLU Redux and GPQA Diamond evaluations using lighteval framework, following the existing 3-layer pipeline structure (submitter.sh → evaluate_*.sh → evaluate_*.py), using SFT models from `model.py`, with 0-shot evaluation and single generation per sample.
+明确需求：核对 lm-evaluation-harness 中的 _mmlu.yaml 任务定义，确认调用方式（CLI 参数 / Python API）以及所需模型配置、输出路径约定。
+设计脚本流程：参考 evaluate_likelihood.{sh,py}，确定 evaluate_harness.sh 的参数解析、环境激活、日志输出及对 Python 脚本的调用方式，并规划 Python 脚本的主要步骤（模型过滤、任务配置、Slurm 提交、结果汇总）。
+编写与验证：先实现 Python 脚本中的核心函数，再填充 Shell 脚本；完成后检查命令行参数、输出目录、依赖路径（尤其是 _mmlu.yaml）是否正确，最后补充必要的日志与错误处理。
 
-## Architecture Design
 
-### 1. Pipeline Structure (Following GSM8K Pattern)
-```
-submitter.sh (entry point)
-    ├── evaluate_lighteval.sh (SLURM batch script)
-    │   └── evaluate_lighteval.py (orchestrator)
-    │       └── Per-model SLURM jobs using lighteval
-```
+脚本结构设计
 
-### 2. Key Requirements
-- **Models**: Use `SFT_MODEL_MAP` from `/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/model.py`
-- **Evaluation**: 0-shot, single generation per sample (no pass@k)
-- **Framework**: lighteval with vLLM backend
-- **Output Format**: JSON results + metrics.txt per model
+RL-eval/new_pipeline/evaluate_harness.sh
 
-## Implementation Steps
+顶部 Slurm 配置块（job 名称、日志输出路径、资源需求）。
+激活 harness-eval 环境的步骤。
+参数解析函数或循环，仅提取 --task（后续可拓展）。
+构造基于任务名的 .out/.err 路径。
+调用 python -u new_pipeline/evaluate_harness.py "$@" > … 2> …。
+结束状态检查与提示信息。
+RL-eval/new_pipeline/evaluate_harness.py
 
-### Phase 1: Core Scripts Development
-
-#### 1.1 Create `evaluate_lighteval.py` (Manager Script)
-```python
-# Features:
-- Load SFT_MODEL_MAP from model.py
-- Submit per-model SLURM jobs
-- Configure lighteval tasks based on --task argument
-- Monitor job completion
-- Aggregate results
-```
-
-Key configurations:
-- MMLU Redux: All 57 subjects via `lighteval|mmlu_redux_2:{subset}|0`
-- GPQA Diamond: `lighteval|gpqa:diamond|0`
-- Output directory structure: `/mnt/sharefs/users/haolong.jia/result/{task}_sft/{model_name}/`
-
-#### 1.2 Create `evaluate_lighteval.sh` (SLURM Batch Script)
-```bash
-# SLURM configuration:
-- Job name: eval_lighteval_manager_${SLURM_JOB_ID}
-- Output logs: /mnt/weka/home/haolong.jia/eval/runs/
-- Resources: 8 CPUs, 16GB RAM
-- Calls evaluate_lighteval.py with --submit_jobs flag
-```
-
-#### 1.3 Update `submitter.sh`
-Add new task entries:
-```bash
-elif [[ "$TASK_NAME" == "mmlu_redux" ]]; then
-    CMD="sbatch evaluate_lighteval.sh --task mmlu_redux --type sft"
-elif [[ "$TASK_NAME" == "gpqa_diamond" ]]; then
-    CMD="sbatch evaluate_lighteval.sh --task gpqa_diamond --type sft"
-```
-
-### Phase 2: Task Configuration
-
-#### 2.1 MMLU Redux Task Configuration
-```python
-MMLU_REDUX_SUBJECTS = [
-    "abstract_algebra", "anatomy", "astronomy", "business_ethics",
-    "clinical_knowledge", "college_biology", "college_chemistry",
-    # ... all 57 subjects
-]
-
-# Task list format for lighteval:
-tasks = [f"lighteval|mmlu_redux_2:{subject}|0" for subject in MMLU_REDUX_SUBJECTS]
-```
-
-#### 2.2 GPQA Diamond Task Configuration
-```python
-GPQA_TASKS = ["lighteval|gpqa:diamond|0"]
-```
-
-### Phase 3: Per-Model Job Script Generation
-
-Each model job will execute:
-```bash
-python -m lighteval vllm \
-    --model-args="pretrained=$MODEL_PATH" \
-    --tasks="$TASK_LIST" \
-    --output-dir="$OUTPUT_DIR" \
-    --save-details \
-    --dataset-loading-processes=8 \
-    --max-samples=-1
-```
-
-### Phase 4: Results Processing
-
-#### 4.1 Output Files per Model
-- `results.json`: Raw lighteval output
-- `metrics.txt`: Formatted accuracy scores
-- `slurm.out/err`: Job logs
-
-#### 4.2 Aggregation
-- Create summary JSON at base output directory
-- Calculate average scores across subjects (for MMLU Redux)
-- Format results for leaderboard submission
-
-## Task-Specific Details
-
-### MMLU Redux
-- **Metrics**: Accuracy per subject, overall average
-- **Output Path**: `/mnt/sharefs/users/haolong.jia/result/mmlu_redux_sft/`
-- **Subjects**: 57 subjects from MMLU Redux 2.0
-- **Evaluation**: 0-shot, single generation
-
-### GPQA Diamond
-- **Metrics**: Accuracy
-- **Output Path**: `/mnt/sharefs/users/haolong.jia/result/gpqa_diamond_sft/`
-- **Dataset**: GPQA Diamond subset
-- **Evaluation**: 0-shot, single generation
-
-## Validation Plan
-
-1. **Dry Run**: Test with single model on subset of data
-2. **Output Verification**: Ensure metrics.txt and results.json are created
-3. **Accuracy Check**: Verify scores are reasonable (not 0% or 100%)
-4. **Integration Test**: Run through full submitter.sh pipeline
-5. **Multi-model Test**: Verify queue management with 2-3 models
-
-## Environment Setup
-
-```bash
-# Conda environment (use harness-eval since lighteval install on this)
-source /mnt/weka/home/haolong.jia/miniconda3/bin/activate harness-eval
-
-# lighteval should already be installed in:
-/mnt/weka/home/haolong.jia/eval/RL-eval/lighteval/
-```
-
+parse_args()：处理 --task、--limit-models、--dry-run 等潜在参数。
+load_model_map()：重用/引用 Model_map，必要时支持白名单过滤。
+build_task_config(task)：根据任务名生成 harness 调用所需信息（指向 _mmlu.yaml、few-shot 数、其他 CLI flags）。
+prepare_directories(task)：创建结果、日志、job 脚本目录并返回路径。
+generate_sbatch_script(model_info, task_cfg, paths)：产出单模型 Slurm 脚本，包含 lm_eval 命令和 _mmlu.yaml 的配置加载方式。
+submit_jobs(job_scripts)：提交 Slurm、收集 Job ID。
+wait_for_jobs(job_ids)：轮询 squeue 等待任务完成。
+collect_metrics(task_cfg, paths)：读取每个模型 result.json，抽取主要指标并写汇总文件。
+main()：按顺序调用上述函数，打印进度日志与 summary。
+每个函数职责清晰，可复用 evaluate_likelihood.py 的部分逻辑（尤其目录与 Slurm 相关），同时针对 _mmlu.yaml 添加专用的任务配置与 post-processing。完成实现后建议补充一个最小任务的 dry run 或本地 smoke test，确认 harness 能正确读取配置。

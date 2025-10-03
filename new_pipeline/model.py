@@ -87,7 +87,6 @@ SFT_MODEL_MAP = {
     ########## below are the SFT models ##########
     ##############################################
     "/mnt/sharefs/users/haolong.jia/RL-model/sft/lonely_cone_0/checkpoint-27358": "lonely_cone_0_27358",
-    "/mnt/sharefs/users/haolong.jia/RL-model/sft/awesome_kilby/checkpoint-27358": "awesome_kilby_27358",
     "/mnt/sharefs/users/haolong.jia/RL-model/sft/brave_noether/checkpoint-27358": "brave_noether_27358",
     "/mnt/sharefs/users/haolong.jia/RL-model/sft/confident_booth/checkpoint-27358": "confident_booth_27358",
     "/mnt/sharefs/users/haolong.jia/RL-model/sft/driven_spectacle/checkpoint-27358": "driven_spectacle_27358",

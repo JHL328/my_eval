@@ -16,7 +16,7 @@
 #   bash submitter.sh --task drop
 #   bash submitter.sh --task arc_challenge
 #   bash submitter.sh --task mmlu_flan_cot_fewshot_pass16
-#
+#   bash submitter.sh --task mmlu_redux_generative --type sft
 # All sbatch commands and arguments are hardcoded per task below.
 # =============================================================================
 
@@ -138,16 +138,16 @@ elif [[ "$TASK_NAME" == "mmlu" ]]; then
 ##############################
 ###### Lighteval Tasks #######
 ##############################
-elif [[ "$TASK_NAME" == "mmlu_redux" ]]; then
-    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_lighteval.sh --task mmlu_redux --type $MODEL_TYPE"
-elif [[ "$TASK_NAME" == "gpqa_diamond" ]]; then
-    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_lighteval.sh --task gpqa_diamond --type $MODEL_TYPE"
+elif [[ "$TASK_NAME" == "mmlu_redux" || "$TASK_NAME" == "mmlu_redux_generative" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_harness.sh --task mmlu_redux_generative --model-type $MODEL_TYPE"
+elif [[ "$TASK_NAME" == "ifeval" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_harness.sh --task ifeval --model-type $MODEL_TYPE"
 ##############################
 ###### GQA Tasks #############
 ##############################
 else
     echo "[submitter.sh] ERROR: Unknown or unsupported task: $TASK_NAME"
-    echo "Supported tasks: mbpp, humaneval, mbpp_old, humaneval_old, gsm8k, math500, drop, arc_easy, arc_challenge, hellaswag, piqa, winogrande, triviaqa, nq_open, commonsense_qa, agieval, openbookqa, social_iqa, truthfulqa_mc2, mmlu_flan_cot_fewshot_pass16, mmlu_pro_pass16, bbh_pass16, mmlu, mmlu_redux, gpqa_diamond"
+    echo "Supported tasks: mbpp, humaneval, mbpp_old, humaneval_old, gsm8k, math500, drop, arc_easy, arc_challenge, hellaswag, piqa, winogrande, triviaqa, nq_open, commonsense_qa, agieval, openbookqa, social_iqa, truthfulqa_mc2, mmlu_flan_cot_fewshot_pass16, mmlu_pro_pass16, bbh_pass16, mmlu, mmlu_redux, mmlu_redux_generative, ifeval, gpqa_diamond"
     echo "Note: Use mbpp/humaneval for two-stage GPU+CPU pipeline, or mbpp_old/humaneval_old for single-job pipeline"
     exit 2
 fi
