@@ -10,11 +10,9 @@ from vllm import LLM, SamplingParams
 import os
 import sys
 
-# eval result output dir
-output_dir = "/mnt/sharefs/users/haolong.jia/result/bbh_pass16"
-os.makedirs(output_dir, exist_ok=True)
+# eval result output dir will be set based on model type
 
-from model import Model_map
+from model import get_model_map_by_type
 
 def parse_args():
     parser = OptionParser()
@@ -24,6 +22,7 @@ def parse_args():
     parser.add_option("--task", type="str", dest="task")
     parser.add_option("--cot_prompts_path", type="str", dest="cot_prompts_path", default="/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/bbh_cot_prompts.json")
     parser.add_option("--tp_size", type="int", dest="tp_size", default=1, help="Tensor parallel size for VLLM")
+    parser.add_option("--type", type="str", dest="type", default="base", help="Model type: base or sft")
     (options, args) = parser.parse_args()
     return options
 
@@ -51,9 +50,17 @@ def extract_answer(text):
             return line.split()[-1].strip('.').strip()
     return ""
 
-def build_prompt(fewshot, example):
-    # fewshot + current test sample input
-    return fewshot + '\n\nQ: ' + example['input'] + '\nA: Let\'s think step by step.'
+def build_prompt(fewshot, example, model_type="base"):
+    if model_type == "sft":
+        """
+        SFT model uses 0-shot, return the input
+        """
+        return example['input']
+    else:
+        """
+        Base model keeps the original fewshot format
+        """
+        return fewshot + '\n\nQ: ' + example['input'] + '\nA: Let\'s think step by step.'
 
 def main():
     options = parse_args()
@@ -62,8 +69,17 @@ def main():
     model_path = options.model
     task = options.task
     cot_prompts_path = options.cot_prompts_path
+    model_type = options.type
 
-    model_name = Model_map[model_path]
+    # Set output dir based on model type
+    if model_type == "sft":
+        output_dir = "/mnt/sharefs/users/haolong.jia/result/bbh_pass16_sft"
+    else:
+        output_dir = "/mnt/sharefs/users/haolong.jia/result/bbh_pass16"
+    os.makedirs(output_dir, exist_ok=True)
+
+    model_map = get_model_map_by_type(model_type)
+    model_name = model_map[model_path]
     model_dir = os.path.join(output_dir, model_name)
     os.makedirs(model_dir, exist_ok=True)
 
@@ -78,8 +94,31 @@ def main():
     data = dataset['test'].select(range(idx_start, idx_end))
     print(type(data), data[:2])
 
-    prompts = [build_prompt(fewshot, ex) for ex in data]
+    prompts = [build_prompt(fewshot, ex, model_type) for ex in data]
     targets = [build_target(ex) for ex in data]
+
+    # For SFT model, use chat template
+    if model_type == "sft":
+        from transformers import AutoTokenizer
+        tokenizer = AutoTokenizer.from_pretrained(model_path)
+        
+        # System prompt to guide the model to solve logical reasoning problems
+        system_prompt = """You are a helpful assistant that solves logical reasoning problems step by step. When given a problem: 1. Think through the solution systematically 2. Show your reasoning process clearly 3. remember, must end with a clear final answer using the format: "So the answer is [your answer]". Note: there maybe some options provided in the problem, for example, (A) (B) (C) (D) OR Yes/No OR valid/invalid, You should keep the same format as the options, format like this: "So the answer is (A)" to help parse the answer. Remember to be precise and logical in your reasoning.
+<think>"""
+        
+        formatted_prompts = []
+        for prompt in prompts:
+            messages = [
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": prompt}
+            ]
+            formatted_prompt = tokenizer.apply_chat_template(
+                messages, 
+                tokenize=False, 
+                add_generation_prompt=True
+            )
+            formatted_prompts.append(formatted_prompt)
+        prompts = formatted_prompts
 
     print("==== First Prompt Example ====")
     print(prompts[0])
@@ -99,7 +138,7 @@ def main():
                 raise
 
     sampling_params = SamplingParams(
-        max_tokens=512,
+        max_tokens=1024,
         n=16,
         temperature=0.7,
         # stop=["</s>"]  # stop=["</s>"] will cause the model to stop generating when it sees </s>

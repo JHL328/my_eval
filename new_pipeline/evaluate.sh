@@ -58,14 +58,17 @@ source /mnt/weka/home/haolong.jia/miniconda3/bin/activate harness-eval
 
 # --- 优化参数解析，动态生成 python 日志文件名 ---
 TASK_NAME="default_task"
+MODEL_TYPE="base"
 prev_arg=""
 for arg in "$@"; do
     if [[ "$prev_arg" == "--task" ]]; then
         TASK_NAME="$arg"
-        break
     elif [[ "$arg" == --task=* ]]; then
         TASK_NAME="${arg#*=}"
-        break
+    elif [[ "$prev_arg" == "--type" ]]; then
+        MODEL_TYPE="$arg"
+    elif [[ "$arg" == --type=* ]]; then
+        MODEL_TYPE="${arg#*=}"
     fi
     prev_arg="$arg"
 done
@@ -84,15 +87,31 @@ echo "Running evaluation for task: ${TASK_NAME}"
 #echo "Python output will be saved to: ${PYTHON_OUT_FILE}"
 #echo "Python errors will be saved to: ${PYTHON_ERR_FILE}"
 
-# set output directory based on TASK_NAME
+# set output directory based on TASK_NAME and MODEL_TYPE
 if [[ "$TASK_NAME" == "mmlu_flan_cot_fewshot_pass16" ]]; then
-    OUTPUT_DIR="/mnt/sharefs/users/haolong.jia/result/mmlu_flan_pass16"
+    if [[ "$MODEL_TYPE" == "sft" ]]; then
+        OUTPUT_DIR="/mnt/sharefs/users/haolong.jia/result/mmlu_flan_pass16_sft"
+    else
+        OUTPUT_DIR="/mnt/sharefs/users/haolong.jia/result/mmlu_flan_pass16"
+    fi
 elif [[ "$TASK_NAME" == "mmlu_pro_pass16" ]]; then
-    OUTPUT_DIR="/mnt/sharefs/users/haolong.jia/result/mmlu_pro_pass16"
+    if [[ "$MODEL_TYPE" == "sft" ]]; then
+        OUTPUT_DIR="/mnt/sharefs/users/haolong.jia/result/mmlu_pro_pass16_sft"
+    else
+        OUTPUT_DIR="/mnt/sharefs/users/haolong.jia/result/mmlu_pro_pass16"
+    fi
 elif [[ "$TASK_NAME" == "bbh_pass16" ]]; then
-    OUTPUT_DIR="/mnt/sharefs/users/haolong.jia/result/bbh_pass16"
+    if [[ "$MODEL_TYPE" == "sft" ]]; then
+        OUTPUT_DIR="/mnt/sharefs/users/haolong.jia/result/bbh_pass16_sft"
+    else
+        OUTPUT_DIR="/mnt/sharefs/users/haolong.jia/result/bbh_pass16"
+    fi
 elif [[ "$TASK_NAME" == "mmlu" ]]; then
-    OUTPUT_DIR="/mnt/sharefs/users/haolong.jia/result/mmlu"
+    if [[ "$MODEL_TYPE" == "sft" ]]; then
+        OUTPUT_DIR="/mnt/sharefs/users/haolong.jia/result/mmlu_sft"
+    else
+        OUTPUT_DIR="/mnt/sharefs/users/haolong.jia/result/mmlu"
+    fi
 else
     echo "Error: Unknown task name '$TASK_NAME' for setting OUTPUT_DIR in evaluate.sh."
     exit 1
@@ -101,18 +120,15 @@ fi
 echo "🔍 Monitoring directory: $OUTPUT_DIR"
 mkdir -p "$OUTPUT_DIR" # ensure directory exists
 
-# --- add monitoring ---
-CHECK_INTERVAL=60   # check every 60 seconds
-TIMEOUT=600         # 600 seconds = 10 minutes
-
 # Function to check if all models are complete based on result.json files
 check_all_models_complete() {
-    # Get all model names from Model_map by parsing model.py
+    # Get all model names from correct model map based on MODEL_TYPE
     local python_output=$(python3 -c "
 import sys
 sys.path.append('new_pipeline')
-from model import Model_map
-for model_path, model_name in Model_map.items():
+from model import get_model_map_by_type
+model_map = get_model_map_by_type('$MODEL_TYPE')
+for model_path, model_name in model_map.items():
     print(model_name)
 ")
     
@@ -156,65 +172,21 @@ for model_path, model_name in Model_map.items():
     fi
 }
 
-while true; do
-    # Check if all models are already complete before starting/restarting evaluate.py
-    if check_all_models_complete; then
-        echo "🎉 All models were already complete. Exiting."
-        exit 0
-    fi
+# Check if all models are already complete before starting evaluate.py
+if check_all_models_complete; then
+    echo "🎉 All models were already complete. Exiting."
+    exit 0
+fi
 
-    # start main evaluation task (background)
-    echo "🚀 Starting evaluation..."
-    START_TS=$(date +%s) # record start time
-    # run evaluate
-    python -u new_pipeline/evaluate.py "$@" &
-    EVAL_PID=$!
+# Start main evaluation task
+echo "🚀 Starting evaluation..."
+python -u new_pipeline/evaluate.py "$@"
 
-    last_change=""
-
-    while kill -0 $EVAL_PID 2>/dev/null; do
-        sleep $CHECK_INTERVAL
-        now=$(date +%s)
-
-        # Check for overall completion while evaluate.py is still running
-        if check_all_models_complete; then
-            echo "🎉 All models seem to be complete!"
-            kill $EVAL_PID 2>/dev/null # Kill evaluate.py gracefully
-            wait $EVAL_PID 2>/dev/null # Wait for it to terminate
-            exit 0 # Exit the manager script successfully
-        fi
-
-        # only count new/modified csvs since last start
-        new_change=$(find "$OUTPUT_DIR" -name "*.csv" -printf "%T@\n" 2>/dev/null | awk -v st="$START_TS" '$1 > st' | sort -n | tail -1)
-        if [[ -n "$new_change" ]] && { [[ -z "$last_change" ]] || (( $(echo "$new_change > $last_change" | bc -l) )); }; then
-            last_change=$new_change
-        fi
-
-        if [[ -n "$last_change" ]]; then
-            idle_time=$(echo "$now - $last_change" | bc)
-            if (( $(echo "$idle_time > $TIMEOUT" | bc -l) )); then
-                echo "⏳ No new csv for $TIMEOUT seconds, restarting evaluation..."
-                kill $EVAL_PID 2>/dev/null
-                wait $EVAL_PID 2>/dev/null
-                # kill all related slurm tasks (if any)
-                squeue -u $USER -n '*mmlu*' -h -o '%i' | xargs -r scancel
-                break
-            fi
-        else
-            echo "DEBUG: Waiting for new CSV generated after script start."
-            idle_time=0
-        fi
-        echo "DEBUG: last_change=$last_change, now=$now, idle_time=$idle_time"
-    done
-
-    # If evaluate.py exited on its own (kill -0 failed), check if it completed successfully
-    if check_all_models_complete; then
-        echo "🎉 evaluate.py exited successfully and all models are complete. Exiting."
-        exit 0
-    else
-        echo "⚠️ evaluate.py exited unexpectedly or incomplete. Restarting..."
-        # No need to scancel here, as it would have been done by timeout or if evaluate.py handles it on crash.
-        # The outer loop will just restart evaluate.py.
-    fi
-
-done 
+# Check completion status after evaluate.py finishes
+if check_all_models_complete; then
+    echo "🎉 All models are complete. Exiting."
+    exit 0
+else
+    echo "⚠️ Some models may be incomplete."
+    exit 1
+fi 

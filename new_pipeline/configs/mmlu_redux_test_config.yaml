@@ -1,0 +1,91 @@
+# MMLU Redux Test Configuration (Limited subjects for testing)
+# This config file tests with a subset of subjects to verify the pipeline works
+
+task:
+  name: "mmlu_redux"
+  # Test with just 3 subjects for quick validation
+  subjects:
+    - "abstract_algebra"
+    - "college_mathematics"
+    - "elementary_mathematics"
+  output_base: "/mnt/sharefs/users/haolong.jia/result/mmlu_redux_sft_test"
+
+# SLURM Job Configuration (shorter time for test)
+slurm:
+  partition: "lowprio"
+  qos: "lowprio"
+  time_limit: "1:00:00"            # 1 hour for test
+  gpus_per_task: 1
+  cpus_per_task: 16
+  mem: "100G"
+
+# Conda Environment
+environment:
+  conda_env: "harness-eval"
+  lighteval_path: "/mnt/weka/home/haolong.jia/eval/RL-eval/lighteval"
+
+# vLLM Model Parameters
+model_parameters:
+  # Model loading
+  dtype: "auto"
+  trust_remote_code: true
+  revision: "main"
+
+  # Parallelism settings
+  tensor_parallel_size: 1
+  data_parallel_size: 1
+  pipeline_parallel_size: 1
+
+  # Memory management
+  gpu_memory_utilization: 0.9
+  max_model_length: 8192
+  swap_space: 4
+
+  # Batch processing
+  max_num_seqs: 128
+  max_num_batched_tokens: 2048
+
+  # Other settings
+  seed: 1234
+  add_special_tokens: true
+  multichoice_continuations_start_space: true
+  pairwise_tokenization: false
+  subfolder: null
+  is_async: false
+
+  # Generation parameters
+  generation_parameters:
+    # Sampling parameters
+    temperature: 0.0
+    top_k: null
+    top_p: 0.9
+    min_p: null
+
+    # Penalties
+    presence_penalty: 0.0
+    repetition_penalty: 1.0
+    frequency_penalty: 0.0
+
+    # Output control
+    max_new_tokens: 1024
+    min_new_tokens: 0
+    stop_tokens: null
+
+    # Other
+    seed: 42
+
+# Dataset loading settings
+dataset:
+  loading_processes: 8
+  max_samples: 50                  # Limit to 50 samples per subject for testing
+
+# Chat template settings
+chat_template:
+  use_chat_template: true
+  override_chat_template: true
+
+# Output settings
+output:
+  save_details: true
+  metrics_file: "metrics.txt"
+  results_file: "results.json"

@@ -1,0 +1,87 @@
+# GPQA Diamond Evaluation Configuration
+# This config file is used by evaluate_lighteval.py for GPQA Diamond task evaluation
+
+task:
+  name: "gpqa_diamond"
+  task_list: "lighteval|gpqa:diamond|0"
+  output_base: "/mnt/sharefs/users/haolong.jia/result/gpqa_diamond_sft"
+
+# SLURM Job Configuration
+slurm:
+  partition: "lowprio"
+  qos: "lowprio"
+  time_limit: "4:00:00"
+  gpus_per_task: 1
+  cpus_per_task: 16
+  mem: "100G"
+
+# Conda Environment
+environment:
+  conda_env: "harness-eval"
+  lighteval_path: "/mnt/weka/home/haolong.jia/eval/RL-eval/lighteval"
+
+# vLLM Model Parameters
+model_parameters:
+  # Model loading
+  dtype: "bfloat16"                    # auto, float16, bfloat16
+  trust_remote_code: true          # Required for many models
+  revision: "main"                 # Git revision/branch
+
+  # Parallelism settings
+  tensor_parallel_size: 1          # Number of GPUs for tensor parallelism
+  data_parallel_size: 1            # Number of GPUs for data parallelism
+  pipeline_parallel_size: 1        # Number of GPUs for pipeline parallelism
+
+  # Memory management
+  gpu_memory_utilization: 0.9      # Fraction of GPU memory to use (0.0-1.0)
+  max_model_length: 8192           # Maximum sequence length
+  swap_space: 4                    # CPU swap space in GB
+
+  # Batch processing
+  max_num_seqs: 128                # Maximum number of sequences to process in parallel
+  max_num_batched_tokens: 2048     # Maximum number of tokens in a batch
+
+  # Other settings
+  seed: 1234                       # Random seed for reproducibility
+  add_special_tokens: true         # Add special tokens to input
+  multichoice_continuations_start_space: true  # For multiple choice tasks
+  pairwise_tokenization: false     # For pairwise comparison tasks
+  subfolder: null                  # Subfolder in model repository
+  is_async: false                  # Async inference mode
+
+  # Generation parameters
+  generation_parameters:
+    # Sampling parameters
+    temperature: 0.7               # 0.0 for deterministic, higher for more random
+    top_k: null                    # Top-k sampling (null to disable)
+    top_p: 0.9                     # Nucleus sampling (null to disable)
+    min_p: 0.0                     # Min-p sampling (null to disable)
+
+    # Penalties
+    presence_penalty: 0.0          # Penalty for repeated tokens
+    repetition_penalty: 1.0        # Multiplicative penalty for repeated tokens
+    frequency_penalty: 0.0         # Frequency-based penalty
+
+    # Output control
+    max_new_tokens: 1024           # Maximum tokens to generate
+    min_new_tokens: 0              # Minimum tokens to generate
+    stop_tokens: ["<|im_end|>"]              # Custom stop tokens
+
+    # Other
+    seed: 42                       # Generation seed
+
+# Dataset loading settings
+dataset:
+  loading_processes: 8             # Number of processes for dataset loading
+  max_samples: -1                  # -1 for all samples, positive int for limit
+
+# Chat template settings
+chat_template:
+  use_chat_template: true          # Use model's chat template
+  override_chat_template: true     # Override with custom template if needed
+
+# Output settings
+output:
+  save_details: true               # Save detailed results
+  metrics_file: "metrics.txt"      # Metrics output filename
+  results_file: "results.json"     # Results output filename

@@ -1,3 +1,9 @@
 [submodule "mmlu-redux"]
 	path = mmlu-redux
 	url = https://github.com/aryopg/mmlu-redux
+[submodule "lighteval"]
+	path = lighteval
+	url = https://github.com/huggingface/lighteval
+[submodule "new_pipeline/sft/lm-evaluation-harness"]
+	path = new_pipeline/sft/lm-evaluation-harness
+	url = https://github.com/EleutherAI/lm-evaluation-harness.git

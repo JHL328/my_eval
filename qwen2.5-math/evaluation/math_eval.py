@@ -250,14 +250,31 @@ def main(llm, tokenizer, data_name, args):
         sample["prompt"] for sample in samples for _ in range(args.n_sampling)
     ]
     if args.apply_chat_template:
-        input_prompts = [
-            tokenizer.apply_chat_template(
-                [{"role": "user", "content": prompt.strip()}],
-                tokenize=False,
-                add_generation_prompt=True,
-            )
-            for prompt in input_prompts
-        ]
+        # Check if using qwen25 template (indicating SFT model)
+        if args.prompt_type == "qwen25":
+            # SFT model uses a better system prompt
+            system_prompt = "You are a helpful assistant skilled in mathematical problem-solving. Please solve the problem step by step and put your final answer within \\boxed{}."
+            input_prompts = [
+                tokenizer.apply_chat_template(
+                    [
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": prompt.strip()}
+                    ],
+                    tokenize=False,
+                    add_generation_prompt=True,
+                )
+                for prompt in input_prompts
+            ]
+        else:
+            # Other cases use the original processing
+            input_prompts = [
+                tokenizer.apply_chat_template(
+                    [{"role": "user", "content": prompt.strip()}],
+                    tokenize=False,
+                    add_generation_prompt=True,
+                )
+                for prompt in input_prompts
+            ]
     remain_prompts = input_prompts
     remain_prompts = [(i, prompt) for i, prompt in enumerate(remain_prompts)]
     end_prompts = []

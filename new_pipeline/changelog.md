@@ -1,5 +1,449 @@
 # Changelog
 
+## [2025-09-08] - Math500 SFT模型支持
+
+### 背景
+需要为Math500评估任务添加SFT模型支持，类似于之前BBH任务的改造。SFT模型需要：
+1. 使用0-shot评估（不使用few-shot examples）
+2. 使用chat template格式化输入
+3. 添加system prompt引导数学推理
+4. 独立的输出目录避免与base模型冲突
+
+### 修改内容
+
+#### 1. **submitter.sh**（小改动）
+- 第95-96行：为math500任务添加--type参数传递
+  ```bash
+  elif [[ "$TASK_NAME" == "math500" ]]; then
+      CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_gsm8k.sh --task math500 --type $MODEL_TYPE"
+  ```
+
+#### 2. **evaluate_gsm8k.py**（主要修改）
+
+##### 添加SFT支持基础设施
+- **导入模块**（第15行）：添加 `from model import Model_map, get_model_map_by_type`
+- **命令行参数**（第498行）：添加 `--type` 参数，支持 base/sft 选择
+- **动态配置**（第520-525行）：
+  ```python
+  if args.task == "math500" and hasattr(args, 'type') and args.type == "sft":
+      task_config["BASE_OUT"] = "/mnt/sharefs/users/haolong.jia/result/math500_pass16_sft"
+      task_config["NUM_SHOTS"] = 0  # 0-shot
+      task_config["PROMPT_TYPE"] = "qwen25"  # 使用qwen25模板
+      task_config["N_SAMPLING"] = 16  # 减少采样次数
+      task_config["K_LIST"] = [1, 8, 16]  # 调整pass@k列表
+  ```
+
+##### 模型映射和任务提交
+- **submit_jobs_for_all_models函数**（第310-314行）：根据type选择正确的模型映射
+- **任务脚本生成**（第356-393行）：SFT模型添加--apply_chat_template标志
+- **后处理支持**（第531-534行）：使用正确的model_map进行后处理
+- **summarize函数改进**（第462-476行）：添加model_map参数支持
+
+#### 3. **math_eval.py**（可选优化）
+
+- **System Prompt支持**（第254-277行）：
+  ```python
+  if args.apply_chat_template:
+      if args.prompt_type == "qwen25":
+          # SFT模型使用专门的system prompt
+          system_prompt = "You are a helpful assistant skilled in mathematical problem-solving. Please solve the problem step by step and put your final answer within \\boxed{}."
+          input_prompts = [
+              tokenizer.apply_chat_template(
+                  [
+                      {"role": "system", "content": system_prompt},
+                      {"role": "user", "content": prompt.strip()}
+                  ],
+                  tokenize=False,
+                  add_generation_prompt=True,
+              )
+              for prompt in input_prompts
+          ]
+  ```
+
+### 技术细节
+
+#### SFT模型特殊配置
+- **输出目录**：`/mnt/sharefs/users/haolong.jia/result/math500_pass16_sft`（独立于base模型）
+- **Few-shot设置**：NUM_SHOTS = 0（零样本学习）
+- **Prompt类型**：qwen25（触发chat template应用）
+- **采样参数**：N_SAMPLING = 16，K_LIST = [1, 8, 16]（优化计算资源）
+- **Chat Template**：通过--apply_chat_template标志自动应用
+
+#### 实现策略
+- **最小化修改**：主要逻辑集中在evaluate_gsm8k.py，math_eval.py基本不动
+- **利用现有机制**：复用math_eval.py的apply_chat_template和prompt_type机制
+- **向后兼容**：完全兼容现有base模型评估流程
+
+### 使用方式
+
+```bash
+# 评估Base模型（默认）
+bash submitter.sh --task math500
+# 或
+bash submitter.sh --task math500 --type base
+
+# 评估SFT模型
+bash submitter.sh --task math500 --type sft
+```
+
+### 预期效果
+- SFT模型通过system prompt获得更好的数学推理引导
+- 0-shot评估避免few-shot examples对SFT模型的干扰  
+- 独立输出目录确保base和SFT结果不冲突
+- 减少的采样次数提高评估效率
+
+### 注意事项
+1. **环境依赖**：确保qwen-eval环境已安装所有requirements.txt中的依赖
+2. **不需要pip install -e**：math_eval.py使用本地导入，在正确工作目录下即可运行
+3. **结果位置**：
+   - Base模型：`/mnt/sharefs/users/haolong.jia/result/math500_pass64/`
+   - SFT模型：`/mnt/sharefs/users/haolong.jia/result/math500_pass16_sft/`
+
+## [2025-08-25] - BBH评估脚本修改以支持SFT模型0-shot评估
+
+### 背景
+SFT模型在BBH任务上使用原有的fewshot格式评估时存在问题：
+1. SFT模型的prompt构建格式混乱，影响输出质量
+2. SFT模型需要使用0-shot评估而非fewshot
+3. 需要自定义system prompt来引导模型输出格式
+
+### 修改内容
+
+#### evaluate_bbh_pass16.py
+1. **修改build_prompt函数**（第53-63行）
+   - SFT模型：直接返回example['input']，实现0-shot评估
+   - Base模型：保持原有fewshot格式不变
+   
+2. **添加System Prompt**（第106-107行）
+   ```python
+   system_prompt = """You are a helpful assistant that solves logical reasoning problems step by step. 
+   When given a problem: 
+   1. Think through the solution systematically 
+   2. Show your reasoning process clearly 
+   3. remember, must end with a clear final answer using the format: "So the answer is [your answer]". 
+   Remember to be precise and logical in your reasoning.
+   <think>"""
+   ```
+   - 引导模型进行step-by-step推理
+   - 保持"So the answer is"输出格式，与原有答案提取逻辑兼容
+   - 添加`<think>`标记以激活模型的推理能力
+
+3. **Chat Template应用**（第101-121行）
+   - SFT模型使用tokenizer.apply_chat_template格式化prompt
+   - 将system prompt和用户输入组合成对话格式
+   - Base模型保持原有prompt格式
+
+### 技术细节
+- **兼容性**：修改完全向后兼容，base模型评估逻辑不变
+- **答案提取**：extract_answer函数保持不变，两种模型类型使用相同的答案提取逻辑
+- **0-shot实现**：SFT模型不使用fewshot examples，直接处理问题输入
+- **输出目录**：SFT模型结果存储在`bbh_pass16_sft`目录
+
+### 使用方式
+```bash
+# Base模型评估（fewshot）
+bash submitter.sh --task bbh_pass16
+
+# SFT模型评估（0-shot with system prompt）
+bash submitter.sh --task bbh_pass16 --type sft
+```
+
+### 预期效果
+- SFT模型输出格式更加规范，遵循"So the answer is"格式
+- 0-shot评估避免了fewshot examples对SFT模型的干扰
+- System prompt引导模型进行清晰的逻辑推理
+
+## [2025-08-19] - SFT Modle Support and SLURM Job Array change
+
+### 第一部分：添加 SFT 模型评估支持
+
+#### 背景
+之前的评估管道只支持 base 模型，使用原始 prompt 格式。现在需要支持 SFT（Supervised Fine-Tuning）模型，这些模型需要使用 chat template（如 ChatML）格式化 prompt。
+
+#### 问题与解决
+**初始问题**：SFT 模型和 base 模型共用同一输出目录，导致系统误判 SFT 模型已完成。
+
+**解决方案**：为 SFT 模型使用独立的输出目录：
+- Base 模型：`/mnt/sharefs/users/haolong.jia/result/{task}/`
+- SFT 模型：`/mnt/sharefs/users/haolong.jia/result/{task}_sft/`
+
+### 第二部分：SLURM Job Array 优化
+
+#### 背景
+之前每个模型的每个 subject/task 批次都会占用一个独立的 job ID，导致大量消耗 SLURM job IDs。例如，一个模型评估 BBH 的 27 个 tasks 需要 27 个独立的 job IDs。
+
+#### 实现方案
+使用 SLURM job array 功能，让同一模型的所有批次任务共享一个 array job ID。
+
+#### 技术实现
+
+1. **新增函数** `create_array_job_script()` in evaluate.py：
+   - 创建 SLURM array job 脚本
+   - 使用 `--array=1-N` 参数指定任务数量
+   - 通过 `SLURM_ARRAY_TASK_ID` 读取对应任务命令
+
+2. **修改任务提交流程**：
+   - 收集每个模型的所有待运行任务到列表
+   - 将任务命令写入 `tasks_{model_name}.txt` 文件
+   - 创建 array job 脚本 `array_job_{model_name}.sh`
+   - 一次 `sbatch` 提交所有任务
+
+3. **修改的函数**：
+   - `run_mmlu_flan_cot_fewshot_pass16`
+   - `run_bbh_pass16`
+   - `run_mmlu_pro_pass16`
+   - `run_mmlu`
+
+#### 效果对比
+
+**之前（独立 jobs）**：
+```
+Submitted batch job 622846  # task 1
+Submitted batch job 622847  # task 2
+...
+Submitted batch job 622872  # task 27
+```
+
+**现在（job array）**：
+```
+Submitting array job for model_name with 27 tasks
+Submitted batch job 622846  # 包含 27 个子任务：622846_1 到 622846_27
+```
+
+### 修改文件清单
+
+1. **evaluate.py**：
+   - 添加 `create_array_job_script()` 函数
+   - 修改 4 个 run 函数使用 job array
+   - 根据 model_type 设置不同的输出目录
+
+2. **evaluate_*.py**（4个评估脚本）：
+   - 根据 model_type 动态设置输出目录
+   - 添加 SFT 模型的 chat template 支持
+
+3. **evaluate.sh**：
+   - 根据 MODEL_TYPE 设置正确的输出目录
+   - 使用 `get_model_map_by_type()` 获取对应模型列表
+
+### 使用方式
+
+```bash
+# 评估 base 模型（默认）
+bash submitter.sh --task mmlu
+bash submitter.sh --task bbh_pass16
+
+# 评估 SFT 模型（使用独立目录和 chat template）
+bash submitter.sh --task mmlu --type sft
+bash submitter.sh --task bbh_pass16 --type sft
+```
+
+### 性能优化
+- **Job ID 消耗**：从每个模型 20-100 个 jobs 减少到 1 个 array job
+- **管理便利性**：更容易跟踪和管理任务状态
+- **SLURM 负载**：减少 SLURM 调度器的压力
+
+### 注意事项
+1. SFT 和 base 模型的结果存储在不同目录，避免冲突
+2. 日志文件命名：`{job_id}_{array_task_id}.out`
+3. 保持向后兼容，默认使用 base 模型
+
+## [2025-08-19] - 添加 SFT 模型评估支持（初始版本）
+
+### 背景
+之前的评估管道只支持 base 模型，使用原始 prompt 格式。现在需要支持 SFT（Supervised Fine-Tuning）模型，这些模型需要使用 chat template（如 ChatML）格式化 prompt。
+
+### 实现方案
+- 添加 `--type` 参数（base/sft）来区分模型类型
+- type=sft 时使用 SFT_MODEL_MAP 获取模型映射
+- SFT 模型自动使用 chat template 格式化 prompt
+- 保持向后兼容，默认使用 base 模型
+
+### 修改内容
+
+#### 1. **model.py**
+- 已包含 `get_model_map_by_type(model_type)` 函数
+- 根据 model_type 返回对应的模型映射（SFT_MODEL_MAP 或 Model_map）
+
+#### 2. **评估脚本修改**（4个文件）
+修改的文件：
+- evaluate_mmlu.py
+- evaluate_mmlu_pro_pass16.py  
+- evaluate_bbh_pass16.py
+- evaluate_mmlu_flan_cot_fewshot.py
+
+每个文件的修改：
+- 添加 `--type` 参数，默认值 "base"
+- 导入 `get_model_map_by_type` 函数
+- 使用 `model_map = get_model_map_by_type(model_type)` 获取模型映射
+- 为 SFT 模型添加 chat template 处理：
+  ```python
+  if model_type == "sft":
+      from transformers import AutoTokenizer
+      tokenizer = AutoTokenizer.from_pretrained(model_path)
+      formatted_prompts = []
+      for prompt in prompts:
+          messages = [{"role": "user", "content": prompt}]
+          formatted_prompt = tokenizer.apply_chat_template(
+              messages, 
+              tokenize=False, 
+              add_generation_prompt=True
+          )
+          formatted_prompts.append(formatted_prompt)
+      prompts = formatted_prompts
+  ```
+
+#### 3. **evaluate.py**
+- 导入改为 `from model import get_model_map_by_type, ModelQueue`
+- 所有 run 函数添加 `model_type="base"` 参数
+- 每个函数中使用 `model_map = get_model_map_by_type(model_type)`
+- 在生成 job script 的命令中添加 `--type {model_type}`
+- 主函数添加 `--type` 参数解析
+- TASKS 调用时传递 `model_type=args.type`
+
+#### 4. **evaluate.sh**
+- 添加 MODEL_TYPE 变量，默认 "base"
+- 在参数解析循环中解析 `--type` 参数
+
+#### 5. **submitter.sh**
+- 在 4 个任务的提交命令中添加 `--type $MODEL_TYPE`：
+  - mmlu_flan_cot_fewshot_pass16
+  - mmlu_pro_pass16
+  - bbh_pass16
+  - mmlu
+
+### 使用方式
+
+```bash
+# 评估 base 模型（默认）
+bash submitter.sh --task mmlu
+bash submitter.sh --task bbh_pass16
+bash submitter.sh --task mmlu_pro_pass16
+bash submitter.sh --task mmlu_flan_cot_fewshot_pass16
+
+# 评估 SFT 模型
+bash submitter.sh --task mmlu --type sft
+bash submitter.sh --task bbh_pass16 --type sft
+bash submitter.sh --task mmlu_pro_pass16 --type sft
+bash submitter.sh --task mmlu_flan_cot_fewshot_pass16 --type sft
+```
+
+### 注意事项
+1. **向后兼容**：默认使用 base 模型，不影响现有使用方式
+2. **答案提取不变**：所有评估脚本的答案提取逻辑保持不变
+3. **SFT 模型要求**：必须支持 transformers 的 chat template 功能
+4. **结果存储**：base 和 sft 模型的结果存储在相同目录结构中，通过模型名称区分
+
+### 技术细节
+- SFT 模型使用 `tokenizer.apply_chat_template()` 将原始 prompt 转换为对话格式
+- `add_generation_prompt=True` 确保添加助手回复的起始标记
+- 输出格式和评分逻辑完全不变，只是输入格式化方式不同
+
+## [2025-08-12] - 移除冗余监控代码（第二阶段）
+
+### 背景
+在第一阶段清理后，发现 evaluate.py 中仍保留了定期状态打印的监控代码。这些代码虽然轻量，但为了代码的最大简洁性，决定将其完全移除。
+
+### 第二阶段清理内容
+
+#### evaluate.py 深度清理
+- **移除的部分**：
+  - 所有 `last_status_time` 变量定义和赋值
+  - 所有 `status_interval = 60` 变量定义
+  - 所有定期状态打印的 if 语句块（每分钟打印）
+  - 移除了约 20 处监控相关代码
+  
+- **保留的部分**：
+  - ✅ 保留 `queue.print_status()` 在主循环开始时的调用
+  - ✅ 基本的队列状态输出（每轮循环一次）
+
+### 最终成果
+- **evaluate.py**：从 889 行减少到 571 行（总计减少 318 行）
+- **evaluate.sh**：171 行（第一阶段已清理）
+- **总计移除**：367 行监控代码
+
+### 清理后的执行流程
+```python
+while queue.is_active():
+    queue.update_finished()      # 更新队列状态
+    queue.print_status()         # 打印一次状态
+    # 提交新作业...
+    queue.wait_for_slot()        # 等待空闲槽位
+```
+
+## [2025-08-12] - 移除冗余监控代码（第一阶段）
+
+### 背景
+之前由于某些 slurm 脚本即便完成也不会正常退出的问题，在 evaluate.sh 和 evaluate.py 中添加了大量监控代码。现在该问题已经消失，这些监控代码变成了冗余。
+
+### 修改内容
+
+#### 1. **evaluate.sh 清理**
+- **移除的部分**：
+  - 删除 while true 无限循环（第159-220行）
+  - 删除 CSV 文件修改时间监控
+  - 删除 600秒超时重启机制
+  - 删除 squeue 相关的作业取消逻辑
+  
+- **保留的部分**：
+  - ✅ 保留 `check_all_models_complete` 函数 - 用于防止重复运行
+  - ✅ 保留启动前的完成检查
+  - ✅ 保留结束后的状态验证
+
+- **简化后的执行流程**：
+  ```bash
+  1. 检查是否已完成 → 避免重复运行
+  2. 执行 python evaluate.py
+  3. 检查完成状态 → 返回适当退出码
+  ```
+
+#### 2. **evaluate.py 清理**
+- **移除的部分**：
+  - 删除主循环中频繁的 `auto_postprocess_all_models` 调用
+  - 删除"绕过 slurm 状态"的监控逻辑
+  - 删除检查批次文件并强制标记完成的代码
+  - 删除 run_gpqa 函数（不再需要）
+
+- **保留的部分**：
+  - ✅ 保留 `auto_postprocess_all_models` 函数 - 提供故障恢复能力
+  - ✅ 保留开始时的调用 - 恢复中断的任务
+  - ✅ 保留正常的后处理逻辑
+
+- **清理的函数**：
+  - run_mmlu_flan_cot_fewshot_pass16
+  - run_bbh_pass16
+  - run_mmlu_pro_pass16
+  - run_mmlu
+
+### 性能影响
+- **代码行数**：总计减少 338 行冗余代码
+  - evaluate.sh：从 220 行减少到 171 行（-49 行）
+  - evaluate.py：减少 274 行监控代码
+- **维护性**：代码更简洁，易于理解和维护
+- **执行效率**：移除了不必要的定期检查，减少系统开销
+
+### 功能变化
+- **保留的功能**：
+  - 防止重复运行
+  - 故障恢复能力
+  - 正常的作业队列管理
+  - 定期状态输出
+
+- **移除的功能**（不影响正常使用）：
+  - CSV 文件时间戳监控
+  - 超时自动重启
+  - 强制绕过 slurm 状态
+
+### 使用说明
+清理后的代码使用方式不变：
+```bash
+# 提交任务
+bash submitter.sh --task mmlu
+bash submitter.sh --task bbh_pass16
+bash submitter.sh --task mmlu_pro_pass16
+```
+
+系统现在完全依赖 slurm 的作业管理机制，不再有额外的监控层。
+
 ## [2025-01-30] - Further Optimization for Step 2-3 Performance
 
 ### Problem

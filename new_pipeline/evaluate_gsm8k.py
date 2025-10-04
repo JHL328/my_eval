@@ -12,7 +12,7 @@ from vllm import LLM, SamplingParams
 import subprocess
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from model import Model_map
+from model import Model_map, get_model_map_by_type
 
 # =====================
 # Task Configurations
@@ -158,10 +158,20 @@ def postprocess_math_results(model_out_dir, model_name, task_config):
     # 1. move nested directories
     base_name = os.path.basename(model_name)
     math500_dir = os.path.join(model_out_dir, "math500")
-    target_dir = os.path.join(math500_dir, base_name)
+    
+    # Look for checkpoint directories (e.g., checkpoint-5472)
+    import glob, shutil
+    checkpoint_dirs = glob.glob(os.path.join(math500_dir, "checkpoint-*"))
+    
+    if checkpoint_dirs:
+        # Use the first checkpoint directory found
+        target_dir = checkpoint_dirs[0]
+    else:
+        # Fallback to original logic for compatibility
+        target_dir = os.path.join(math500_dir, base_name)
+    
     if os.path.isdir(target_dir):
         # process jsonl
-        import glob, shutil
         jsonl_files = glob.glob(os.path.join(target_dir, "*.jsonl"))
         if jsonl_files:
             shutil.move(jsonl_files[0], os.path.join(model_out_dir, "sample.jsonl"))
@@ -306,11 +316,18 @@ def run_single_model_evaluation(task_name, gsm8k_path, output_dir, n_sampling, m
 # =====================
 def submit_jobs_for_all_models(args, task_config):
     os.makedirs(task_config["BASE_OUT"], exist_ok=True)
+    
+    # choose model map according to type
+    if hasattr(args, 'type') and args.type == 'sft':
+        model_map = get_model_map_by_type('sft')
+    else:
+        model_map = Model_map
+    
     models_to_run = []
     models_skipped = []
     sbatch_commands = []
     submitted_slurm_job_ids = []
-    for model_path, model_name in Model_map.items():
+    for model_path, model_name in model_map.items():
         model_out_dir = os.path.join(task_config["BASE_OUT"], model_name)
         os.makedirs(model_out_dir, exist_ok=True)
         if not args.reforce and is_job_running_or_done(model_out_dir):
@@ -346,6 +363,9 @@ python3 -u {os.path.abspath(__file__)} \
     --model_name {model_name}
 """)
             elif args.task == "math500":
+                # apply chat template according to type
+                apply_chat_template_flag = "--apply_chat_template" if hasattr(args, 'type') and args.type == 'sft' else ""
+                
                 f.write(f"""#!/bin/bash
 #SBATCH --job-name={job_name}
 #SBATCH --output={model_out_dir}/slurm.out
@@ -379,7 +399,8 @@ python3 -u {task_config['EVAL_SCRIPT']} \
     --use_vllm \
     --save_outputs \
     --overwrite \
-    --num_shots {task_config['NUM_SHOTS']}
+    --num_shots {task_config['NUM_SHOTS']} \
+    {apply_chat_template_flag}
 """)
         sbatch_commands.append((f"sbatch {job_script}", model_name))
     print("\n--- 📝 summary of the model evaluation plan ---")
@@ -448,7 +469,10 @@ def wait_for_jobs_completion(submitted_slurm_job_ids):
 # =====================
 # Summarize pass@k for all models
 # =====================
-def summarize_passk_for_all_models(task_name, task_config):
+def summarize_passk_for_all_models(task_name, task_config, model_map=None):
+    if model_map is None:
+        model_map = Model_map
+    
     passk_json = os.path.join(task_config["BASE_OUT"], "passk.json")
     if os.path.exists(passk_json):
         try:
@@ -459,7 +483,7 @@ def summarize_passk_for_all_models(task_name, task_config):
     else:
         all_results = {}
     # 2. update/add pass@k for all models
-    for model_path, model_name in Model_map.items():
+    for model_path, model_name in model_map.items():
         model_dir = os.path.join(task_config["BASE_OUT"], model_name)
         csv_path = os.path.join(model_dir, "result.csv")
         if not os.path.exists(csv_path):
@@ -495,20 +519,34 @@ def parse_args():
     parser.add_argument("--model_name", type=str, default=None)
     parser.add_argument("--submit_jobs", action="store_true", help="If set, submit slurm jobs for all models.")
     parser.add_argument("--reforce", action="store_true", help="If set, rerun evaluation even if result.csv already exists.")
+    parser.add_argument("--type", type=str, default="base", choices=["base", "sft"], help="Model type: base or sft")
     return parser.parse_args()
 
 if __name__ == "__main__":
     args = parse_args()
-    task_config = TASK_CONFIGS[args.task]
+    task_config = TASK_CONFIGS[args.task].copy()  # Create a copy to avoid modifying the original
+    
+    # SFT model special configuration
+    if args.task == "math500" and hasattr(args, 'type') and args.type == "sft":
+        task_config["BASE_OUT"] = "/mnt/sharefs/users/haolong.jia/result/math500_pass16_sft"
+        task_config["NUM_SHOTS"] = 0  # 0-shot
+        task_config["PROMPT_TYPE"] = "qwen25"  # use qwen25 template
+        task_config["N_SAMPLING"] = 1
+        task_config["K_LIST"] = [1]
+    
     if args.submit_jobs:
         submitted_ids, models_run, models_skipped_list = submit_jobs_for_all_models(args, task_config)
         wait_for_jobs_completion(submitted_ids)
         # math500: postprocess after all jobs
         if args.task == "math500":
-            for model_path, model_name in Model_map.items():
+            # use the correct model_map
+            model_map = get_model_map_by_type(args.type) if hasattr(args, 'type') and args.type == 'sft' else Model_map
+            for model_path, model_name in model_map.items():
                 model_out_dir = os.path.join(task_config["BASE_OUT"], model_name)
                 postprocess_math_results(model_out_dir, model_name, task_config)
-        summarize_passk_for_all_models(args.task, task_config)
+        # Pass the correct model_map to summarize function
+        used_model_map = get_model_map_by_type(args.type) if hasattr(args, 'type') and args.type == 'sft' else Model_map
+        summarize_passk_for_all_models(args.task, task_config, used_model_map)
     else:
         assert args.model_path is not None and args.output_dir is not None
         n_sampling = args.n_sampling if args.n_sampling is not None else task_config["N_SAMPLING"]
