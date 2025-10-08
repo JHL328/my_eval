@@ -116,48 +116,48 @@ Model_map = {
     ##########################################################
     ########## below are the SmolLM3-3B Base series ##########
     ##########################################################
-    "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-40000": "stage1-step-40000",
-    "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-80000": "stage1-step-80000",
-    "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-120000": "stage1-step-120000",
-    "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-160000": "stage1-step-160000",
-    "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-200000": "stage1-step-200000",
-    "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-240000": "stage1-step-240000",
-    "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-280000": "stage1-step-280000",
-    "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-320000": "stage1-step-320000",
-    "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-360000": "stage1-step-360000",
-    "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-400000": "stage1-step-400000",
-    "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-440000": "stage1-step-440000",
-    "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-480000": "stage1-step-480000",
-    "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-520000": "stage1-step-520000",
-    "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-560000": "stage1-step-560000",
-    "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-600000": "stage1-step-600000",
+    # "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-40000": "stage1-step-40000",
+    # "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-80000": "stage1-step-80000",
+    # "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-120000": "stage1-step-120000",
+    # "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-160000": "stage1-step-160000",
+    # "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-200000": "stage1-step-200000",
+    # "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-240000": "stage1-step-240000",
+    # "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-280000": "stage1-step-280000",
+    # "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-320000": "stage1-step-320000",
+    # "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-360000": "stage1-step-360000",
+    # "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-400000": "stage1-step-400000",
+    # "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-440000": "stage1-step-440000",
+    # "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-480000": "stage1-step-480000",
+    # "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-520000": "stage1-step-520000",
+    # "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-560000": "stage1-step-560000",
+    # "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM3-3B-Base-series/stage1-step-600000": "stage1-step-600000",
 
-    ########################################################################
-    ########## below are the final 587bins with 600B tokens models #########
-    ########################################################################
-    "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_7343": "lonely_cone_0_7343",
-    "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_14686": "lonely_cone_0_14686",
-    "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_22029": "lonely_cone_0_22029",
-    "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_29372": "lonely_cone_0_29372",
-    "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_36715": "lonely_cone_0_36715",
-    "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_44058": "lonely_cone_0_44058",
-    "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_51401": "lonely_cone_0_51401",
-    "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_58744": "lonely_cone_0_58744",
-    "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_66087": "lonely_cone_0_66087",
-    "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_73430": "lonely_cone_0_73430",
-    "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_80773": "lonely_cone_0_80773",
-    "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_88116": "lonely_cone_0_88116",
-    "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_95459": "lonely_cone_0_95459",
-    "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_102802": "lonely_cone_0_102802",
-    "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_110145": "lonely_cone_0_110145",
-    "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_117488": "lonely_cone_0_117488",
-    "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_124831": "lonely_cone_0_124831",
-    "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_132174": "lonely_cone_0_132174",
-    "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_139517": "lonely_cone_0_139517",
-    "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_143051": "lonely_cone_0_143051",
-    #######################################################
-    ########## below are the final 587bins models ##########
-    #######################################################
+    # # ########################################################################
+    # # ########## below are the final 587bins with 600B tokens models #########
+    # # ########################################################################
+    # "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_7343": "lonely_cone_0_7343",
+    # "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_14686": "lonely_cone_0_14686",
+    # "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_22029": "lonely_cone_0_22029",
+    # "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_29372": "lonely_cone_0_29372",
+    # "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_36715": "lonely_cone_0_36715",
+    # "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_44058": "lonely_cone_0_44058",
+    # "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_51401": "lonely_cone_0_51401",
+    # "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_58744": "lonely_cone_0_58744",
+    # "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_66087": "lonely_cone_0_66087",
+    # "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_73430": "lonely_cone_0_73430",
+    # "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_80773": "lonely_cone_0_80773",
+    # "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_88116": "lonely_cone_0_88116",
+    # "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_95459": "lonely_cone_0_95459",
+    # "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_102802": "lonely_cone_0_102802",
+    # "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_110145": "lonely_cone_0_110145",
+    # "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_117488": "lonely_cone_0_117488",
+    # "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_124831": "lonely_cone_0_124831",
+    # "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_132174": "lonely_cone_0_132174",
+    # "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_139517": "lonely_cone_0_139517",
+    # "/mnt/sharefs/users/haolong.jia/tokenmix-checkpoints-588bins-2-17a/tokenmix_ablation_lonely_cone_0/lonely_cone_0_143051": "lonely_cone_0_143051",
+    # #######################################################
+    # ########## below are the final 587bins models ##########
+    # #######################################################
     # "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_final4/tokenmix_ablation_usable_model_0/usable_model_0_71525": "usable_model_0_71525",
     # "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_final4/tokenmix_ablation_solitary_instruction_1/solitary_instruction_1_71525": "solitary_instruction_1_71525",
     # "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_final4/tokenmix_ablation_adorable_axis_2/adorable_axis_2_71525": "adorable_axis_2_71525",
@@ -200,20 +200,20 @@ Model_map = {
     # "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_thirsty_opacity_23/thirsty_opacity_23_71525": "thirsty_opacity_23_71525",
     # "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_unchanged_freddiemercury_28/unchanged_freddiemercury_28_71525": "unchanged_freddiemercury_28_71525",
     # "/mnt/sharefs/users/haolong.jia/checkpoint_587bins_round2/tokenmix_ablation_zesty_triangle_29/zesty_triangle_29_71525": "zesty_triangle_29_71525",
-    ######################################################
-    ######### below are the open source models ###########
-    ######################################################
-    "/mnt/sharefs/users/haolong.jia/checkpoint/Llama-3.2-3B": "Llama-3.2-3B",
-    "/mnt/sharefs/users/haolong.jia/checkpoint/Qwen2.5-1.5B": "Qwen2.5-1.5B",
-    "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM2-1.7B": "SmolLM2-1.7B",
-    "/mnt/sharefs/users/haolong.jia/checkpoint/Llama-3.2-1B": "Llama-3.2-1B",
-    "/mnt/sharefs/users/haolong.jia/checkpoint/Mistral-7B-v0.3": "Mistral-7B",
-    "/mnt/sharefs/users/haolong.jia/checkpoint/Qwen2.5-3B": "Qwen2.5-3B",
-    "/mnt/sharefs/users/haolong.jia/checkpoint/Qwen3-1.7B-Base": "Qwen3-1.7B-Base",
-    "/mnt/sharefs/users/haolong.jia/checkpoint/Qwen3-4B-Base": "Qwen3-4B-Base",
-    ########################################################################
-    ######## below are the tokenmix ablation models with 587 bins ##########
-    ########################################################################
+    # #####################################################
+    # ######## below are the open source models ###########
+    # #####################################################
+    # "/mnt/sharefs/users/haolong.jia/checkpoint/Llama-3.2-3B": "Llama-3.2-3B",
+    # "/mnt/sharefs/users/haolong.jia/checkpoint/Qwen2.5-1.5B": "Qwen2.5-1.5B",
+    # "/mnt/sharefs/users/haolong.jia/checkpoint/SmolLM2-1.7B": "SmolLM2-1.7B",
+    # "/mnt/sharefs/users/haolong.jia/checkpoint/Llama-3.2-1B": "Llama-3.2-1B",
+    # "/mnt/sharefs/users/haolong.jia/checkpoint/Mistral-7B-v0.3": "Mistral-7B",
+    # "/mnt/sharefs/users/haolong.jia/checkpoint/Qwen2.5-3B": "Qwen2.5-3B",
+    # "/mnt/sharefs/users/haolong.jia/checkpoint/Qwen3-1.7B-Base": "Qwen3-1.7B-Base",
+    # "/mnt/sharefs/users/haolong.jia/checkpoint/Qwen3-4B-Base": "Qwen3-4B-Base",
+    # #######################################################################
+    # ####### below are the tokenmix ablation models with 587 bins ##########
+    # #######################################################################
     # "/mnt/sharefs/users/haolong.jia/checkpoint_587bins/tokenmix_ablation_abstract_determinant_16/abstract_determinant_16_71525": "abstract_determinant_16_71525",
     # "/mnt/sharefs/users/haolong.jia/checkpoint_587bins/tokenmix_ablation_accurate_method_12/accurate_method_12_71525": "accurate_method_12_71525",
     # "/mnt/sharefs/users/haolong.jia/checkpoint_587bins/tokenmix_ablation_alluring_calculator_13/alluring_calculator_13_71525": "alluring_calculator_13_71525",
@@ -291,9 +291,9 @@ Model_map = {
     # "/mnt/sharefs/users/haolong.jia/checkpoint_587bins/tokenmix_ablation_weekly_polynomial_36/weekly_polynomial_36_71525": "weekly_polynomial_36_71525",
     # "/mnt/sharefs/users/haolong.jia/checkpoint_587bins/tokenmix_ablation_weird_eminem_22/weird_eminem_22_71525": "weird_eminem_22_71525",
     # "/mnt/sharefs/users/haolong.jia/checkpoint_587bins/tokenmix_ablation_willing_violin_31/willing_violin_31_71525": "willing_violin_31_71525",
-    # #########################################################################
-    # ######### below are the tokenmix ablation models with low bins ##########
-    # #########################################################################
+    # # #########################################################################
+    # # ######### below are the tokenmix ablation models with low bins ##########
+    # # #########################################################################
     # "/mnt/sharefs/users/haolong.jia/checkpoint/tokenmix_ablation_awesome_kilby/awesome_kilby_102802": "t35-m30-g35-102802",
     # "/mnt/sharefs/users/haolong.jia/checkpoint/tokenmix_ablation_awesome_kilby/awesome_kilby_110145": "t35-m30-g35-110145",
     # "/mnt/sharefs/users/haolong.jia/checkpoint/tokenmix_ablation_awesome_kilby/awesome_kilby_117488": "t35-m30-g35-117488",

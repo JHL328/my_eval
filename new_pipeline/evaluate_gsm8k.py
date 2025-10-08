@@ -10,6 +10,7 @@ import pandas as pd
 from tqdm import tqdm
 from vllm import LLM, SamplingParams
 import subprocess
+from math_verify import parse, verify
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from model import Model_map, get_model_map_by_type
@@ -19,7 +20,7 @@ from model import Model_map, get_model_map_by_type
 # =====================
 TASK_CONFIGS = {
     "gsm8k": {
-        "BASE_OUT": "/mnt/sharefs/users/haolong.jia/result/gsm8k_pass16",
+        "BASE_OUT": "/mnt/sharefs/users/haolong.jia/result-rewrite/gsm8k_pass16",
         "EVAL_SCRIPT": None,
         "DATA_NAME": "gsm8k",
         "K_LIST": [1, 2, 4, 8, 16],
@@ -45,7 +46,7 @@ TASK_CONFIGS = {
         "CD_PATH_IN_JOB_SCRIPT": "/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline",
     },
     "math500": {
-        "BASE_OUT": "/mnt/sharefs/users/haolong.jia/result/math500_pass64",
+        "BASE_OUT": "/mnt/sharefs/users/haolong.jia/result-rewrite/math500_pass64",
         "EVAL_SCRIPT": "/mnt/weka/home/haolong.jia/eval/RL-eval/qwen2.5-math/evaluation/math_eval.py",
         "DATA_NAME": "math500",
         "K_LIST": [1, 2, 4, 8, 16, 32, 64],
@@ -67,7 +68,7 @@ SAMPLING_PARAMS = dict(
     temperature=0.6,
     top_p=0.95,
     n=16,
-    max_tokens=2048,
+    max_tokens=4096,
     stop=["Q:", "</s>", "<|im_end|>", "\n\nQ:", "\n\nHuman:", "\n\nAssistant:", "Human:", "Assistant:"],
     seed=42,
 )
@@ -83,7 +84,17 @@ def generate_fewshot_prompt(fewshot_examples):
         prompt += f"Q: {ex['question']}\nA: {ex['target']}\n\n"
     return prompt
 
-def parse_answer(text):
+def parse_answer_with_verify(text):
+    """Parse answer using math_verify library with fallback to regex patterns."""
+    try:
+        # First try to parse with math_verify
+        parsed = parse(text)
+        if parsed is not None:
+            return parsed
+    except Exception:
+        pass
+    
+    # Fallback to regex patterns for extraction
     answer_patterns = [
         r"The answer is:?\s*\$?([\-0-9\.,]+)",
         r"#### ?\$?([\-0-9\.,]+)",
@@ -102,13 +113,21 @@ def parse_answer(text):
             # take the last match (usually the final answer)
             ans = matches[-1].replace(",", "").strip().rstrip(".")
             if ans:
-                return ans
+                try:
+                    return parse(ans)
+                except:
+                    return ans
+    
     sentence_end_pattern = r"(?:is|are|equals?|makes?|has|have|gets?|arrives?|covers?|travels?)\s+\$?([\-0-9\.,]+)(?:\s*(?:miles?|minutes?|hours?|dollars?|GB))?\.?\s*$"
     m = re.search(sentence_end_pattern, text, re.MULTILINE | re.IGNORECASE)
     if m:
         ans = m.group(1).replace(",", "").strip().rstrip(".")
         if ans:
-            return ans
+            try:
+                return parse(ans)
+            except:
+                return ans
+    
     # last fallback: find the last number in the last complete sentence
     sentences = text.split('.')
     for sent in reversed(sentences):
@@ -117,8 +136,35 @@ def parse_answer(text):
             continue
         numbers = re.findall(r"[-+]?[0-9]*\.?[0-9]+", sent)
         if numbers:
-            return numbers[-1].lstrip('0') or '0'
-    return ""
+            num = numbers[-1].lstrip('0') or '0'
+            try:
+                return parse(num)
+            except:
+                return num
+    return None
+
+def compare_answers(gold, pred):
+    """Compare two answers using math_verify with fallback to string comparison."""
+    try:
+        # If both are already parsed objects from math_verify
+        if gold is not None and pred is not None:
+            return verify(gold, pred)
+    except Exception:
+        pass
+    
+    # Fallback to string comparison if math_verify fails
+    if gold is None or pred is None:
+        return False
+    
+    # Convert to string for comparison if needed
+    gold_str = str(gold) if gold is not None else ""
+    pred_str = str(pred) if pred is not None else ""
+    
+    # Clean up for comparison
+    gold_str = gold_str.replace(",", "").strip().rstrip(".")
+    pred_str = pred_str.replace(",", "").strip().rstrip(".")
+    
+    return gold_str == pred_str
 
 def pass_at_k(n, c, k):
     if c == 0:
@@ -239,7 +285,7 @@ def run_single_model_evaluation(task_name, gsm8k_path, output_dir, n_sampling, m
     prompts, golds, questions = [], [], []
     for item in tqdm(data, desc="Preparing data"):
         q = item["question"]
-        gold = parse_answer(item["answer"])
+        gold = parse_answer_with_verify(item["answer"])
         prompt = fewshot_prompt + f"Q: {q}\nA: Let's think step by step."
         prompts.append(prompt)
         golds.append(gold)
@@ -254,14 +300,33 @@ def run_single_model_evaluation(task_name, gsm8k_path, output_dir, n_sampling, m
     print("Processing results...")
     for idx, (q, gold, output) in enumerate(tqdm(zip(questions, golds, outputs), total=len(questions), desc="Processing results")):
         generations = [output.outputs[i].text for i in range(n_sampling)]
-        parsed = [parse_answer(gen) for gen in generations]
-        em = [p == gold for p in parsed]
+        parsed = [parse_answer_with_verify(gen) for gen in generations]
+        em = [compare_answers(gold, p) for p in parsed]
         passk = any(em)
+        # Convert parsed results to strings for JSON serialization
+        parsed_str = []
+        for p in parsed:
+            if p is None:
+                parsed_str.append("")
+            elif isinstance(p, (list, tuple)):
+                # If it's a list or tuple from math_verify, convert each element
+                parsed_str.append(str(p[0]) if len(p) > 0 else "")
+            else:
+                parsed_str.append(str(p))
+        
+        # Convert gold to string as well
+        gold_str = ""
+        if gold is not None:
+            if isinstance(gold, (list, tuple)):
+                gold_str = str(gold[0]) if len(gold) > 0 else ""
+            else:
+                gold_str = str(gold)
+        
         results.append({
             "question": q,
-            "gold": gold,
+            "gold": gold_str,
             "generations": generations,
-            "parsed": parsed,
+            "parsed": parsed_str,
             "exact_match": em,
             "pass@16": passk
         })
@@ -271,14 +336,14 @@ def run_single_model_evaluation(task_name, gsm8k_path, output_dir, n_sampling, m
             print("\n==== First Sample Debug Info ====\nPrompt:\n{}\n\nGenerations:".format(prompts[idx]))
             for i, g in enumerate(generations):
                 print(f"[{i+1}] {g}")
-            print(f"\nGT: {gold}")
-            print(f"Parsed: {parsed}")
+            print(f"\nGT: {gold_str}")
+            print(f"Parsed: {parsed_str}")
             print(f"EM: {em}")
             print("===============================\n")
-        row = {"question": q, "gt": gold}
+        row = {"question": q, "gt": gold_str}
         for i in range(n_sampling):
             row[f"gen_{i+1}"] = generations[i]
-            row[f"parse_{i+1}"] = parsed[i]
+            row[f"parse_{i+1}"] = parsed_str[i]
             row[f"em_{i+1}"] = int(em[i])
         csv_rows.append(row)
     
