@@ -99,6 +99,63 @@ SFT_MODEL_MAP = {
 
 
 Model_map = {
+    ###############################################
+    ########## below are the 7b base models #######
+    ###############################################
+    "/mnt/sharefs/users/haolong.jia/checkpoint_7B/tokenmix_ablation_7B_mix_all_fuchsia_ipaddress/6374": "all_fuchsia_ipaddress_6374",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_7B/tokenmix_ablation_7B_mix_all_fuchsia_ipaddress/12748": "all_fuchsia_ipaddress_12748",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_7B/tokenmix_ablation_7B_mix_all_fuchsia_ipaddress/19122": "all_fuchsia_ipaddress_19122",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_7B/tokenmix_ablation_7B_mix_baseline_congruent_cocoa/6374": "baseline_congruent_cocoa_6374",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_7B/tokenmix_ablation_7B_mix_baseline_congruent_cocoa/12748": "baseline_congruent_cocoa_12748",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_7B/tokenmix_ablation_7B_mix_baseline_congruent_cocoa/19122": "baseline_congruent_cocoa_19122",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_7B/tokenmix_ablation_7B_mix_math_acrylic_beethoven/6374": "math_acrylic_beethoven_6374",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_7B/tokenmix_ablation_7B_mix_math_acrylic_beethoven/12748": "math_acrylic_beethoven_12748",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_7B/tokenmix_ablation_7B_mix_math_acrylic_beethoven/19122": "math_acrylic_beethoven_19122",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_7B/tokenmix_ablation_7B_mix_nvidia_cynical_hydrogenfuel/6374": "nvidia_cynical_hydrogenfuel_6374",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_7B/tokenmix_ablation_7B_mix_nvidia_cynical_hydrogenfuel/12748": "nvidia_cynical_hydrogenfuel_12748",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_7B/tokenmix_ablation_7B_mix_nvidia_cynical_hydrogenfuel/19122": "nvidia_cynical_hydrogenfuel_19122",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_7B/tokenmix_ablation_7B_mix_regmix_holistic_plane/6374": "regmix_holistic_plane_6374",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_7B/tokenmix_ablation_7B_mix_regmix_holistic_plane/12748": "regmix_holistic_plane_12748",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_7B/tokenmix_ablation_7B_mix_regmix_holistic_plane/19122": "regmix_holistic_plane_19122",
+
+    ##########################################################
+    ######## below are Octorber's models for new mixes #######
+    ##########################################################
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_all_third_sine/1p5B_mix_all_third_sine_7347": "all_third_sine_7347",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_all_third_sine/1p5B_mix_all_third_sine_14694": "all_third_sine_14694",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_all_third_sine/1p5B_mix_all_third_sine_22041": "all_third_sine_22041",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_all_third_sine/1p5B_mix_all_third_sine_29388": "all_third_sine_29388",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_all_third_sine/1p5B_mix_all_third_sine_36735": "all_third_sine_36735",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_all_third_sine/1p5B_mix_all_third_sine_44082": "all_third_sine_44082",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_all_third_sine/1p5B_mix_all_third_sine_51429": "all_third_sine_51429",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_baseline_crooked_rice/1p5B_mix_baseline_crooked_rice_7347": "baseline_crooked_rice_7347",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_baseline_crooked_rice/1p5B_mix_baseline_crooked_rice_14694": "baseline_crooked_rice_14694",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_baseline_crooked_rice/1p5B_mix_baseline_crooked_rice_22041": "baseline_crooked_rice_22041",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_baseline_crooked_rice/1p5B_mix_baseline_crooked_rice_29388": "baseline_crooked_rice_29388",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_baseline_crooked_rice/1p5B_mix_baseline_crooked_rice_36735": "baseline_crooked_rice_36735",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_baseline_crooked_rice/1p5B_mix_baseline_crooked_rice_44082": "baseline_crooked_rice_44082",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_baseline_crooked_rice/1p5B_mix_baseline_crooked_rice_51429": "baseline_crooked_rice_51429",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_math_lasting_mannerism/1p5B_mix_math_lasting_mannerism_7347": "math_lasting_mannerism_7347",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_math_lasting_mannerism/1p5B_mix_math_lasting_mannerism_14694": "math_lasting_mannerism_14694",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_math_lasting_mannerism/1p5B_mix_math_lasting_mannerism_22041": "math_lasting_mannerism_22041",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_math_lasting_mannerism/1p5B_mix_math_lasting_mannerism_29388": "math_lasting_mannerism_29388",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_math_lasting_mannerism/1p5B_mix_math_lasting_mannerism_36735": "math_lasting_mannerism_36735",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_math_lasting_mannerism/1p5B_mix_math_lasting_mannerism_44082": "math_lasting_mannerism_44082",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_math_lasting_mannerism/1p5B_mix_math_lasting_mannerism_51429": "math_lasting_mannerism_51429",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_math_lasting_mannerism/1p5B_mix_math_lasting_mannerism_58776": "math_lasting_mannerism_58776",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_nvidia_cheerful_gong/1p5B_mix_nvidia_cheerful_gong_7347": "nvidia_cheerful_gong_7347",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_nvidia_cheerful_gong/1p5B_mix_nvidia_cheerful_gong_14694": "nvidia_cheerful_gong_14694",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_nvidia_cheerful_gong/1p5B_mix_nvidia_cheerful_gong_22041": "nvidia_cheerful_gong_22041",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_nvidia_cheerful_gong/1p5B_mix_nvidia_cheerful_gong_29388": "nvidia_cheerful_gong_29388",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_nvidia_cheerful_gong/1p5B_mix_nvidia_cheerful_gong_36735": "nvidia_cheerful_gong_36735",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_nvidia_cheerful_gong/1p5B_mix_nvidia_cheerful_gong_44082": "nvidia_cheerful_gong_44082",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_regmix_evasive_gateway/1p5B_mix_regmix_evasive_gateway_7347": "regmix_evasive_gateway_7347",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_regmix_evasive_gateway/1p5B_mix_regmix_evasive_gateway_14694": "regmix_evasive_gateway_14694",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_regmix_evasive_gateway/1p5B_mix_regmix_evasive_gateway_22041": "regmix_evasive_gateway_22041",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_regmix_evasive_gateway/1p5B_mix_regmix_evasive_gateway_29388": "regmix_evasive_gateway_29388",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_regmix_evasive_gateway/1p5B_mix_regmix_evasive_gateway_36735": "regmix_evasive_gateway_36735",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_regmix_evasive_gateway/1p5B_mix_regmix_evasive_gateway_44082": "regmix_evasive_gateway_44082",
+    "/mnt/sharefs/users/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_regmix_evasive_gateway/1p5B_mix_regmix_evasive_gateway_51429": "regmix_evasive_gateway_51429",
     ##########################################################
     ########## below are the rewrite based models ##########
     ##########################################################

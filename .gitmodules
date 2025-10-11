@@ -7,3 +7,6 @@
 [submodule "new_pipeline/sft/lm-evaluation-harness"]
 	path = new_pipeline/sft/lm-evaluation-harness
 	url = https://github.com/EleutherAI/lm-evaluation-harness.git
+[submodule "Enigmata"]
+	path = Enigmata
+	url = https://github.com/BytedTsinghua-SIA/Enigmata.git
