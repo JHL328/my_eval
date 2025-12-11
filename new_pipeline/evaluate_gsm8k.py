@@ -20,7 +20,7 @@ from model import Model_map, get_model_map_by_type
 # =====================
 TASK_CONFIGS = {
     "gsm8k": {
-        "BASE_OUT": "/mnt/sharefs/users/haolong.jia/result-rewrite/gsm8k_pass16",
+        "BASE_OUT": "/mnt/sharefs/users/haolong.jia/result/gsm8k_pass16",
         "EVAL_SCRIPT": None,
         "DATA_NAME": "gsm8k",
         "K_LIST": [1, 2, 4, 8, 16],
@@ -46,7 +46,7 @@ TASK_CONFIGS = {
         "CD_PATH_IN_JOB_SCRIPT": "/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline",
     },
     "math500": {
-        "BASE_OUT": "/mnt/sharefs/users/haolong.jia/result-rewrite/math500_pass64",
+        "BASE_OUT": "/mnt/sharefs/users/haolong.jia/result/math500_pass64",
         "EVAL_SCRIPT": "/mnt/weka/home/haolong.jia/eval/RL-eval/qwen2.5-math/evaluation/math_eval.py",
         "DATA_NAME": "math500",
         "K_LIST": [1, 2, 4, 8, 16, 32, 64],
@@ -205,6 +205,9 @@ def postprocess_math_results(model_out_dir, model_name, task_config):
     base_name = os.path.basename(model_name)
     math500_dir = os.path.join(model_out_dir, "math500")
     
+    if not os.path.isdir(math500_dir):
+        return
+    
     # Look for checkpoint directories (e.g., checkpoint-5472)
     import glob, shutil
     checkpoint_dirs = glob.glob(os.path.join(math500_dir, "checkpoint-*"))
@@ -213,19 +216,41 @@ def postprocess_math_results(model_out_dir, model_name, task_config):
         # Use the first checkpoint directory found
         target_dir = checkpoint_dirs[0]
     else:
-        # Fallback to original logic for compatibility
-        target_dir = os.path.join(math500_dir, base_name)
+        # Fallbacks for other directory layouts
+        candidate = os.path.join(math500_dir, base_name)
+        if os.path.isdir(candidate):
+            target_dir = candidate
+        else:
+            # Some runs write into a numeric step directory (e.g., math500/19122)
+            subdirs = [
+                os.path.join(math500_dir, d)
+                for d in os.listdir(math500_dir)
+                if os.path.isdir(os.path.join(math500_dir, d))
+            ]
+            subdirs.sort()
+            target_dir = subdirs[0] if subdirs else None
     
-    if os.path.isdir(target_dir):
+    if target_dir and os.path.isdir(target_dir):
         # process jsonl
         jsonl_files = glob.glob(os.path.join(target_dir, "*.jsonl"))
         if jsonl_files:
-            shutil.move(jsonl_files[0], os.path.join(model_out_dir, "sample.jsonl"))
+            dest_jsonl = os.path.join(model_out_dir, "sample.jsonl")
+            if not os.path.exists(dest_jsonl):
+                shutil.move(jsonl_files[0], dest_jsonl)
+            else:
+                # destination already exists; keep newest file by replacing
+                shutil.move(jsonl_files[0], dest_jsonl)
         # process json
         json_files = glob.glob(os.path.join(target_dir, "*.json"))
         if json_files:
-            shutil.move(json_files[0], os.path.join(model_out_dir, "result.json"))
-        shutil.rmtree(target_dir)
+            dest_json = os.path.join(model_out_dir, "result.json")
+            if not os.path.exists(dest_json):
+                shutil.move(json_files[0], dest_json)
+            else:
+                shutil.move(json_files[0], dest_json)
+        # remove the nested directory if it is now empty to keep the folder tidy
+        if not os.listdir(target_dir):
+            shutil.rmtree(target_dir)
     # 2. generate result.csv
     sample_jsonl = os.path.join(model_out_dir, "sample.jsonl")
     if not os.path.exists(sample_jsonl):
@@ -273,7 +298,7 @@ def run_single_model_evaluation(task_name, gsm8k_path, output_dir, n_sampling, m
         return  # only run for gsm8k
     os.makedirs(output_dir, exist_ok=True)
     print(f"Loading model: {model_path}")
-    llm = LLM(model=model_path, dtype="auto", tensor_parallel_size=1)
+    llm = LLM(model=model_path, dtype="auto", tensor_parallel_size=1, trust_remote_code=True)
     print("Model loaded successfully!")
     results = []
     csv_rows = []
@@ -438,7 +463,7 @@ python3 -u {os.path.abspath(__file__)} \
 #SBATCH --gres=gpu:{task_config['GPUS_PER_TASK']}
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
-#SBATCH --time={task_config['TIME_LIMIT']}
+#SBATCH --time={task_config['TIME_LIMIT'    ]}
 #SBATCH --partition={task_config['PARTITION']}
 #SBATCH --qos={task_config['QOS']}
 #SBATCH --mem={task_config['MEM']}

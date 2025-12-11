@@ -153,8 +153,10 @@ SBATCH_TEMPLATE = """#!/bin/bash
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=32
 #SBATCH --time=24:00:00
-# SBATCH --partition=main
-#SBATCH --mem=300G
+#SBATCH --partition=lowprio
+#SBATCH --qos=lowprio
+#SBATCH --reservation=moe
+#SBATCH --mem=400G
 
 cd /mnt/weka/home/haolong.jia/eval/RL-eval
 source /mnt/weka/home/haolong.jia/miniconda3/bin/activate evalplus-eval

@@ -35,19 +35,40 @@ ALLOWED_MODEL_GROUPS = [
     # 't70-m30', 
     # 't35-m30-g35',
     # 't40-m30-o0-r4-p3-a3-g10-ma10',
-    't20-m25-o0-r7-p7-a7-g9-ma25',
+    # 't20-m25-o0-r7-p7-a7-g9-ma25',
     # 't60-m30-o0-g0-r0-p0-ma10',
     # 't70-m10-o0-g0-r0-p0-ma20',
     # 't30-m15-o10-r5-p5-g20-ma15',
     # 't50-m30-o20-r0-p0-g0-ma0',
     # 'social_candy_0',
-    'lonely_cone_0',
-    'rolling_inverse_0',
-    'mountainous_extension_0',
-    "weary_alias_0",
-    "enthusiastic_minimalism_0",
-    "courageous_congruence_0",
+    # 'lonely_cone_0',
+    # 'rolling_inverse_0',
+    # 'mountainous_extension_0',
+    # "weary_alias_0",
+    # "enthusiastic_minimalism_0",
+    # "courageous_congruence_0",
+    # "all_third_sine_",
+    # "baseline_crooked_rice_",
+    # "math_lasting_mannerism_",
+    # "nvidia_cheerful_gong_",
+    # "regmix_evasive_gateway_",
+    # "web_double_teenage_monochrome_",
+    # "web_high_fashionable_multiplication_",
+    ##########################
+    ###### 7B base models ####
+    ##########################
+    # "all_fuchsia_ipaddress_",
+    # "baseline_congruent_cocoa_",
+    # "math_acrylic_beethoven_",
+    # "nvidia_cynical_hydrogenfuel_",
+    # "regmix_holistic_plane_",
     # Add more model groups here as needed
+    ##########################
+    ##### coding mixes #######
+    ##########################
+    # "code_dialogues_substantial_remoulade_",
+    # "code_thinking_imperial_shannon_",
+    # "math_grateful_refrain_",
 ]
 
 def get_canonical_color_key(raw_group):
@@ -94,6 +115,37 @@ def group_to_label(group):
         return 'Web-High'
     if group == 'courageous_congruence_0':
         return 'Web-Medium'
+    if group == 'all_third_sine_':
+        return 'mix_all'
+    if group == 'baseline_crooked_rice_':
+        return 'mix_baseline'
+    if group == 'math_lasting_mannerism_':
+        return 'mix_math'
+    if group == 'nvidia_cheerful_gong_':
+        return 'mix_nvidia'
+    if group == 'regmix_evasive_gateway_':
+        return 'mix_regmix'
+    if group == 'web_double_teenage_monochrome_':
+        return 'mix_web_double'
+    if group == 'web_high_fashionable_multiplication_':
+        return 'mix_web_high'
+    if group == 'all_fuchsia_ipaddress_':
+        return 'mix_all_7B'
+    if group == 'baseline_congruent_cocoa_':
+        return 'mix_baseline_7B'
+    if group == 'math_acrylic_beethoven_':
+        return 'mix_math_7B'
+    if group == 'nvidia_cynical_hydrogenfuel_':
+        return 'mix_nvidia_7B'
+    if group == 'regmix_holistic_plane_':
+        return 'mix_regmix_7B'
+    if group == 'code_dialogues_substantial_remoulade_':
+        return 'mix_code_dialogues'
+    if group == 'code_thinking_imperial_shannon_':
+        return 'mix_code_thinking'
+    if group == 'math_grateful_refrain_':
+        return 'mix_math_WSD'
+    
     mapping = {
         't': 't',
         'm': 'mm',
@@ -139,6 +191,21 @@ color_map = {
     'data_v2': '#45b1e8',       # Blue
     'Web-High': '#1f77b4',
     'Web-Medium': '#1fff77', 
+    'mix_all': '#1f77b4',
+    'mix_baseline': '#ff7f0e',
+    'mix_math': '#2ca02c',
+    'mix_nvidia': '#d62728',
+    'mix_regmix': '#9467bd',
+    'mix_web_double': '#e377c2',
+    'mix_web_high': '#7f7f7f',
+    'mix_all_7B': '#1f77b4',
+    'mix_baseline_7B': '#ff7f0e',
+    'mix_math_7B': '#2ca02c',
+    'mix_nvidia_7B': '#d62728',
+    'mix_regmix_7B': '#9467bd',
+    'mix_code_dialogues': '#b2df8a',
+    'mix_code_thinking': '#cab2d6',
+    'mix_math_WSD': '#fb9a99',
 }
 
 parser = argparse.ArgumentParser()
@@ -231,7 +298,171 @@ for model_name, result in data.items():
         if args.metric in result:
             group_lines[group].append((step, result[args.metric]))
         continue
+
+    # special case for all_third_sine_XXXXX
+    if model_name.startswith('all_third_sine_'):
+        group = 'all_third_sine_'
+        # Check if this group is allowed
+        if group not in ALLOWED_MODEL_GROUPS:
+            continue
+        step = int(model_name.split('_')[-1])
+        if args.metric in result:
+            group_lines[group].append((step, result[args.metric]))
+        continue
     
+    # special case for baseline_crooked_rice_XXXXX
+    if model_name.startswith('baseline_crooked_rice_'):
+        group = 'baseline_crooked_rice_'
+        # Check if this group is allowed
+        if group not in ALLOWED_MODEL_GROUPS:
+            continue
+        step = int(model_name.split('_')[-1])
+        if args.metric in result:
+            group_lines[group].append((step, result[args.metric]))
+        continue
+    
+    # special case for math_lasting_mannerism_XXXXX
+    if model_name.startswith('math_lasting_mannerism_'):
+        group = 'math_lasting_mannerism_'
+        # Check if this group is allowed
+        if group not in ALLOWED_MODEL_GROUPS:
+            continue
+        step = int(model_name.split('_')[-1])
+        if args.metric in result:
+            group_lines[group].append((step, result[args.metric]))
+        continue
+    
+    # special case for nvidia_cheerful_gong_XXXXX
+    if model_name.startswith('nvidia_cheerful_gong_'):
+        group = 'nvidia_cheerful_gong_'
+        # Check if this group is allowed
+        if group not in ALLOWED_MODEL_GROUPS:
+            continue
+        step = int(model_name.split('_')[-1])
+        if args.metric in result:
+            group_lines[group].append((step, result[args.metric]))
+        continue
+    
+    # special case for regmix_evasive_gateway_XXXXX
+    if model_name.startswith('regmix_evasive_gateway_'):
+        group = 'regmix_evasive_gateway_'
+        # Check if this group is allowed
+        if group not in ALLOWED_MODEL_GROUPS:
+            continue
+        step = int(model_name.split('_')[-1])
+        if args.metric in result:
+            group_lines[group].append((step, result[args.metric]))
+        continue
+
+    # special case for web_double_teenage_monochrome_XXXXX
+    if model_name.startswith('web_double_teenage_monochrome_'):
+        group = 'web_double_teenage_monochrome_'
+        # Check if this group is allowed
+        if group not in ALLOWED_MODEL_GROUPS:
+            continue
+        step = int(model_name.split('_')[-1])
+        if args.metric in result:
+            group_lines[group].append((step, result[args.metric]))
+        continue
+    
+    # special case for web_high_fashionable_multiplication_XXXXX
+    if model_name.startswith('web_high_fashionable_multiplication_'):
+        group = 'web_high_fashionable_multiplication_'
+        # Check if this group is allowed
+        if group not in ALLOWED_MODEL_GROUPS:
+            continue
+        step = int(model_name.split('_')[-1])
+        if args.metric in result:
+            group_lines[group].append((step, result[args.metric]))
+        continue
+    
+    # special case for all_fuchsia_ipaddress_XXXXX
+    if model_name.startswith('all_fuchsia_ipaddress_'):
+        group = 'all_fuchsia_ipaddress_'
+        # Check if this group is allowed
+        if group not in ALLOWED_MODEL_GROUPS:
+            continue
+        step = int(model_name.split('_')[-1])
+        if args.metric in result:
+            group_lines[group].append((step, result[args.metric]))
+        continue
+    
+    # special case for baseline_congruent_cocoa_XXXXX
+    if model_name.startswith('baseline_congruent_cocoa_'):
+        group = 'baseline_congruent_cocoa_'
+        # Check if this group is allowed
+        if group not in ALLOWED_MODEL_GROUPS:
+            continue
+        step = int(model_name.split('_')[-1])
+        if args.metric in result:
+            group_lines[group].append((step, result[args.metric]))
+        continue
+    
+    # special case for math_acrylic_beethoven_XXXXX
+    if model_name.startswith('math_acrylic_beethoven_'):
+        group = 'math_acrylic_beethoven_'
+        # Check if this group is allowed
+        if group not in ALLOWED_MODEL_GROUPS:
+            continue
+        step = int(model_name.split('_')[-1])
+        if args.metric in result:
+            group_lines[group].append((step, result[args.metric]))
+        continue
+    
+    # special case for nvidia_cynical_hydrogenfuel_XXXXX
+    if model_name.startswith('nvidia_cynical_hydrogenfuel_'):
+        group = 'nvidia_cynical_hydrogenfuel_'
+        # Check if this group is allowed
+        if group not in ALLOWED_MODEL_GROUPS:
+            continue
+        step = int(model_name.split('_')[-1])
+        if args.metric in result:
+            group_lines[group].append((step, result[args.metric]))
+        continue
+    
+    # special case for regmix_holistic_plane_XXXXX
+    if model_name.startswith('regmix_holistic_plane_'):
+        group = 'regmix_holistic_plane_'
+        # Check if this group is allowed
+        if group not in ALLOWED_MODEL_GROUPS:
+            continue
+        step = int(model_name.split('_')[-1])
+        if args.metric in result:
+            group_lines[group].append((step, result[args.metric]))
+        continue
+
+    # special case for code_dialogues_substantial_remoulade_XXXXX
+    if model_name.startswith('code_dialogues_substantial_remoulade_'):
+        group = 'code_dialogues_substantial_remoulade_'
+        # Check if this group is allowed
+        if group not in ALLOWED_MODEL_GROUPS:
+            continue
+        step = int(model_name.split('_')[-1])
+        if args.metric in result:
+            group_lines[group].append((step, result[args.metric]))
+        continue
+    
+    # special case for code_thinking_imperial_shannon_XXXXX
+    if model_name.startswith('code_thinking_imperial_shannon_'):
+        group = 'code_thinking_imperial_shannon_'
+        # Check if this group is allowed
+        if group not in ALLOWED_MODEL_GROUPS:
+            continue
+        step = int(model_name.split('_')[-1])
+        if args.metric in result:
+            group_lines[group].append((step, result[args.metric]))
+        continue
+    
+    # special case for math_grateful_refrain_XXXXX
+    if model_name.startswith('math_grateful_refrain_'):
+        group = 'math_grateful_refrain_'
+        # Check if this group is allowed
+        if group not in ALLOWED_MODEL_GROUPS:
+            continue
+        step = int(model_name.split('_')[-1])
+        if args.metric in result:
+            group_lines[group].append((step, result[args.metric]))
+        continue
     # other groups keep the original -digit ending regex logic
     match = re.match(r'([a-z0-9_\-]+)-(\d+)$', model_name)
     if match and args.metric in result:
@@ -257,7 +488,10 @@ for group, points in group_lines.items():
     points = sorted(points)
     steps, metrics = zip(*points)
     label = group_to_label(group)
-    color = color_map.get(group, None)
+    color = color_map.get(group)
+    if color is None:
+        # Fall back to the human readable label so groups with aliases reuse the intended palette.
+        color = color_map.get(label)
     plt.plot(steps, metrics, marker='o', label=label, color=color, linewidth=2, markersize=7)
 
 # assign fixed colors to open source models
@@ -278,6 +512,8 @@ plt.legend(
     borderaxespad=0.
 )
 plt.grid(True, linestyle='--', alpha=0.5)
+plt.xlim(left=0)
+plt.ylim(bottom=0)
 plt.tight_layout()
 plt.savefig(args.output, format='pdf', bbox_inches='tight', facecolor='#f7f7f7')
 print(f'Saved plot to {args.output}')

@@ -58,7 +58,8 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=64
 #SBATCH --mem=64G
-#SBATCH --partition=main
+#SBATCH --partition=lowprio
+#SBATCH --qos=lowprio
 
 cd /mnt/weka/home/haolong.jia/eval/RL-eval || { echo "Failed to change directory"; exit 1; }
 

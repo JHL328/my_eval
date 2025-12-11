@@ -6,9 +6,10 @@
 #SBATCH --gres=gpu:1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=32
-#SBATCH --mem=300G
-#SBATCH --partition=main
-#SBATCH --time=4:00:00
+#SBATCH --mem=400G
+#SBATCH --partition=lowprio
+#SBATCH --qos=lowprio
+#SBATCH --time=30:00:00
 
 cd /mnt/weka/home/haolong.jia/eval/RL-eval || { echo "Failed to change directory"; exit 1; }
 

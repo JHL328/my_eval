@@ -80,12 +80,12 @@ elif [[ "$TASK_NAME" == "humaneval" ]]; then
     # Two-stage submission: GPU for generation, then CPU for sanitize/evaluate
     echo "[submitter.sh] Submitting two-stage pipeline for humaneval"
     CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/generate_code_gpu.sh --task humaneval"
-elif [[ "$TASK_NAME" == "mbpp_old" ]]; then
-    # Old single-job submission for backward compatibility
-    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_code.sh --task mbpp"
-elif [[ "$TASK_NAME" == "humaneval_old" ]]; then
-    # Old single-job submission for backward compatibility
-    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_code.sh --task humaneval"
+# elif [[ "$TASK_NAME" == "mbpp_old" ]]; then
+#     # Old single-job submission for backward compatibility
+#     CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_code.sh --task mbpp"
+# elif [[ "$TASK_NAME" == "humaneval_old" ]]; then
+#     # Old single-job submission for backward compatibility
+#     CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_code.sh --task humaneval"
     
 ##############################
 ###### MATH Tasks ###########
@@ -142,6 +142,11 @@ elif [[ "$TASK_NAME" == "mmlu_redux" || "$TASK_NAME" == "mmlu_redux_generative" 
     CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_harness.sh --task mmlu_redux_generative --model-type $MODEL_TYPE"
 elif [[ "$TASK_NAME" == "ifeval" ]]; then
     CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_harness.sh --task ifeval --model-type $MODEL_TYPE"
+##############################
+###### Enigmata Tasks ########
+##############################
+elif [[ "$TASK_NAME" == "enigmata" ]]; then
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/enigmata.sh --model-type $MODEL_TYPE"
 ##############################
 ###### GQA Tasks #############
 ##############################

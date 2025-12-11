@@ -668,13 +668,13 @@ if __name__ == "__main__":
     # set default max_model for each task
     if args.max_model is None:
         if args.task == "mmlu_flan_cot_fewshot_pass16":
-            args.max_model = 8
+            args.max_model = 20
         elif args.task == "mmlu":
-            args.max_model = 8
+            args.max_model = 20
         elif args.task == "bbh_pass16":
-            args.max_model = 8
+            args.max_model = 20
         elif args.task == "mmlu_pro_pass16":
-            args.max_model = 8
+            args.max_model = 20
         else:
             args.max_model = 8
 

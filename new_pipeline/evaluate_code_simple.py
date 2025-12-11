@@ -48,7 +48,7 @@ if task == "humaneval":
     MAX_TOKENS = 1024
 elif task == "mbpp":
     N_SAMPLES = 64
-    MAX_TOKENS = 512
+    MAX_TOKENS = 1024
 else:
     print(f"Unknown task: {task}")
     sys.exit(1)
@@ -65,7 +65,9 @@ SBATCH_TEMPLATE = """#!/bin/bash
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=32
 #SBATCH --time=24:00:00
-#SBATCH --mem=300G
+#SBATCH --partition=lowprio
+#SBATCH --qos=lowprio
+#SBATCH --mem=400G
 
 cd /mnt/weka/home/haolong.jia/eval/RL-eval
 source /mnt/weka/home/haolong.jia/miniconda3/bin/activate evalplus-eval
@@ -263,16 +265,16 @@ def main():
             
             # Automatically generate pass@k summary after all jobs complete
             print(f"\n{'='*60}")
-            # Only update the models that were just run
-            generate_passk_summary(task, models_to_update=models_to_run)
+            # Update all models to ensure consistency, even for skipped ones
+            generate_passk_summary(task, models_to_update=None)
         else:
             print("\n✅ All models already completed!")
-            # Don't regenerate summary if nothing was run
-            print(f"  💾 Pass@k summaries should already be up to date.")
+            # Even if nothing ran, ensure summary is up to date for all models
+            generate_passk_summary(task, models_to_update=None)
     else:
         print("\n✅ All models already completed!")
-        # Don't regenerate summary if nothing was run
-        print(f"  💾 Pass@k summaries should already be up to date.")
+        # Even if nothing ran, ensure summary is up to date for all models
+        generate_passk_summary(task, models_to_update=None)
     
     print(f"\n{'='*60}")
 
