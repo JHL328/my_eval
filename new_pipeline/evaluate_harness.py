@@ -191,7 +191,7 @@ parser.add_argument('--model-type', type=str, default='sft', choices=['base', 's
 args = parser.parse_args()
 
 task = args.task
-output_dir = f"/mnt/sharefs/users/haolong.jia/result/{task}"
+output_dir = f"/mnt/weka/shrd/k2m/haolong.jia/result/{task}"
 job_dir = os.path.join(output_dir, "job_scripts")
 log_dir = os.path.join(output_dir, "logs")
 os.makedirs(output_dir, exist_ok=True)
@@ -269,9 +269,9 @@ for model_path, model_name in model_map.items():
   --num_fewshot 0 \
   --trust_remote_code"""
 
-        # Add apply_chat_template for sft models
-        if args.model_type == 'sft':
-            lm_eval_cmd += " \\\n  --apply_chat_template"
+    # Add apply_chat_template for sft models for ALL tasks
+    if args.model_type == 'sft':
+        lm_eval_cmd += " \\\n  --apply_chat_template"
 
     # write the job script
     with open(job_script, "w") as f:

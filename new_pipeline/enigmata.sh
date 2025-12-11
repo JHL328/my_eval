@@ -14,7 +14,7 @@
 # Enigmata Evaluation Manager
 # =============================================================================
 # This script iterates over all models of a given type (base/sft) defined in model.py
-# and submits a separate GPU job for each model to run test_enigmata.py.
+# and submits a separate GPU job for each model to run enigmata.py.
 #
 # Usage: sbatch enigmata.sh --model-type <base|sft>
 # =============================================================================
@@ -93,11 +93,11 @@ for entry in "${MODEL_ENTRIES[@]}"; do
     echo "📨 Submitting job for model: $MODEL_NAME"
     
     # Directly submit the python script which contains #SBATCH configuration
-    # We only specify the job name here; resources are defined in test_enigmata.py
+    # We only specify the job name here; resources are defined in enigmata.py
     sbatch \
         --job-name="${JOB_NAME}" \
         --chdir="/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline" \
-        test_enigmata.py \
+        enigmata.py \
         --model "${MODEL_PATH}" \
         --model-type "${MODEL_TYPE}" \
         --run-eval

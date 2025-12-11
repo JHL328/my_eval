@@ -41,6 +41,16 @@ from model import get_model_map_by_type  # noqa: E402
 DATA_ROOT = Path("/mnt/weka/shrd/k2m/haolong.jia/result/enigmata/Enigmata-Eval/")
 EVAL_SCRIPT = Path("/mnt/weka/home/haolong.jia/eval/RL-eval/Enigmata/test_eval.py")
 
+# Tasks that have shown non-zero accuracy on baseline models
+TARGET_TASKS = [
+    "FOLIO",
+    "car_painting",
+    "knights_and_knaves",
+    "maze",
+    "natural_language_navigation",
+    "sudoku2"
+]
+
 
 # ----------------------------
 # CLI helpers
@@ -176,9 +186,16 @@ def main() -> None:
     
     tokenizer = llm.get_tokenizer()
 
-    # Find all easy tasks
-    task_files = sorted(list(DATA_ROOT.glob("*_easy.parquet")))
-    print(f"🎯 Found {len(task_files)} easy tasks to process.")
+    # Build task list from TARGET_TASKS
+    task_files = []
+    for task_name in TARGET_TASKS:
+        fpath = DATA_ROOT / f"{task_name}_easy.parquet"
+        if fpath.exists():
+            task_files.append(fpath)
+        else:
+            print(f"⚠️  Warning: Target task file not found: {fpath.name}")
+
+    print(f"🎯 Found {len(task_files)} valid tasks to process (filtered from whitelist).")
     
     final_results = []
     total_tasks = len(task_files)
