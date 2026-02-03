@@ -79,9 +79,9 @@ def main():
 
     # Set output dir based on model type
     if model_type == "sft":
-        output_dir = "/mnt/sharefs/users/haolong.jia/result/mmlu_flan_pass16_sft"
+        output_dir = "/mnt/weka/shrd/k2m/haolong.jia/result/mmlu_flan_pass16_sft"
     else:
-        output_dir = "/mnt/sharefs/users/haolong.jia/result/mmlu_flan_pass16"
+        output_dir = "/mnt/weka/shrd/k2m/haolong.jia/result/mmlu_flan_pass16"
     os.makedirs(output_dir, exist_ok=True)
 
     # get model_name from Model_map
@@ -97,8 +97,7 @@ def main():
     dataset = load_dataset(
         "hails/mmlu_no_train",
         subject,
-        cache_dir="/mnt/sharefs/users/haolong.jia/eval_data",
-        trust_remote_code=True
+        cache_dir="/mnt/weka/shrd/k2m/haolong.jia/eval_data"
     )
     data = dataset['test'].select(range(idx_start, idx_end))
 
@@ -110,7 +109,7 @@ def main():
     # 为SFT模型使用chat template
     if model_type == "sft":
         from transformers import AutoTokenizer
-        tokenizer = AutoTokenizer.from_pretrained(model_path)
+        tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
         formatted_prompts = []
         for prompt in prompts:
             messages = [{"role": "user", "content": prompt}]
@@ -131,7 +130,7 @@ def main():
     max_retries = 10
     for attempt in range(max_retries):
         try:
-            llm = LLM(model=model_path, gpu_memory_utilization=0.95, tensor_parallel_size=1, enable_prefix_caching=True)
+            llm = LLM(model=model_path, gpu_memory_utilization=0.95, tensor_parallel_size=1, enable_prefix_caching=True, trust_remote_code=True)
             break
         except Exception as e:
             print(f"Attempt {attempt + 1} to load model failed: {e}")

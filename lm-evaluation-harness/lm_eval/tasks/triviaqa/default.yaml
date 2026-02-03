@@ -29,5 +29,3 @@ metric_list:
     ignore_punctuation: true
 metadata:
   version: 3.0
-
-num_fewshot: 5

@@ -39,7 +39,8 @@ def create_job_script(script_path, exp_name, log_path, command_args, time_limit=
 #SBATCH -e {log_path}%j_%x.err
 
 cd /mnt/weka/home/haolong.jia/eval/RL-eval
-source /mnt/weka/home/haolong.jia/miniconda3/bin/activate harness-eval
+# source /mnt/weka/home/haolong.jia/miniconda3/bin/activate harness-eval
+source /mnt/weka/home/haolong.jia/miniconda3/bin/activate base
 
 export TRITON_CACHE_DIR="/tmp/triton-cache"
 
@@ -66,7 +67,8 @@ def create_array_job_script(script_path, exp_name, log_path, tasks_file, num_tas
 #SBATCH --array=1-{num_tasks}
 
 cd /mnt/weka/home/haolong.jia/eval/RL-eval
-source /mnt/weka/home/haolong.jia/miniconda3/bin/activate harness-eval
+# source /mnt/weka/home/haolong.jia/miniconda3/bin/activate harness-eval
+source /mnt/weka/home/haolong.jia/miniconda3/bin/activate base
 
 export TRITON_CACHE_DIR="/tmp/triton-cache"
 
@@ -109,9 +111,9 @@ def auto_postprocess_all_models(output_dir,  all_batch_results_exist, concat_csv
 
 def run_mmlu_flan_cot_fewshot_pass16(max_model=10, force=False, model_type="base"):
     if model_type == "sft":
-        output_dir = "/mnt/sharefs/users/haolong.jia/result/mmlu_flan_pass16_sft"
+        output_dir = "/mnt/weka/shrd/k2m/haolong.jia/result/mmlu_flan_pass16_sft"
     else:
-        output_dir = "/mnt/sharefs/users/haolong.jia/result/mmlu_flan_pass16"
+        output_dir = "/mnt/weka/shrd/k2m/haolong.jia/result/mmlu_flan_pass16"
     cot_prompts_path = "/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/mmlu_cot_prompts.json"
     scripts_dir = f'{output_dir}/job_scripts/'
     logs_dir = f'{output_dir}/logs/'
@@ -141,7 +143,7 @@ def run_mmlu_flan_cot_fewshot_pass16(max_model=10, force=False, model_type="base
             "hails/mmlu_no_train",
             subject,
             split="test",
-            cache_dir="/mnt/sharefs/users/haolong.jia/eval_data",
+            cache_dir="/mnt/weka/shrd/k2m/haolong.jia/eval_data",
             trust_remote_code=True
         )
         n_total = len(dataset_test_split)
@@ -230,9 +232,9 @@ def run_mmlu_flan_cot_fewshot_pass16(max_model=10, force=False, model_type="base
 
 def run_bbh_pass16(max_model=10, force=False, model_type="base"):
     if model_type == "sft":
-        output_dir = "/mnt/sharefs/users/haolong.jia/result/bbh_pass16_sft"
+        output_dir = "/mnt/weka/shrd/k2m/haolong.jia/result/bbh_pass16_sft"
     else:
-        output_dir = "/mnt/sharefs/users/haolong.jia/result/bbh_pass16"
+        output_dir = "/mnt/weka/shrd/k2m/haolong.jia/result/bbh_pass16"
     cot_prompts_path = "/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/bbh_cot_prompts.json"
     scripts_dir = f'{output_dir}/job_scripts/'
     logs_dir = f'{output_dir}/logs/'
@@ -262,7 +264,7 @@ def run_bbh_pass16(max_model=10, force=False, model_type="base"):
             "lukaemon/bbh",
             task,
             split="test",
-            cache_dir="/mnt/sharefs/users/haolong.jia/eval_data",
+            cache_dir="/mnt/weka/shrd/k2m/haolong.jia/eval_data",
             trust_remote_code=True
         )
         n_total = len(dataset_test_split)
@@ -355,9 +357,9 @@ def run_bbh_pass16(max_model=10, force=False, model_type="base"):
 
 def run_mmlu_pro_pass16(max_model=10, force=False, model_type="base"):
     if model_type == "sft":
-        output_dir = "/mnt/sharefs/users/haolong.jia/result/mmlu_pro_pass16_sft"
+        output_dir = "/mnt/weka/shrd/k2m/haolong.jia/result/mmlu_pro_pass16_sft"
     else:
-        output_dir = "/mnt/sharefs/users/haolong.jia/result/mmlu_pro_pass16"
+        output_dir = "/mnt/weka/shrd/k2m/haolong.jia/result/mmlu_pro_pass16"
     prompts_path = "/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/mmlu_pro_prompts.json"
     scripts_dir = f'{output_dir}/job_scripts/'
     logs_dir = f'{output_dir}/logs/'
@@ -473,9 +475,9 @@ def run_mmlu_pro_pass16(max_model=10, force=False, model_type="base"):
 
 def run_mmlu(max_model=10, force=False, model_type="base"):
     if model_type == "sft":
-        output_dir = "/mnt/sharefs/users/haolong.jia/result/mmlu_sft"
+        output_dir = "/mnt/weka/shrd/k2m/haolong.jia/result/mmlu_sft"
     else:
-        output_dir = "/mnt/sharefs/users/haolong.jia/result/mmlu"
+        output_dir = "/mnt/weka/shrd/k2m/haolong.jia/result/mmlu"
     prompts_path = "/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/mmlu_prompts.json"
     scripts_dir = f'{output_dir}/job_scripts/'
     logs_dir = f'{output_dir}/logs/'
@@ -504,7 +506,7 @@ def run_mmlu(max_model=10, force=False, model_type="base"):
             "hails/mmlu_no_train",
             subject,
             split="test",
-            cache_dir="/mnt/sharefs/users/haolong.jia/eval_data",
+            cache_dir="/mnt/weka/shrd/k2m/haolong.jia/eval_data",
             trust_remote_code=True
         )
         n_total = len(dataset_test_split)

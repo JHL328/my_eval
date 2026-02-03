@@ -20,7 +20,7 @@ from model import Model_map, get_model_map_by_type
 # =====================
 TASK_CONFIGS = {
     "gsm8k": {
-        "BASE_OUT": "/mnt/sharefs/users/haolong.jia/result/gsm8k_pass16",
+        "BASE_OUT": "/mnt/weka/shrd/k2m/haolong.jia/result/gsm8k_pass16",
         "EVAL_SCRIPT": None,
         "DATA_NAME": "gsm8k",
         "K_LIST": [1, 2, 4, 8, 16],
@@ -42,11 +42,12 @@ TASK_CONFIGS = {
             {"question": "Michael had 58 golf balls. On tuesday, he lost 23 golf balls. On wednesday, he lost 2 more. How many golf balls did he have at the end of wednesday?", "target": "Let's think step by step. Michael started with 58 golf balls. After losing 23 on tuesday, he had 58 - 23 = 35. After losing 2 more, he had 35 - 2 = 33 golf balls. The answer is 33."},
             {"question": "Olivia has $23. She bought five bagels for $3 each. How much money does she have left?", "target": "Let's think step by step. Olivia had 23 dollars. 5 bagels for 3 dollars each will be 5 x 3 = 15 dollars. So she has 23 - 15 dollars left. 23 - 15 is 8. The answer is 8."},
         ],
-        "CONDA_ACTIVATE_PATH": "source /mnt/weka/home/haolong.jia/miniconda3/bin/activate qwen-eval",
+        # "CONDA_ACTIVATE_PATH": "source /mnt/weka/home/haolong.jia/miniconda3/bin/activate qwen-eval",
+        "CONDA_ACTIVATE_PATH": "source /mnt/weka/home/haolong.jia/miniconda3/bin/activate base",
         "CD_PATH_IN_JOB_SCRIPT": "/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline",
     },
     "math500": {
-        "BASE_OUT": "/mnt/sharefs/users/haolong.jia/result/math500_pass64",
+        "BASE_OUT": "/mnt/weka/shrd/k2m/haolong.jia/result/math500_pass64",
         "EVAL_SCRIPT": "/mnt/weka/home/haolong.jia/eval/RL-eval/qwen2.5-math/evaluation/math_eval.py",
         "DATA_NAME": "math500",
         "K_LIST": [1, 2, 4, 8, 16, 32, 64],
@@ -55,8 +56,9 @@ TASK_CONFIGS = {
         "PROMPT_TYPE": "cot",
         "GPUS_PER_TASK": 1,
         "TIME_LIMIT": "12:00:00",
-        "PARTITION": "lowprio",
-        "QOS": "lowprio",
+        # "PARTITION": "lowprio",
+        # "QOS": "lowprio",
+        "PARTITION": "main",
         "MEM": "400G",
         "FEWSHOT_EXAMPLES": None,
         "CONDA_ACTIVATE_PATH": "source /mnt/weka/home/haolong.jia/miniconda3/bin/activate qwen-eval",
@@ -293,13 +295,21 @@ def postprocess_math_results(model_out_dir, model_name, task_config):
 # =====================
 # Main Evaluation Function (GSM8K only)
 # =====================
-def run_single_model_evaluation(task_name, gsm8k_path, output_dir, n_sampling, model_path, model_name, base_out, overwrite, task_config):
+def run_single_model_evaluation(task_name, gsm8k_path, output_dir, n_sampling, model_path, model_name, base_out, overwrite, task_config, model_type="base"):
     if task_name != "gsm8k":
         return  # only run for gsm8k
     os.makedirs(output_dir, exist_ok=True)
     print(f"Loading model: {model_path}")
     llm = LLM(model=model_path, dtype="auto", tensor_parallel_size=1, trust_remote_code=True)
     print("Model loaded successfully!")
+    
+    # Load tokenizer for SFT chat template
+    tokenizer = None
+    if model_type == "sft":
+        from transformers import AutoTokenizer
+        tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
+        print("Tokenizer loaded for SFT chat template.")
+
     results = []
     csv_rows = []
     with open(gsm8k_path, 'r') as f:
@@ -308,17 +318,35 @@ def run_single_model_evaluation(task_name, gsm8k_path, output_dir, n_sampling, m
     print("Preparing prompts...")
     fewshot_prompt = generate_fewshot_prompt(task_config["FEWSHOT_EXAMPLES"])
     prompts, golds, questions = [], [], []
+    
     for item in tqdm(data, desc="Preparing data"):
         q = item["question"]
         gold = parse_answer_with_verify(item["answer"])
-        prompt = fewshot_prompt + f"Q: {q}\nA: Let's think step by step."
-        prompts.append(prompt)
+        
+        # Base prompt construction
+        raw_prompt = fewshot_prompt + f"Q: {q}\nA: Let's think step by step."
+        
+        if model_type == "sft":
+            # Apply chat template
+            # We treat the entire constructed few-shot prompt as the user input
+            messages = [{"role": "user", "content": raw_prompt}]
+            final_prompt = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        else:
+            final_prompt = raw_prompt
+            
+        prompts.append(final_prompt)
         golds.append(gold)
         questions.append(q)
     
     # run inference in batch, let vLLM handle batching
     print(f"Running inference on {len(prompts)} prompts...")
-    params = SamplingParams(**{**SAMPLING_PARAMS, "n": n_sampling})
+    
+    # Update stop tokens for SFT
+    current_stop = SAMPLING_PARAMS["stop"]
+    if model_type == "sft" and "<|im_end|>" not in current_stop:
+        current_stop = current_stop + ["<|im_end|>"]
+        
+    params = SamplingParams(**{**SAMPLING_PARAMS, "n": n_sampling, "stop": current_stop})
     outputs = llm.generate(prompts, params)
     
     # process results
@@ -443,14 +471,15 @@ def submit_jobs_for_all_models(args, task_config):
 cd {task_config['CD_PATH_IN_JOB_SCRIPT']}
 {task_config['CONDA_ACTIVATE_PATH']}
 which python
-export TOKENIZERS_PARALLELISM=false
-python3 -u {os.path.abspath(__file__)} \
+    export TOKENIZERS_PARALLELISM=false
+    python3 -u {os.path.abspath(__file__)} \
     --task {args.task} \
     --gsm8k_path {args.gsm8k_path} \
     --output_dir {model_out_dir} \
     --n_sampling {task_config['N_SAMPLING']} \
     --model_path {model_path} \
-    --model_name {model_name}
+    --model_name {model_name} \
+    --type {args.type}
 """)
             elif args.task == "math500":
                 # apply chat template according to type
@@ -465,7 +494,7 @@ python3 -u {os.path.abspath(__file__)} \
 #SBATCH --cpus-per-task=16
 #SBATCH --time={task_config['TIME_LIMIT'    ]}
 #SBATCH --partition={task_config['PARTITION']}
-#SBATCH --qos={task_config['QOS']}
+
 #SBATCH --mem={task_config['MEM']}
 
 cd {task_config['CD_PATH_IN_JOB_SCRIPT']}
@@ -530,30 +559,50 @@ def wait_for_jobs_completion(submitted_slurm_job_ids):
     if not submitted_slurm_job_ids:
         return
     print(f"\n⏳ waiting for all {len(submitted_slurm_job_ids)} Slurm jobs to complete...")
+    
+    user = os.environ.get('USER')
+    
     while submitted_slurm_job_ids:
-        job_ids_str = ",".join(submitted_slurm_job_ids)
         try:
-            squeue_output = subprocess.check_output(
-                f"squeue -h -j {job_ids_str} -o '%i %t'",
-                shell=True,
-                text=True
-            )
-            running_jobs = set()
-            for line in squeue_output.strip().split('\n'):
-                if line:
-                    parts = line.strip().split()
-                    if len(parts) >= 2:
-                        job_id = parts[0]
-                        status = parts[1]
-                        if status in ['R', 'PD', 'CG']:
-                            running_jobs.add(job_id)
-            submitted_slurm_job_ids = [job_id for job_id in submitted_slurm_job_ids if job_id in running_jobs]
+            # Use -u USER if available to avoid errors when specific jobs finish
+            if user:
+                cmd = f"squeue -h -u {user} -o '%i'"
+            else:
+                job_ids_str = ",".join(submitted_slurm_job_ids)
+                cmd = f"squeue -h -j {job_ids_str} -o '%i'"
+            
+            # Use subprocess.run to capture errors without throwing exception immediately
+            result = subprocess.run(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+            
+            if result.returncode != 0:
+                err_msg = result.stderr.strip()
+                # If failure is likely due to connection/slurm issues, retry
+                if "slurm_load_jobs error" in err_msg or "Socket timed out" in err_msg:
+                    print(f"⚠️ Slurm communication error: {err_msg}. Retrying...")
+                    time.sleep(30)
+                    continue
+                
+                # If using -j and error is Invalid job id, it implies jobs are done.
+                if not user and "Invalid job id" in err_msg:
+                    print("Jobs not found in queue (completed).")
+                    break
+                
+                # Unknown error, print and retry
+                print(f"⚠️ squeue failed with code {result.returncode}: {err_msg}. Retrying...")
+                time.sleep(30)
+                continue
+
+            running_ids = set(result.stdout.strip().split())
+            submitted_slurm_job_ids = [jid for jid in submitted_slurm_job_ids if jid in running_ids]
+            
             if submitted_slurm_job_ids:
                 print(f"📊 {len(submitted_slurm_job_ids)} jobs still running/pending. Checking again in 30 seconds...")
                 time.sleep(30)
-        except subprocess.CalledProcessError:
-            print("All jobs appear to have completed.")
-            break
+        
+        except Exception as e:
+            print(f"⚠️ Exception in monitoring loop: {e}. Retrying...")
+            time.sleep(30)
+
     print("\n✅ All Slurm jobs have completed!")
 
 # =====================
@@ -618,11 +667,7 @@ if __name__ == "__main__":
     
     # SFT model special configuration
     if args.task == "math500" and hasattr(args, 'type') and args.type == "sft":
-        task_config["BASE_OUT"] = "/mnt/sharefs/users/haolong.jia/result/math500_pass16_sft"
-        task_config["NUM_SHOTS"] = 0  # 0-shot
-        task_config["PROMPT_TYPE"] = "qwen25"  # use qwen25 template
-        task_config["N_SAMPLING"] = 1
-        task_config["K_LIST"] = [1]
+        task_config["BASE_OUT"] = "/mnt/weka/shrd/k2m/haolong.jia/result/math500_pass64_sft"
     
     if args.submit_jobs:
         submitted_ids, models_run, models_skipped_list = submit_jobs_for_all_models(args, task_config)
@@ -640,4 +685,4 @@ if __name__ == "__main__":
     else:
         assert args.model_path is not None and args.output_dir is not None
         n_sampling = args.n_sampling if args.n_sampling is not None else task_config["N_SAMPLING"]
-        run_single_model_evaluation(args.task, args.gsm8k_path, args.output_dir, n_sampling, args.model_path, args.model_name, task_config["BASE_OUT"], overwrite=args.reforce, task_config=task_config)
+        run_single_model_evaluation(args.task, args.gsm8k_path, args.output_dir, n_sampling, args.model_path, args.model_name, task_config["BASE_OUT"], overwrite=args.reforce, task_config=task_config, model_type=args.type)

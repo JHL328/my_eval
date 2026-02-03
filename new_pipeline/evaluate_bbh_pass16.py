@@ -73,9 +73,9 @@ def main():
 
     # Set output dir based on model type
     if model_type == "sft":
-        output_dir = "/mnt/sharefs/users/haolong.jia/result/bbh_pass16_sft"
+        output_dir = "/mnt/weka/shrd/k2m/haolong.jia/result/bbh_pass16_sft"
     else:
-        output_dir = "/mnt/sharefs/users/haolong.jia/result/bbh_pass16"
+        output_dir = "/mnt/weka/shrd/k2m/haolong.jia/result/bbh_pass16"
     os.makedirs(output_dir, exist_ok=True)
 
     model_map = get_model_map_by_type(model_type)
@@ -88,8 +88,7 @@ def main():
     dataset = load_dataset(
         "lukaemon/bbh",
         task,
-        cache_dir="/mnt/sharefs/users/haolong.jia/eval_data",
-        trust_remote_code=True
+        cache_dir="/mnt/weka/shrd/k2m/haolong.jia/eval_data"
     )
     data = dataset['test'].select(range(idx_start, idx_end))
     print(type(data), data[:2])
@@ -100,7 +99,7 @@ def main():
     # For SFT model, use chat template
     if model_type == "sft":
         from transformers import AutoTokenizer
-        tokenizer = AutoTokenizer.from_pretrained(model_path)
+        tokenizer = AutoTokenizer.from_pretrained(model_path, trust_remote_code=True)
         
         # System prompt to guide the model to solve logical reasoning problems
         system_prompt = """You are a helpful assistant that solves logical reasoning problems step by step. When given a problem: 1. Think through the solution systematically 2. Show your reasoning process clearly 3. remember, must end with a clear final answer using the format: "So the answer is [your answer]". Note: there maybe some options provided in the problem, for example, (A) (B) (C) (D) OR Yes/No OR valid/invalid, You should keep the same format as the options, format like this: "So the answer is (A)" to help parse the answer. Remember to be precise and logical in your reasoning.
@@ -128,7 +127,7 @@ def main():
     max_retries = 10
     for attempt in range(max_retries):
         try:
-            llm = LLM(model=model_path, gpu_memory_utilization=0.95, tensor_parallel_size=options.tp_size, enable_prefix_caching=True, dtype="auto")
+            llm = LLM(model=model_path, gpu_memory_utilization=0.95, tensor_parallel_size=options.tp_size, enable_prefix_caching=True, dtype="auto", trust_remote_code=True)
             break
         except Exception as e:
             print(f"Attempt {attempt + 1} to load model failed: {e}")

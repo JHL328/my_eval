@@ -1,16 +1,19 @@
 import logging
 import math
+import os
 import random
 import re
 import string
 from collections.abc import Iterable
-from typing import List, Optional, Union
+from typing import Callable, List, Optional, Sequence, TypeVar
 
 import numpy as np
 import sacrebleu
 
 from lm_eval.api.registry import register_aggregation, register_metric
 
+
+T = TypeVar("T")
 
 eval_logger = logging.getLogger(__name__)
 
@@ -31,11 +34,6 @@ def nanmean(arr):
 @register_aggregation("mean")
 def mean(arr):
     return sum(arr) / len(arr)
-
-
-@register_aggregation("harmonic")
-def harmonic(arr):
-    return len(arr) / (sum([1 / (val + 0.01) for val in arr]))
 
 
 @register_aggregation("median")
@@ -181,6 +179,16 @@ def acc_mutual_info_fn(items):  # This is a passthrough function
     return items
 
 
+@register_metric(
+    metric="acc_bytes",
+    higher_is_better=True,
+    output_type=["loglikelihood", "multiple_choice"],
+    aggregation="mean",
+)
+def acc_bytes_fn(items):  # This is a passthrough function
+    return items
+
+
 ### the code used in the `exact_match_hf_evaluate` function is ported from
 ### https://github.com/huggingface/evaluate/blob/main/metrics/exact_match/exact_match.py
 ### which is under the apache license.
@@ -246,60 +254,6 @@ def exact_match_hf_evaluate(
 def exact_match_fn(**kwargs):
     return exact_match_hf_evaluate(**kwargs)
 
-@register_metric(
-    metric="pass@k",            # use this to call the metric in YAML
-    higher_is_better=True,
-    # likelihood_required=False,  # only process generated content
-    aggregation="mean",         # harness automatically averages over samples
-    output_type="generate_until"  # for generate / MC tasks
-) 
-def pass_at_k(
-    *pos_args,                           # match the fallback position arguments
-    references: Optional[List[str]] = None,
-    predictions: Optional[List[Union[str, List[str]]]] = None,
-    args: Optional[dict] = None,        # YAML will pass {...}
-    k: int = 16,                        # if args is empty, use default 16
-    ignore_case: bool = False,
-    ignore_punctuation: bool = False,
-    regexes_to_ignore: Optional[List[str]] = None,
-    **_,
-) -> float:
-    """
-    Parameters
-    ----------
-    references
-        List[str]; len==1 reference answer.
-    predictions
-        - for `repeats` →   [pred_1, pred_2, ...]  (length >= k)
-        - for `repeats` → [[pred_1, pred_2, ...]]
-        both formats should be compatible.
-    k
-        k in pass@k; in YAML `args:{k: ...}` overwrite.
-    other kwargs
-        same as exact_match.
-    """
-    gold = references[0].strip()
-
-    # compatible with two predictions structures
-    if len(predictions) == 1 and isinstance(predictions[0], list):
-        preds = predictions[0]
-    else:
-        preds = predictions
-
-    # helper same as official exact_match
-    def _is_correct(p: str) -> bool:
-        return bool(
-            exact_match_hf_evaluate(
-                predictions=[p.strip()],
-                references=[gold],
-                ignore_case=ignore_case,
-                ignore_punctuation=ignore_punctuation,
-                regexes_to_ignore=regexes_to_ignore or [],
-            )["exact_match"]
-        )
-
-    return {"pass@k": float(any(_is_correct(p) for p in preds[:k]))}
-
 
 @register_metric(
     metric="perplexity",
@@ -308,6 +262,16 @@ def pass_at_k(
     aggregation="perplexity",
 )
 def perplexity_fn(items):  # This is a passthrough function
+    return items
+
+
+@register_metric(
+    metric="likelihood",
+    higher_is_better=True,
+    output_type="multiple_choice",
+    aggregation="mean",
+)
+def likelihood_fn(items):  # This is a passthrough function
     return items
 
 
@@ -346,7 +310,7 @@ def pop_stddev(arr):
     return math.sqrt(sum([(x - mu) ** 2 for x in arr]) / len(arr))
 
 
-def sample_stddev(arr):
+def sample_stddev(arr: Sequence[T]) -> float:
     mu = mean(arr)
     return math.sqrt(sum([(x - mu) ** 2 for x in arr]) / (len(arr) - 1))
 
@@ -508,11 +472,16 @@ def _sacreformat(refs, preds):
 
 
 class _bootstrap_internal:
-    def __init__(self, f, n) -> None:
+    """
+    Pool worker: `(i, xs)` → `n` bootstrap replicates
+    of `f(xs)`using a RNG seeded with `i`.
+    """
+
+    def __init__(self, f: Callable[[Sequence[T]], float], n: int) -> None:
         self.f = f
         self.n = n
 
-    def __call__(self, v):
+    def __call__(self, v: tuple[int, Sequence[T]]) -> list[float]:
         i, xs = v
         rnd = random.Random()
         rnd.seed(i)
@@ -522,36 +491,79 @@ class _bootstrap_internal:
         return res
 
 
-def bootstrap_stderr(f, xs, iters):
-    import multiprocessing as mp
-
-    pool = mp.Pool(mp.cpu_count())
-    # this gives a biased estimate of the stderr (i.e w/ the mean, it gives something
-    # equivalent to stderr calculated without Bessel's correction in the stddev.
-    # Unfortunately, I haven't been able to figure out what the right correction is
-    # to make the bootstrap unbiased - i considered multiplying by sqrt(n/(n-1)) but
-    # that would be ad-hoc and I can't prove that that would actually be an unbiased estimator)
-    # Thankfully, shouldn't matter because our samples are pretty big usually anyways
+def _bootstrap_internal_no_mp(
+    f: Callable[[Sequence[T]], float], xs: Sequence[T], iters: int
+) -> list[float]:
+    """
+    Single-process fallback: compute `iters` bootstrap replicates
+    of statistic`f(xs)`, chunked (≤ 1000 draws).
+    """
     res = []
     chunk_size = min(1000, iters)
     from tqdm import tqdm
 
-    print("bootstrapping for stddev:", f.__name__)
-    for bootstrap in tqdm(
-        pool.imap(
-            _bootstrap_internal(f, chunk_size),
-            [(i, xs) for i in range(iters // chunk_size)],
-        ),
-        total=iters // chunk_size,
-    ):
-        # sample w replacement
-        res.extend(bootstrap)
+    print(f"bootstrapping for stddev: {f.__name__}")
 
-    pool.close()
+    # A single loop replaces the multiprocessing pool.
+    for i in tqdm(range(iters // chunk_size)):
+        rnd = random.Random(i)
+        for _ in range(chunk_size):
+            res.append(f(rnd.choices(xs, k=len(xs))))
+
+    return res
+
+
+def bootstrap_stderr(
+    f: Callable[[Sequence[T]], float], xs: Sequence[T], iters: int
+) -> float:
+    """
+    Bootstrap estimate of the standard error of statistic `f(xs)`
+    using up to `iters` resamples, chunked (≤ 1000 draws)
+
+    Executes in parallel unless the env-var `DISABLE_MULTIPROC` is set;
+    """
+    if not os.getenv("DISABLE_MULTIPROC"):
+        import multiprocessing as mp
+
+        # this gives a biased estimate of the stderr (i.e w/ the mean, it gives something
+        # equivalent to stderr calculated without Bessel's correction in the stddev.
+        # Unfortunately, I haven't been able to figure out what the right correction is
+        # to make the bootstrap unbiased - i considered multiplying by sqrt(n/(n-1)) but
+        # that would be ad-hoc and I can't prove that that would actually be an unbiased estimator)
+        # Thankfully, shouldn't matter because our samples are pretty big usually anyways
+        res = []
+        chunk_size = min(1000, iters)
+        from tqdm import tqdm
+
+        print("bootstrapping for stddev:", f.__name__)
+        with mp.Pool(mp.cpu_count()) as pool:
+            for bootstrap in tqdm(
+                pool.imap(
+                    _bootstrap_internal(f, chunk_size),
+                    [(i, xs) for i in range(iters // chunk_size)],
+                ),
+                total=iters // chunk_size,
+            ):
+                # sample w replacement
+                res.extend(bootstrap)
+    else:
+        res = _bootstrap_internal_no_mp(f, xs, iters)
+
     return sample_stddev(res)
 
 
-def stderr_for_metric(metric, bootstrap_iters: int):
+def stderr_for_metric(
+    metric: Callable[[Sequence[T]], float], bootstrap_iters: int
+) -> Optional[Callable[[Sequence[T]], float]]:
+    """
+    Return a function that estimates the standard error of `metric(xs)`.
+
+    * If `bootstrap_iters > 0` and the metric is in the pre-approved
+      bootstrappable list, use `bootstrap_stderr` with that many draws.
+    * If the metric has a closed-form SE (e.g. `mean`, `acc_all`), use it.
+    * Otherwise, return `None`.
+    """
+
     if bootstrap_iters <= 0:
         # return no function (don't compute stderr) if bootstrap iters = 0
         return None
@@ -635,128 +647,3 @@ def aggregate_subtask_metrics(metrics, sizes, weight_by_size=True):
     assert len(metrics) == len(sizes)
 
     return sum([metric * size for metric, size in zip(metrics, sizes)]) / sum(sizes)
-
-
-def aggregate_harmonic_subtask_metrics(metrics, sizes, weight_by_size=True):
-    if not weight_by_size:
-        sizes = [1] * len(sizes)
-    assert len(metrics) == len(sizes)
-    return sum(sizes) / (sum([size / (val + 0.01) for size, val in zip(sizes, metrics)]))
-
-
-@register_metric(
-    metric="bigbench_extrahard",
-    higher_is_better=True,
-    output_type="loglikelihood",
-    aggregation="mean",
-)
-def bbeh_accuracy(predictions, references):
-
-    """Evaluation functions for BigBench Extra Hard."""
-    def strip_latex(response: str) -> str:
-        if response.startswith("$") and response.endswith("$"):
-            response = response[1:-1]
-        if "boxed{" in response and response.endswith("}"):
-            response = response[0:-1].split("boxed{")[1]
-        if "text{" in response and response.endswith("}"):
-            response = response[0:-1].split("text{")[1]
-        if "texttt{" in response and response.endswith("}"):
-            response = response[0:-1].split("texttt{")[1]
-        return response
-
-    def extract_answer(sample: str) -> str:
-        """Extracts the final answer from the sample."""
-        answer_prefixes = [
-            "</think>",
-            "The answer is:",
-            "The final answer is: ",
-            "The correct answer is:",
-            "The correct answer is",
-            "is:\n",
-            "The answer is ",
-            "**Answer:**",
-            "**Final Answer:**",
-            "**option ",
-            "Answer:",
-            "boxed{"
-        ]
-        answer = sample
-        for answer_prefix in answer_prefixes:
-            if answer_prefix.lower() in answer.lower():
-                answer = answer.split(answer_prefix)[-1].strip()
-            if answer.endswith("."):
-                answer = answer[:-1]
-        return strip_latex(answer)
-
-    def fuzzy_match(prediction: str, reference: str) -> bool:
-        import copy
-        if not prediction: return False
-        prediction = prediction.strip()
-        reference = reference.strip()
-        import re
-        if "**" in prediction:
-            for m in re.finditer(r"\*\*(.*)\*\*", prediction):
-                if len(m.groups()) > 1 and  len(m[1]) < len(prediction) and fuzzy_match(m[1], reference):
-                    return True
-        """Fuzzy match function for BigBench Extra Hard."""
-        if prediction == reference:
-            return True
-        # (a) vs a
-        if len(prediction) == 3 and prediction[0] == "(" and prediction[2] == ")":
-            return prediction[1] == reference
-        if len(reference) == 3 and reference[0] == "(" and reference[2] == ")":
-            if len(prediction) == 1 or len(prediction) == 2 and prediction[1] == ")":
-                return reference[1] == prediction[0]
-            elif prediction[0] == reference[1] and (len(prediction) == 1 or not prediction[1].isalnum()):
-                return True
-
-        # Numbers
-        try:
-            if float(prediction) == float(reference):
-                return True
-        except ValueError:
-            pass
-
-        # quote issues
-        if prediction.replace("'", "") == reference.replace("'", ""):
-            return True
-
-        # Bracket issues
-        if f"[{reference}]" == prediction or f"[{prediction}]" == reference:
-            return True
-        # Question mark issues
-        if m := re.match(r"\\text{((\w|\s)*)}", prediction):
-            if len(m.groups()) > 1:
-                inner = m[1]
-                if inner.lower() == reference.lower():
-                    return True
-        if prediction.endswith("?") and prediction[:-1] == reference:
-            return True
-        if prediction.lower().startswith(reference.lower()) or reference.lower().startswith(prediction.lower()):
-            return True
-        if re.sub(r"[^a-z0-9]", "", prediction.lower()) == re.sub(r"[^a-z0-9]", "", reference.lower()):
-            return True
-        return False 
-
-    def preprocess_sample(sample: str) -> str:
-        prediction = extract_answer(sample.strip()).lower()
-        prediction = prediction.replace(", ", ",")
-        return prediction
-
-    def preprocess_reference(reference: str) -> str:
-        reference = reference.strip().lower()
-        reference = reference.replace(", ", ",")
-        return reference
-
-    def evaluate_correctness(sample: str, reference: str) -> bool:
-        prediction = preprocess_sample(sample)
-        reference = preprocess_reference(reference)
-        return fuzzy_match(prediction, reference)
-
-    correct = 0
-    total = 0
-    for prediction, reference in zip(predictions, references):
-        total += 1
-        if evaluate_correctness(prediction, reference):
-            correct += 1
-    return correct / total

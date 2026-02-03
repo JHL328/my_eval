@@ -55,7 +55,8 @@
 
 cd /mnt/weka/home/haolong.jia/eval/RL-eval || { echo "Failed to change directory"; exit 1; }
 
-source /mnt/weka/home/haolong.jia/miniconda3/bin/activate harness-eval
+# source /mnt/weka/home/haolong.jia/miniconda3/bin/activate harness-eval
+source /mnt/weka/home/haolong.jia/miniconda3/bin/activate base
 
 # --- 优化参数解析，动态生成 python 日志文件名 ---
 TASK_NAME="default_task"
@@ -91,27 +92,27 @@ echo "Running evaluation for task: ${TASK_NAME}"
 # set output directory based on TASK_NAME and MODEL_TYPE
 if [[ "$TASK_NAME" == "mmlu_flan_cot_fewshot_pass16" ]]; then
     if [[ "$MODEL_TYPE" == "sft" ]]; then
-        OUTPUT_DIR="/mnt/sharefs/users/haolong.jia/result/mmlu_flan_pass16_sft"
+        OUTPUT_DIR="/mnt/weka/shrd/k2m/haolong.jia/result/mmlu_flan_pass16_sft"
     else
-        OUTPUT_DIR="/mnt/sharefs/users/haolong.jia/result/mmlu_flan_pass16"
+        OUTPUT_DIR="/mnt/weka/shrd/k2m/haolong.jia/result/mmlu_flan_pass16"
     fi
 elif [[ "$TASK_NAME" == "mmlu_pro_pass16" ]]; then
     if [[ "$MODEL_TYPE" == "sft" ]]; then
-        OUTPUT_DIR="/mnt/sharefs/users/haolong.jia/result/mmlu_pro_pass16_sft"
+        OUTPUT_DIR="/mnt/weka/shrd/k2m/haolong.jia/result/mmlu_pro_pass16_sft"
     else
-        OUTPUT_DIR="/mnt/sharefs/users/haolong.jia/result/mmlu_pro_pass16"
+        OUTPUT_DIR="/mnt/weka/shrd/k2m/haolong.jia/result/mmlu_pro_pass16"
     fi
 elif [[ "$TASK_NAME" == "bbh_pass16" ]]; then
     if [[ "$MODEL_TYPE" == "sft" ]]; then
-        OUTPUT_DIR="/mnt/sharefs/users/haolong.jia/result/bbh_pass16_sft"
+        OUTPUT_DIR="/mnt/weka/shrd/k2m/haolong.jia/result/bbh_pass16_sft"
     else
-        OUTPUT_DIR="/mnt/sharefs/users/haolong.jia/result/bbh_pass16"
+        OUTPUT_DIR="/mnt/weka/shrd/k2m/haolong.jia/result/bbh_pass16"
     fi
 elif [[ "$TASK_NAME" == "mmlu" ]]; then
     if [[ "$MODEL_TYPE" == "sft" ]]; then
-        OUTPUT_DIR="/mnt/sharefs/users/haolong.jia/result/mmlu_sft"
+        OUTPUT_DIR="/mnt/weka/shrd/k2m/haolong.jia/result/mmlu_sft"
     else
-        OUTPUT_DIR="/mnt/sharefs/users/haolong.jia/result/mmlu"
+        OUTPUT_DIR="/mnt/weka/shrd/k2m/haolong.jia/result/mmlu"
     fi
 else
     echo "Error: Unknown task name '$TASK_NAME' for setting OUTPUT_DIR in evaluate.sh."

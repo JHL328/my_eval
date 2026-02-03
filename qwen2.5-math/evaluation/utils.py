@@ -234,7 +234,15 @@ def construct_prompt(example, data_name, args):
     if prompt_type == "tool-integrated":
         prompt_type = "tora"
 
-    prompt_temp = PROMPT_TEMPLATES[args.prompt_type]
+    if (
+        args.prompt_type == "qwen25"
+        and data_name in ["amc23", "math500", "aime24", "aime25"]
+        and getattr(args, "apply_chat_template", False)
+    ):
+        # Avoid double chat formatting when apply_chat_template is enabled.
+        prompt_temp = ("{input}", "{output}", "\n\n")
+    else:
+        prompt_temp = PROMPT_TEMPLATES[args.prompt_type]
 
     splitter = prompt_temp[2]
     input_template, output_template, splitter = (

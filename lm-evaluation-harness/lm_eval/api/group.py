@@ -1,5 +1,5 @@
 import abc
-from dataclasses import asdict, dataclass, fields
+from dataclasses import asdict, dataclass
 from inspect import getsource
 from typing import Any, Callable, List, Optional, Union
 
@@ -13,7 +13,7 @@ class AggMetricConfig(dict):
     filter_list: Optional[Union[str, list]] = "none"
 
     def __post_init__(self):
-        if not (self.aggregation == "mean" or self.aggregation == "harmonic") and not callable(self.aggregation):
+        if self.aggregation != "mean" and not callable(self.aggregation):
             raise ValueError(
                 f"Currently, 'mean' is the only pre-defined aggregation across groups' subtasks. Got '{self.aggregation}'."
             )
@@ -46,8 +46,7 @@ class GroupConfig(dict):
                 self.aggregate_metric_list = [self.aggregate_metric_list]
 
             self.aggregate_metric_list = [
-                # AggMetricConfig(**item) if isinstance(item, dict) else item
-                AggMetricConfig(**{k: v for k, v in item.items() if k in {f.name for f in fields(AggMetricConfig)}}) if isinstance(item, dict) else item
+                AggMetricConfig(**item) if isinstance(item, dict) else item
                 for item in self.aggregate_metric_list
             ]
 
