@@ -189,6 +189,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--task', type=str, default='mmlu_redux_generative', help='Task name for evaluation')
 parser.add_argument('--model-type', type=str, default='sft', choices=['base', 'sft'], help='Model type')
 args = parser.parse_args()
+eval_conda_env = os.environ.get("EVAL_CONDA_ENV", "base")
 
 task = args.task
 output_dir = f"/mnt/weka/shrd/k2m/haolong.jia/result/{task}"
@@ -224,7 +225,7 @@ SBATCH_TEMPLATE = """#!/bin/bash
 #SBATCH --mem=160G
 
 cd /mnt/weka/home/haolong.jia/eval/RL-eval
-source /mnt/weka/home/haolong.jia/miniconda3/bin/activate harness-sft
+source /mnt/weka/home/haolong.jia/miniconda3/bin/activate {eval_conda_env}
 
 {lm_eval_cmd}
 
@@ -280,7 +281,8 @@ for model_path, model_name in model_map.items():
             model_out_dir=model_out_dir,
             log_dir=log_dir,
             task=task,
-            lm_eval_cmd=lm_eval_cmd
+            lm_eval_cmd=lm_eval_cmd,
+            eval_conda_env=eval_conda_env
         ))
 
     # add the submission command to the list

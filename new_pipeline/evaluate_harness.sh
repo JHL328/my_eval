@@ -10,7 +10,8 @@
 
 cd /mnt/weka/home/haolong.jia/eval/RL-eval || { echo "❌ Failed to change directory"; exit 1; }
 
-source /mnt/weka/home/haolong.jia/miniconda3/bin/activate harness-sft
+EVAL_CONDA_ENV="${EVAL_CONDA_ENV:-base}"
+source /mnt/weka/home/haolong.jia/miniconda3/bin/activate "${EVAL_CONDA_ENV}"
 
 ORIGINAL_ARGS=("$@")
 # the task can be mmlu_redux_generative or ifeval

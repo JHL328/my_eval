@@ -86,14 +86,14 @@ SFT_MODEL_MAP = {
     ################################################################    
     ########## below are the 1p5B base with chat data models #######
     ################################################################    
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_ministerial_banjo/100135": "mix-bbq-all-sft-chat-Chat_100135",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_ministerial_banjo/114440": "mix-bbq-all-sft-chat-Chat_114440",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_ministerial_banjo/128745": "mix-bbq-all-sft-chat-Chat_128745",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_ministerial_banjo/143051": "mix-bbq-all-sft-chat-Chat_143051",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_with_allturns_diagonal_degree/100135": "mix-bbq-all-sft-chat-with-allturns-Chat_100135",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_with_allturns_diagonal_degree/114440": "mix-bbq-all-sft-chat-with-allturns-Chat_114440",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_with_allturns_diagonal_degree/128745": "mix-bbq-all-sft-chat-with-allturns-Chat_128745",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_with_allturns_diagonal_degree/143051": "mix-bbq-all-sft-chat-with-allturns-Chat_143051",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_ministerial_banjo/100135": "mix-bbq-all-sft-chat-Chat_100135",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_ministerial_banjo/114440": "mix-bbq-all-sft-chat-Chat_114440",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_ministerial_banjo/128745": "mix-bbq-all-sft-chat-Chat_128745",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_ministerial_banjo/143051": "mix-bbq-all-sft-chat-Chat_143051",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_with_allturns_diagonal_degree/100135": "mix-bbq-all-sft-chat-with-allturns-Chat_100135",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_with_allturns_diagonal_degree/114440": "mix-bbq-all-sft-chat-with-allturns-Chat_114440",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_with_allturns_diagonal_degree/128745": "mix-bbq-all-sft-chat-with-allturns-Chat_128745",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_with_allturns_diagonal_degree/143051": "mix-bbq-all-sft-chat-with-allturns-Chat_143051",
 
     ##############################################
     ########## below are the SFT models ##########
@@ -128,6 +128,11 @@ SFT_MODEL_MAP = {
     "/mnt/weka/shrd/k2m/haolong.jia/checkpoint/Qwen3-1.7B-Base": "Qwen3-1.7B-Base-Chat",
     "/mnt/weka/shrd/k2m/haolong.jia/checkpoint/Qwen2.5-1.5B": "Qwen2.5-1.5B-Base-Chat",
     "/mnt/weka/shrd/k2m/haolong.jia/checkpoint/Qwen2.5-1.5B-Instruct": "Qwen2.5-1.5B-Instruct",
+    "/mnt/weka/shrd/k2m/junlin.chen/hf_models/qwen3_0p6b": "Qwen3-0.6B",
+    # "/mnt/weka/shrd/k2m/junlin.chen/hf_models/mobilellm_pro": "mobilellm_pro",
+    "/mnt/weka/shrd/k2m/junlin.chen/hf_models/mobilellm_r1_5_950m": "mobilellm_r1_5_950m",
+    "/mnt/weka/shrd/k2m/junlin.chen/hf_models/mobilellm_r1_950m": "mobilellm_r1_950m",
+    "/mnt/weka/shrd/k2m/junlin.chen/hf_models/gemma-3-1b-it": "gemma-3-1b",
 }
 
 
@@ -135,86 +140,87 @@ Model_map = {
     ################################################################
     ########## below are the 1p5B base with chat data models #######
     ################################################################
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_no_chat_temperate_datatable/100135": "mix-bbq-all-sft-no-chat_100135",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_no_chat_temperate_datatable/114440": "mix-bbq-all-sft-no-chat_114440",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_no_chat_temperate_datatable/128745": "mix-bbq-all-sft-no-chat_128745",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_no_chat_temperate_datatable/143051": "mix-bbq-all-sft-no-chat_143051",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_no_chat_no_think_loose_polynomial/100135": "mix-bbq-all-sft-no-chat-no-think_100135",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_no_chat_no_think_loose_polynomial/114440": "mix-bbq-all-sft-no-chat-no-think_114440",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_no_chat_no_think_loose_polynomial/128745": "mix-bbq-all-sft-no-chat-no-think_128745",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_no_chat_no_think_loose_polynomial/143051": "mix-bbq-all-sft-no-chat-no-think_143051",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_ministerial_banjo/100135": "mix-bbq-all-sft-chat_100135",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_ministerial_banjo/114440": "mix-bbq-all-sft-chat_114440",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_ministerial_banjo/128745": "mix-bbq-all-sft-chat_128745",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_ministerial_banjo/143051": "mix-bbq-all-sft-chat_143051",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_with_allturns_diagonal_degree/100135": "mix-bbq-all-sft-chat-with-allturns_100135",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_with_allturns_diagonal_degree/114440": "mix-bbq-all-sft-chat-with-allturns_114440",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_with_allturns_diagonal_degree/128745": "mix-bbq-all-sft-chat-with-allturns_128745",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_with_allturns_diagonal_degree/143051": "mix-bbq-all-sft-chat-with-allturns_143051",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_no_chat_temperate_datatable/100135": "mix-bbq-all-sft-no-chat_100135",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_no_chat_temperate_datatable/114440": "mix-bbq-all-sft-no-chat_114440",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_no_chat_temperate_datatable/128745": "mix-bbq-all-sft-no-chat_128745",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_no_chat_temperate_datatable/143051": "mix-bbq-all-sft-no-chat_143051",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_no_chat_no_think_loose_polynomial/100135": "mix-bbq-all-sft-no-chat-no-think_100135",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_no_chat_no_think_loose_polynomial/114440": "mix-bbq-all-sft-no-chat-no-think_114440",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_no_chat_no_think_loose_polynomial/128745": "mix-bbq-all-sft-no-chat-no-think_128745",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_no_chat_no_think_loose_polynomial/143051": "mix-bbq-all-sft-no-chat-no-think_143051",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_ministerial_banjo/100135": "mix-bbq-all-sft-chat_100135",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_ministerial_banjo/114440": "mix-bbq-all-sft-chat_114440",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_ministerial_banjo/128745": "mix-bbq-all-sft-chat_128745",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_ministerial_banjo/143051": "mix-bbq-all-sft-chat_143051",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_with_allturns_diagonal_degree/100135": "mix-bbq-all-sft-chat-with-allturns_100135",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_with_allturns_diagonal_degree/114440": "mix-bbq-all-sft-chat-with-allturns_114440",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_with_allturns_diagonal_degree/128745": "mix-bbq-all-sft-chat-with-allturns_128745",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_sft_chat_with_allturns_diagonal_degree/143051": "mix-bbq-all-sft-chat-with-allturns_143051",
     
 
 
     #########################################################
     ########## below are the ELLM models for midtraining ####
     #########################################################
+    "/mnt/weka/shrd/k2m/mikhail.yurochkin/bbq_checkpoints/4b/checkpoint_0250000": "bbq_4b_0250000",
     # "/mnt/weka/shrd/k2m/runner/ellm/checkpoints/huggingface/checkpoint_0300000": "ellm_checkpoint_0300000",
-    "/mnt/weka/shrd/k2m/haolong.jia/xllm/checkpoint/k2mobile780M_txt360v2.2_5T_jais64k_bsz16M_seq4k_lr9e-4_cosine_wd0.05_rope128/checkpoint_0300000": "xllm_wd0.05_rope128_0300000",
+    # "/mnt/weka/shrd/k2m/haolong.jia/xllm/checkpoint/k2mobile780M_txt360v2.2_5T_jais64k_bsz16M_seq4k_lr9e-4_cosine_wd0.05_rope128/checkpoint_0300000": "xllm_wd0.05_rope128_0300000",
 
     #########################################################################
     ########## below are the 1p5b December models， new tokenizers ##########
     #########################################################################
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_nltk_booster_afraid_calculator/100135": "nltk_booster_afraid_calculator_100135",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_nltk_booster_afraid_calculator/114440": "nltk_booster_afraid_calculator_114440",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_nltk_booster_afraid_calculator/128745": "nltk_booster_afraid_calculator_128745",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_nltk_booster_afraid_calculator/143051": "nltk_booster_afraid_calculator_143051",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_solutions_with_reasoning_alternating_tomato/100135": "code_solutions_with_reasoning_alternating_tomato_100135",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_solutions_with_reasoning_alternating_tomato/114440": "code_solutions_with_reasoning_alternating_tomato_114440",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_solutions_with_reasoning_alternating_tomato/128745": "code_solutions_with_reasoning_alternating_tomato_128745",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_solutions_with_reasoning_alternating_tomato/143051": "code_solutions_with_reasoning_alternating_tomato_143051",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_solutions_no_reasoning_buoyant_sauce/100135": "code_solutions_no_reasoning_buoyant_sauce_100135",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_solutions_no_reasoning_buoyant_sauce/114440": "code_solutions_no_reasoning_buoyant_sauce_114440",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_solutions_no_reasoning_buoyant_sauce/128745": "code_solutions_no_reasoning_buoyant_sauce_128745",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_solutions_no_reasoning_buoyant_sauce/143051": "code_solutions_no_reasoning_buoyant_sauce_143051",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_mega_code_sensitive_cpu/100135": "mix-mega-code_100135",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_mega_code_sensitive_cpu/114440": "mix-mega-code_114440",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_mega_code_sensitive_cpu/128745": "mix-mega-code_128745",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_mega_code_sensitive_cpu/143051": "mix-mega-code_143051",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_prompts_all_knobs_weary_artificialneuron/100135": "mix-code-prompts-knobs_100135",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_prompts_all_knobs_weary_artificialneuron/114440": "mix-code-prompts-knobs_114440",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_prompts_all_knobs_weary_artificialneuron/128745": "mix-code-prompts-knobs_128745",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_prompts_all_knobs_weary_artificialneuron/143051": "mix-code-prompts-knobs_143051",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_vibe_test_nebulous_cookie/100135": "mix-vibe-test_100135",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_vibe_test_nebulous_cookie/114440": "mix-vibe-test_114440",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_vibe_test_nebulous_cookie/128745": "mix-vibe-test_128745",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_vibe_test_nebulous_cookie/143051": "mix-vibe-test_143051",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_bbq_all_legislative_html/100135": "mix-bbq-all-legislative-html_100135",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_bbq_all_legislative_html/114440": "mix-bbq-all-legislative-html_114440",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_bbq_all_legislative_html/128745": "mix-bbq-all-legislative-html_128745",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_bbq_all_legislative_html/143051": "mix-bbq-all-legislative-html_143051",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_math_supposed_calligraphy/100135": "mix-bbq-math-supposed-calligraphy_100135",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_math_supposed_calligraphy/114440": "mix-bbq-math-supposed-calligraphy_114440",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_math_supposed_calligraphy/128745": "mix-bbq-math-supposed-calligraphy_128745",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_math_supposed_calligraphy/143051": "mix-bbq-math-supposed-calligraphy_143051",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_sft_lacking_butterkase/100135": "mix-bbq-sft-lacking-butterkase_100135",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_sft_lacking_butterkase/114440": "mix-bbq-sft-lacking-butterkase_114440",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_sft_lacking_butterkase/128745": "mix-bbq-sft-lacking-butterkase_128745",
-    "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_sft_lacking_butterkase/143051": "mix-bbq-sft-lacking-butterkase_143051",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_nltk_booster_afraid_calculator/100135": "nltk_booster_afraid_calculator_100135",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_nltk_booster_afraid_calculator/114440": "nltk_booster_afraid_calculator_114440",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_nltk_booster_afraid_calculator/128745": "nltk_booster_afraid_calculator_128745",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_nltk_booster_afraid_calculator/143051": "nltk_booster_afraid_calculator_143051",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_solutions_with_reasoning_alternating_tomato/100135": "code_solutions_with_reasoning_alternating_tomato_100135",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_solutions_with_reasoning_alternating_tomato/114440": "code_solutions_with_reasoning_alternating_tomato_114440",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_solutions_with_reasoning_alternating_tomato/128745": "code_solutions_with_reasoning_alternating_tomato_128745",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_solutions_with_reasoning_alternating_tomato/143051": "code_solutions_with_reasoning_alternating_tomato_143051",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_solutions_no_reasoning_buoyant_sauce/100135": "code_solutions_no_reasoning_buoyant_sauce_100135",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_solutions_no_reasoning_buoyant_sauce/114440": "code_solutions_no_reasoning_buoyant_sauce_114440",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_solutions_no_reasoning_buoyant_sauce/128745": "code_solutions_no_reasoning_buoyant_sauce_128745",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_solutions_no_reasoning_buoyant_sauce/143051": "code_solutions_no_reasoning_buoyant_sauce_143051",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_mega_code_sensitive_cpu/100135": "mix-mega-code_100135",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_mega_code_sensitive_cpu/114440": "mix-mega-code_114440",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_mega_code_sensitive_cpu/128745": "mix-mega-code_128745",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_mega_code_sensitive_cpu/143051": "mix-mega-code_143051",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_prompts_all_knobs_weary_artificialneuron/100135": "mix-code-prompts-knobs_100135",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_prompts_all_knobs_weary_artificialneuron/114440": "mix-code-prompts-knobs_114440",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_prompts_all_knobs_weary_artificialneuron/128745": "mix-code-prompts-knobs_128745",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_prompts_all_knobs_weary_artificialneuron/143051": "mix-code-prompts-knobs_143051",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_vibe_test_nebulous_cookie/100135": "mix-vibe-test_100135",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_vibe_test_nebulous_cookie/114440": "mix-vibe-test_114440",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_vibe_test_nebulous_cookie/128745": "mix-vibe-test_128745",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_vibe_test_nebulous_cookie/143051": "mix-vibe-test_143051",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_bbq_all_legislative_html/100135": "mix-bbq-all-legislative-html_100135",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_bbq_all_legislative_html/114440": "mix-bbq-all-legislative-html_114440",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_bbq_all_legislative_html/128745": "mix-bbq-all-legislative-html_128745",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_bbq_all_legislative_html/143051": "mix-bbq-all-legislative-html_143051",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_math_supposed_calligraphy/100135": "mix-bbq-math-supposed-calligraphy_100135",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_math_supposed_calligraphy/114440": "mix-bbq-math-supposed-calligraphy_114440",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_math_supposed_calligraphy/128745": "mix-bbq-math-supposed-calligraphy_128745",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_math_supposed_calligraphy/143051": "mix-bbq-math-supposed-calligraphy_143051",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_sft_lacking_butterkase/100135": "mix-bbq-sft-lacking-butterkase_100135",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_sft_lacking_butterkase/114440": "mix-bbq-sft-lacking-butterkase_114440",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_sft_lacking_butterkase/128745": "mix-bbq-sft-lacking-butterkase_128745",
+    # "/mnt/weka/shrd/k2m/haolong.jia/txt360-ablations/ckpt/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_sft_lacking_butterkase/143051": "mix-bbq-sft-lacking-butterkase_143051",
     
-    ################################################################################
-    ########## below are the 1p5b November models, only last 4 checkpoints ##########
-    ################################################################################
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_dialogues_substantial_remoulade/100135": "code_dialogues_substantial_remoulade_100135",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_dialogues_substantial_remoulade/114440": "code_dialogues_substantial_remoulade_114440",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_dialogues_substantial_remoulade/128745": "code_dialogues_substantial_remoulade_128745",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_dialogues_substantial_remoulade/143051": "code_dialogues_substantial_remoulade_143051",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_thinking_imperial_shannon/100135": "code_thinking_imperial_shannon_100135",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_thinking_imperial_shannon/114440": "code_thinking_imperial_shannon_114440",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_thinking_imperial_shannon/128745": "code_thinking_imperial_shannon_128745",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_thinking_imperial_shannon/143051": "code_thinking_imperial_shannon_143051",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_math_grateful_refrain/100135": "math_grateful_refrain_100135",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_math_grateful_refrain/114440": "math_grateful_refrain_114440",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_math_grateful_refrain/128745": "math_grateful_refrain_128745",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_math_grateful_refrain/143051": "math_grateful_refrain_143051",
+    # ################################################################################
+    # ########## below are the 1p5b November models, only last 4 checkpoints ##########
+    # ################################################################################
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_dialogues_substantial_remoulade/100135": "code_dialogues_substantial_remoulade_100135",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_dialogues_substantial_remoulade/114440": "code_dialogues_substantial_remoulade_114440",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_dialogues_substantial_remoulade/128745": "code_dialogues_substantial_remoulade_128745",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_dialogues_substantial_remoulade/143051": "code_dialogues_substantial_remoulade_143051",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_thinking_imperial_shannon/100135": "code_thinking_imperial_shannon_100135",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_thinking_imperial_shannon/114440": "code_thinking_imperial_shannon_114440",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_thinking_imperial_shannon/128745": "code_thinking_imperial_shannon_128745",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_code_thinking_imperial_shannon/143051": "code_thinking_imperial_shannon_143051",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_math_grateful_refrain/100135": "math_grateful_refrain_100135",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_math_grateful_refrain/114440": "math_grateful_refrain_114440",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_math_grateful_refrain/128745": "math_grateful_refrain_128745",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint_1p5B/tokenmix_ablation_1p5B_mix_math_grateful_refrain/143051": "math_grateful_refrain_143051",
     ###############################################
     ########## below are the 7b base models #######
     ###############################################
@@ -394,14 +400,14 @@ Model_map = {
     ###################################################
     ####### below are the open source models ###########
     ####################################################
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint/Llama-3.2-3B": "Llama-3.2-3B",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint/Qwen2.5-1.5B": "Qwen2.5-1.5B",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint/SmolLM2-1.7B": "SmolLM2-1.7B",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint/Llama-3.2-1B": "Llama-3.2-1B",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint/Mistral-7B-v0.3": "Mistral-7B",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint/Qwen2.5-3B": "Qwen2.5-3B",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint/Qwen3-1.7B-Base": "Qwen3-1.7B-Base",
-    "/mnt/weka/shrd/k2m/haolong.jia/checkpoint/Qwen3-4B-Base": "Qwen3-4B-Base",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint/Llama-3.2-3B": "Llama-3.2-3B",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint/Qwen2.5-1.5B": "Qwen2.5-1.5B",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint/SmolLM2-1.7B": "SmolLM2-1.7B",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint/Llama-3.2-1B": "Llama-3.2-1B",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint/Mistral-7B-v0.3": "Mistral-7B",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint/Qwen2.5-3B": "Qwen2.5-3B",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint/Qwen3-1.7B-Base": "Qwen3-1.7B-Base",
+    # "/mnt/weka/shrd/k2m/haolong.jia/checkpoint/Qwen3-4B-Base": "Qwen3-4B-Base",
     ####################################################################
     #### below are the tokenmix ablation models with 587 bins ##########
     ####################################################################

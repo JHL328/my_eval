@@ -91,7 +91,7 @@ elif [[ "$TASK_NAME" == "humaneval" ]]; then
 ###### MATH Tasks ###########
 ##############################
 elif [[ "$TASK_NAME" == "gsm8k" ]]; then
-    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_gsm8k.sh --task gsm8k"
+    CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_gsm8k.sh --task gsm8k --type $MODEL_TYPE"
 elif [[ "$TASK_NAME" == "math500" ]]; then
     CMD="sbatch /mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline/evaluate_gsm8k.sh --task math500 --type $MODEL_TYPE"
 

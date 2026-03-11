@@ -92,7 +92,7 @@ def main():
     )
     data = dataset['test'].select(range(idx_start, idx_end))
     print(type(data), data[:2])
-
+    
     prompts = [build_prompt(fewshot, ex, model_type) for ex in data]
     targets = [build_target(ex) for ex in data]
 

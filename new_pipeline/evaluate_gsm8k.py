@@ -29,9 +29,9 @@ TASK_CONFIGS = {
         "PROMPT_TYPE": "cot",
         "GPUS_PER_TASK": 1,
         "TIME_LIMIT": "12:00:00",
-        "PARTITION": "lowprio",
-        "QOS": "lowprio",
-        "MEM": "150G",
+        "PARTITION": "main",
+        # "QOS": "lowprio",
+        "MEM": "800G",
         "FEWSHOT_EXAMPLES": [
             {"question": "There are 15 trees in the grove. Grove workers will plant trees in the grove today. After they are done, there will be 21 trees. How many trees did the grove workers plant today?", "target": "Let's think step by step. There are 15 trees originally. Then there were 21 trees after some more were planted. So there must have been 21 - 15 = 6. The answer is 6."},
             {"question": "If there are 3 cars in the parking lot and 2 more cars arrive, how many cars are in the parking lot?", "target": "Let's think step by step. There are originally 3 cars. 2 more cars arrive. 3 + 2 = 5. The answer is 5."},
@@ -42,8 +42,8 @@ TASK_CONFIGS = {
             {"question": "Michael had 58 golf balls. On tuesday, he lost 23 golf balls. On wednesday, he lost 2 more. How many golf balls did he have at the end of wednesday?", "target": "Let's think step by step. Michael started with 58 golf balls. After losing 23 on tuesday, he had 58 - 23 = 35. After losing 2 more, he had 35 - 2 = 33 golf balls. The answer is 33."},
             {"question": "Olivia has $23. She bought five bagels for $3 each. How much money does she have left?", "target": "Let's think step by step. Olivia had 23 dollars. 5 bagels for 3 dollars each will be 5 x 3 = 15 dollars. So she has 23 - 15 dollars left. 23 - 15 is 8. The answer is 8."},
         ],
-        # "CONDA_ACTIVATE_PATH": "source /mnt/weka/home/haolong.jia/miniconda3/bin/activate qwen-eval",
-        "CONDA_ACTIVATE_PATH": "source /mnt/weka/home/haolong.jia/miniconda3/bin/activate base",
+        "CONDA_ACTIVATE_PATH": "source /mnt/weka/home/haolong.jia/miniconda3/bin/activate qwen-eval",
+        # "CONDA_ACTIVATE_PATH": "source /mnt/weka/home/haolong.jia/miniconda3/bin/activate base",
         "CD_PATH_IN_JOB_SCRIPT": "/mnt/weka/home/haolong.jia/eval/RL-eval/new_pipeline",
     },
     "math500": {
@@ -59,7 +59,7 @@ TASK_CONFIGS = {
         # "PARTITION": "lowprio",
         # "QOS": "lowprio",
         "PARTITION": "main",
-        "MEM": "400G",
+        "MEM": "800G",
         "FEWSHOT_EXAMPLES": None,
         "CONDA_ACTIVATE_PATH": "source /mnt/weka/home/haolong.jia/miniconda3/bin/activate qwen-eval",
         "CD_PATH_IN_JOB_SCRIPT": "/mnt/weka/home/haolong.jia/eval/RL-eval/qwen2.5-math/evaluation",
@@ -71,7 +71,7 @@ SAMPLING_PARAMS = dict(
     top_p=0.95,
     n=16,
     max_tokens=4096,
-    stop=["Q:", "</s>", "<|im_end|>", "\n\nQ:", "\n\nHuman:", "\n\nAssistant:", "Human:", "Assistant:"],
+    stop=["</s>", "<|im_end|>"],
     seed=42,
 )
 
@@ -462,10 +462,9 @@ def submit_jobs_for_all_models(args, task_config):
 #SBATCH --error={model_out_dir}/slurm.err
 #SBATCH --gres=gpu:{task_config['GPUS_PER_TASK']}
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=16
+#SBATCH --cpus-per-task=96
 #SBATCH --time={task_config['TIME_LIMIT']}
 #SBATCH --partition={task_config['PARTITION']}
-#SBATCH --qos={task_config['QOS']}
 #SBATCH --mem={task_config['MEM']}
 
 cd {task_config['CD_PATH_IN_JOB_SCRIPT']}
