@@ -28,6 +28,9 @@ GROUP_1P5B = {
     "t30-m15-o10-r5-p5-g20-ma15": "t30-m15-o10-r5-p5-g20-ma15",
     "t50-m30-o20-r0-p0-g0-ma0": "t50-m30-o20-r0-p0-g0-ma0",
     "lonely_cone_0": "final-mix",
+    # pt-mask-ablation 1p5B base ckpts (bbq_ablations): name_<step> -> display row
+    "mix-bbq-all-mask": "mix-bbq-all-mask",
+    "mix-bbq-all-baseline": "mix-bbq-all-baseline",
 }
 
 # Combine for lookup
@@ -44,40 +47,57 @@ def generate_csv_for_subset(data_subset, output_path, size_label):
     if not data_subset:
         return
 
-    # Identify all steps
-    all_steps = set()
-    for model_data in data_subset.values():
-        all_steps.update(model_data.keys())
-    
-    sorted_steps = sorted(list(all_steps))
-    
-    # Sort models (optional, but good for consistency)
-    # Fixed order: mix-all, mix-math, mix-regmix
-    desired_order = ['mix-all', 'mix-math', 'mix-regmix']
-    
-    ordered_models = []
-    for name in desired_order:
-        if name in data_subset:
-            ordered_models.append(name)
-            
-    # Add any others found
-    for name in data_subset.keys():
-        if name not in ordered_models:
-            ordered_models.append(name)
+    # MERGE into existing CSV instead of overwriting, so rows from other mixes
+    # (e.g. mix-all, mix-bbq-all, ...) already in the file are preserved.
+    # master: model_name -> {step(int): value}; existing_order preserves row order.
+    master = {}
+    existing_order = []
+    if os.path.exists(output_path):
+        try:
+            # Read as strings so existing values are preserved verbatim (no float re-formatting),
+            # keeping the git diff to genuine additions only.
+            old = pd.read_csv(output_path, dtype=str, keep_default_na=True)
+            step_cols = [c for c in old.columns if c != 'Model']
+            for _, r in old.iterrows():
+                m = r['Model']
+                existing_order.append(m)
+                master[m] = {}
+                for c in step_cols:
+                    try:
+                        ci = int(c)
+                    except (ValueError, TypeError):
+                        continue
+                    v = r[c]
+                    if pd.notna(v) and str(v).strip() != '':
+                        master[m][ci] = v
+        except Exception as e:
+            print(f"⚠️ Could not read existing {output_path}: {e}; writing fresh.")
+            master, existing_order = {}, []
+
+    # Overlay new data (this run's models): add new rows / update specific (model, step) cells.
+    for name, step_scores in data_subset.items():
+        if name not in master:
+            master[name] = {}
+            existing_order.append(name)
+        for step, score in step_scores.items():
+            master[name][int(step)] = score
+
+    # Union of all steps across all rows, sorted numerically -> column order.
+    all_steps = sorted({s for d in master.values() for s in d.keys()})
 
     rows = []
-    for name in ordered_models:
+    for name in existing_order:
         row = {'Model': name}
-        for step in sorted_steps:
-            row[step] = data_subset[name].get(step, None)
+        for step in all_steps:
+            row[step] = master[name].get(step, None)
         rows.append(row)
-        
+
     df = pd.DataFrame(rows)
-    
+
     # Ensure directory exists
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     df.to_csv(output_path, index=False)
-    print(f"Saved {size_label} CSV to {output_path}")
+    print(f"Saved {size_label} CSV to {output_path} ({len(rows)} rows, {len(all_steps)} steps)")
 
 def main():
     parser = argparse.ArgumentParser()
@@ -92,8 +112,14 @@ def main():
     
     # Deprecated argument, but keeping it just in case, mapped to current logic if possible
     parser.add_argument('--output_dir', type=str, default=None, help='[Deprecated] Directory to save output CSVs')
-    
+
+    # Optional allowlist of display names to emit (comma-separated). Default: all matched models.
+    # Used to restrict output to specific mixes (e.g. only the bbq-ablation rows) so cumulative
+    # passk.json files don't pull in unrelated models from other studies.
+    parser.add_argument('--only', type=str, default=None, help='Comma-separated display names to include')
+
     args = parser.parse_args()
+    only_set = set(s.strip() for s in args.only.split(',')) if args.only else None
 
     if not os.path.exists(args.passk):
         print(f"Error: File {args.passk} not found.")
@@ -125,6 +151,8 @@ def main():
         
         if matched_group and args.metric in result:
             size, display_name = get_model_size_and_name(matched_group)
+            if only_set is not None and display_name not in only_set:
+                continue
             score = result[args.metric]
             
             if size == '7B':

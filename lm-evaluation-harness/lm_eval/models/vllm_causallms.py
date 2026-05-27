@@ -685,6 +685,10 @@ class VLLM(TemplateLM):
                     context_encoding_truncated.append(x)
                 # create sampling params
                 kwargs = self.modify_gen_kwargs(kwargs)
+                # drop lm-eval-only keys that newer vLLM SamplingParams rejects (e.g. max_gen_toks);
+                # max_tokens is already extracted above into max_gen_toks.
+                for _k in ("max_gen_toks", "do_sample"):
+                    kwargs.pop(_k, None)
                 sampling_params.append(
                     SamplingParams(max_tokens=max_gen_toks, stop=until, **kwargs)
                 )

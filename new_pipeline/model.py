@@ -137,6 +137,21 @@ SFT_MODEL_MAP = {
 
 
 Model_map = {
+    #####################################################################################
+    ###### below: pt-mask-ablation 1p5B base ckpts (seungwook.han) — bbq_ablations ######
+    ###### colorful_factorial -> mix-bbq-all-mask ; cyclic_reuben -> mix-bbq-all-baseline
+    #####################################################################################
+    "/mnt/weka/shrd/k2m/seungwook.han/pt-mask-ablation-ckpts/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_colorful_factorial/14305": "mix-bbq-all-mask_14305",
+    "/mnt/weka/shrd/k2m/seungwook.han/pt-mask-ablation-ckpts/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_colorful_factorial/42915": "mix-bbq-all-mask_42915",
+    "/mnt/weka/shrd/k2m/seungwook.han/pt-mask-ablation-ckpts/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_colorful_factorial/85830": "mix-bbq-all-mask_85830",
+    "/mnt/weka/shrd/k2m/seungwook.han/pt-mask-ablation-ckpts/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_colorful_factorial/114440": "mix-bbq-all-mask_114440",
+    "/mnt/weka/shrd/k2m/seungwook.han/pt-mask-ablation-ckpts/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_colorful_factorial/143051": "mix-bbq-all-mask_143051",
+    "/mnt/weka/shrd/k2m/seungwook.han/pt-mask-ablation-ckpts/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_cyclic_reuben/14305": "mix-bbq-all-baseline_14305",
+    "/mnt/weka/shrd/k2m/seungwook.han/pt-mask-ablation-ckpts/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_cyclic_reuben/42915": "mix-bbq-all-baseline_42915",
+    "/mnt/weka/shrd/k2m/seungwook.han/pt-mask-ablation-ckpts/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_cyclic_reuben/85830": "mix-bbq-all-baseline_85830",
+    "/mnt/weka/shrd/k2m/seungwook.han/pt-mask-ablation-ckpts/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_cyclic_reuben/114440": "mix-bbq-all-baseline_114440",
+    "/mnt/weka/shrd/k2m/seungwook.han/pt-mask-ablation-ckpts/tokenmix-checkpoints-1p5B/tokenmix_ablation_1p5B_mix_bbq_all_cyclic_reuben/143051": "mix-bbq-all-baseline_143051",
+
     ################################################################
     ########## below are the 1p5B base with chat data models #######
     ################################################################
@@ -162,7 +177,7 @@ Model_map = {
     #########################################################
     ########## below are the ELLM models for midtraining ####
     #########################################################
-    "/mnt/weka/shrd/k2m/mikhail.yurochkin/bbq_checkpoints/4b/checkpoint_0250000": "bbq_4b_0250000",
+    # "/mnt/weka/shrd/k2m/mikhail.yurochkin/bbq_checkpoints/4b/checkpoint_0250000": "bbq_4b_0250000",  # commented out to focus runs on pt-mask-ablation ckpts
     # "/mnt/weka/shrd/k2m/runner/ellm/checkpoints/huggingface/checkpoint_0300000": "ellm_checkpoint_0300000",
     # "/mnt/weka/shrd/k2m/haolong.jia/xllm/checkpoint/k2mobile780M_txt360v2.2_5T_jais64k_bsz16M_seq4k_lr9e-4_cosine_wd0.05_rope128/checkpoint_0300000": "xllm_wd0.05_rope128_0300000",
 

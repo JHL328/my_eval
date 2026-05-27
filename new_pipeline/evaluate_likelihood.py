@@ -15,7 +15,7 @@ parser.add_argument('--task', type=str, default='drop', help='Task name for eval
 args = parser.parse_args()
 task = args.task
 
-output_dir = f"/mnt/sharefs/users/haolong.jia/result/{task}"
+output_dir = f"/mnt/weka/shrd/k2m/haolong.jia/result/{task}"
 job_dir = os.path.join(output_dir, "job_scripts")
 log_dir = os.path.join(output_dir, "logs")
 os.makedirs(output_dir, exist_ok=True)

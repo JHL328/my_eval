@@ -33,7 +33,7 @@ parser.add_argument('--task', type=str, required=True, help='Task name: humaneva
 args = parser.parse_args()
 
 task = args.task
-output_dir = f"/mnt/sharefs/users/haolong.jia/result/{task}"
+output_dir = f"/mnt/weka/shrd/k2m/haolong.jia/result/{task}"
 log_dir = f"{output_dir}/logs"
 job_dir = f"/mnt/weka/home/haolong.jia/eval/runs/{task}_jobs"
 
@@ -286,7 +286,7 @@ def generate_passk_summary(task, models_to_update=None):
         models_to_update: Optional list of model names to update. If None, update all models.
                          If provided, only update these models and preserve others.
     """
-    output_dir = f"/mnt/sharefs/users/haolong.jia/result/{task}"
+    output_dir = f"/mnt/weka/shrd/k2m/haolong.jia/result/{task}"
     
     print(f"\n📝 Generating overall pass@k JSON files for {task}...")
     
