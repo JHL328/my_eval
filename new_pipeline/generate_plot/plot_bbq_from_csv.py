@@ -23,6 +23,32 @@ import pandas as pd
 # Models to draw thicker / on top so the new ablation lines stand out.
 HIGHLIGHT = {"mix-bbq-all-mask", "mix-bbq-all-baseline"}
 
+# Fixed color per mix so a given mix has the SAME color in every benchmark plot.
+# (Previously color was assigned by each CSV's row index, so the same mix showed
+# up blue in one plot and green in another because row order differs per table.)
+# Canonical order = union of mix names across all bbq_ablations CSVs.
+CANONICAL_MIXES = [
+    "mix-all",
+    "mix-math",
+    "mix-vibe-test",
+    "mix-bbq-all",
+    "mix-bbq-math",
+    "mix-bbq-sft",
+    "mix-bbq-all-baseline",
+    "mix-bbq-all-mask",
+]
+_TAB10 = cm.get_cmap("tab10", 10)
+COLOR_MAP = {name: _TAB10(i) for i, name in enumerate(CANONICAL_MIXES)}
+
+
+def color_for(model):
+    """Stable color keyed on model name (consistent across all plots)."""
+    if model in COLOR_MAP:
+        return COLOR_MAP[model]
+    # Deterministic fallback for any unexpected mix: hash the name into tab20.
+    fallback = cm.get_cmap("tab20", 20)
+    return fallback(hash(model) % 20)
+
 # Progression CSVs are produced by the puzzles workflow; skip them here.
 SKIP_SUFFIX = "_tokenmix_progression"
 
@@ -61,7 +87,6 @@ def plot_one(csv_path, pdf_path):
     steps_int = sorted(int(c) for c in step_cols)
 
     models = list(df["Model"])
-    cmap = cm.get_cmap("tab20", max(len(models), 1))
 
     plt.figure(figsize=(16, 7), facecolor="#f7f7f7")
     drawn = 0
@@ -82,7 +107,7 @@ def plot_one(csv_path, pdf_path):
             xs, ys,
             marker="o" if not hl else "D",
             label=model,
-            color=cmap(models.index(model)),
+            color=color_for(model),
             linewidth=3.0 if hl else 1.8,
             markersize=9 if hl else 6,
             zorder=5 if hl else 3,

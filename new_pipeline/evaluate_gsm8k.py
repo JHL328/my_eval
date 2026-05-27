@@ -345,7 +345,13 @@ def run_single_model_evaluation(task_name, gsm8k_path, output_dir, n_sampling, m
     current_stop = SAMPLING_PARAMS["stop"]
     if model_type == "sft" and "<|im_end|>" not in current_stop:
         current_stop = current_stop + ["<|im_end|>"]
-        
+    elif model_type != "sft":
+        # Base models are prompted with 8-shot "Q: ... A: ..." pairs. Without a
+        # stop at the next "Q:", the model keeps emitting fabricated Q/A pairs and
+        # the answer extractor (which takes the LAST "The answer is" match) grades
+        # a hallucinated question instead of the real one -> spuriously low scores.
+        current_stop = current_stop + ["\n\nQ:"]
+
     params = SamplingParams(**{**SAMPLING_PARAMS, "n": n_sampling, "stop": current_stop})
     outputs = llm.generate(prompts, params)
     

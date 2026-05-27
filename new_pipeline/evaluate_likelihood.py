@@ -42,9 +42,19 @@ TASK_METRIC = {
     "agieval": ("acc_norm,none", "agieval_en"),
     "openbookqa": ("acc_norm,none", "openbookqa"),
     "social_iqa": ("acc_norm,none", "social_iqa"),
-    "truthfulqa_mc2": ("acc_norm,none", "truthfulqa_mc2"),
+    # NOTE: the data-engineering bbq_ablations "truthfulqa_mc2_acc_norm" column was
+    # produced by an OLD lm-eval-harness (git bc8bb06d) that scored truthfulqa_mc2 as
+    # a generic multiple-choice task -> acc + acc_norm ~0.29. Current upstream replaced
+    # that with process_results_mc2 (proper MC2 prob-mass -> acc only ~0.45), which is
+    # NOT comparable to the existing rows. To stay comparable we run our local
+    # truthfulqa_mc2_legacy task (generic MC scoring over the mc2 choice set) and read
+    # its acc_norm,none. Verified: legacy reproduces the old Qwen2.5-1.5B 0.2925 exactly.
+    "truthfulqa_mc2": ("acc_norm,none", "truthfulqa_mc2_legacy"),
     "leaderboard_gpqa_diamond": ("acc_norm,none", "leaderboard_gpqa_diamond"),
 }
+
+# Tasks whose lm_eval task name differs from our pipeline/output dir name.
+EVAL_TASK_REMAP = {"truthfulqa_mc2": "truthfulqa_mc2_legacy"}
 
 # can adjust the resource parameters as needed
 SBATCH_TEMPLATE = """#!/bin/bash
@@ -111,12 +121,15 @@ for model_path, model_name in Model_map.items():
     # create the model output directory
     os.makedirs(model_out_dir, exist_ok=True)
     job_script = os.path.join(job_dir, f"job_{model_name}.sh")
-    
+
+    # lm_eval task to actually evaluate (may differ from our output/dir name)
+    eval_task = EVAL_TASK_REMAP.get(task, task)
+
     # build the lm_eval command
     if task == "social_iqa":
         lm_eval_cmd = f"""lm_eval --model vllm \
   --model_args pretrained={model_path},tensor_parallel_size=1,gpu_memory_utilization=0.95 \
-  --tasks {task} \
+  --tasks {eval_task} \
   --output_path {output_dir}/{model_name} \
   --batch_size auto \
   --log_samples \
@@ -125,7 +138,7 @@ for model_path, model_name in Model_map.items():
     elif task == "arc_challenge":
         lm_eval_cmd = f"""lm_eval --model vllm \
   --model_args pretrained={model_path},tensor_parallel_size=1,gpu_memory_utilization=0.95 \
-  --tasks {task} \
+  --tasks {eval_task} \
   --output_path {output_dir}/{model_name} \
   --batch_size auto \
   --log_samples \
@@ -134,7 +147,7 @@ for model_path, model_name in Model_map.items():
     elif task == "winogrande":
         lm_eval_cmd = f"""lm_eval --model vllm \
   --model_args pretrained={model_path},tensor_parallel_size=1,gpu_memory_utilization=0.95 \
-  --tasks {task} \
+  --tasks {eval_task} \
   --output_path {output_dir}/{model_name} \
   --batch_size auto \
   --log_samples \
@@ -143,7 +156,7 @@ for model_path, model_name in Model_map.items():
     elif task == "triviaqa":
         lm_eval_cmd = f"""lm_eval --model vllm \
   --model_args pretrained={model_path},tensor_parallel_size=1,gpu_memory_utilization=0.95 \
-  --tasks {task} \
+  --tasks {eval_task} \
   --output_path {output_dir}/{model_name} \
   --batch_size auto \
   --log_samples \
@@ -152,7 +165,7 @@ for model_path, model_name in Model_map.items():
     else:
         lm_eval_cmd = f"""lm_eval --model vllm \
   --model_args pretrained={model_path},tensor_parallel_size=1,gpu_memory_utilization=0.95 \
-  --tasks {task} \
+  --tasks {eval_task} \
   --output_path {output_dir}/{model_name} \
   --batch_size auto \
   --log_samples \

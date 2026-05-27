@@ -60,6 +60,9 @@ commands=(
     "python ${CSV_SCRIPT} --passk ${RESULT_DIR}/commonsense_qa/result.json --metric acc_norm,none --task commonsense_qa --output_root_7b ${ROOT_7B} --output_root_1p5b ${ROOT_1P5B} --subdir base --only mix-bbq-all-mask,mix-bbq-all-baseline"
     "python ${CSV_SCRIPT} --passk ${RESULT_DIR}/openbookqa/result.json --metric acc_norm,none --task openbookqa --output_root_7b ${ROOT_7B} --output_root_1p5b ${ROOT_1P5B} --subdir base --only mix-bbq-all-mask,mix-bbq-all-baseline"
     "python ${CSV_SCRIPT} --passk ${RESULT_DIR}/social_iqa/result.json --metric acc_norm,none --task social_iqa --output_root_7b ${ROOT_7B} --output_root_1p5b ${ROOT_1P5B} --subdir base --only mix-bbq-all-mask,mix-bbq-all-baseline"
+    # NOTE: the bbq_ablations "truthfulqa_mc2_acc_norm" column = OLD-harness generic
+    # multiple-choice acc_norm (~0.29), reproduced via our truthfulqa_mc2_legacy task.
+    # NOT the current upstream proper-MC2 prob-mass (~0.45). See evaluate_likelihood.py.
     "python ${CSV_SCRIPT} --passk ${RESULT_DIR}/truthfulqa_mc2/result.json --metric acc_norm,none --task truthfulqa_mc2 --output_root_7b ${ROOT_7B} --output_root_1p5b ${ROOT_1P5B} --subdir base --only mix-bbq-all-mask,mix-bbq-all-baseline"
 
     # --- Code ---

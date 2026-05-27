@@ -1,0 +1,21 @@
+# Legacy-style truthfulqa_mc2: scores the mc2 choice set as a generic
+# multiple-choice task (argmax -> acc + acc_norm), matching the OLD harness
+# (git bc8bb06d, version 3.0) that produced the data-engineering bbq_ablations
+# "truthfulqa_mc2_acc_norm" column (acc/acc_norm ~0.29). The current upstream
+# task replaced this with process_results_mc2 (prob-mass, acc only ~0.45),
+# which is NOT comparable to the existing rows. Use this to stay comparable.
+include: truthfulqa_mc1.yaml
+task: truthfulqa_mc2_legacy
+doc_to_target: 0
+doc_to_choice: "{{mc2_targets.choices}}"
+should_decontaminate: True
+doc_to_decontamination_query: question
+metric_list:
+  - metric: acc
+    aggregation: mean
+    higher_is_better: true
+  - metric: acc_norm
+    aggregation: mean
+    higher_is_better: true
+metadata:
+  version: 3.0
